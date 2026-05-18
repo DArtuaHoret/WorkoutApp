@@ -1,0 +1,57 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+
+# (zostaw to co masz, a poniżej dopisz)
+
+# Kotlin
+.kotlin/
+.kovenant/
+.mvk/
+
+# KSP (kluczowe dla Room + Compose)
+/kspBuild/
+/ksp-classes/
+/kspCaches/
+app/kspBuild/
+app/ksp-classes/
+app/kspCaches/
+
+# Android Studio – dodatki
+/.idea/codeStyles/
+/.idea/compiler.xml
+/.idea/gradle.xml
+/.idea/jarRepositories.xml
+/.idea/misc.xml
+/.idea/vcs.xml
+/.idea/deploymentTargetDropDown.xml
+*.hprof
+
+# Pliki tymczasowe Gradle
+.gradle/
+gradle-app.setting
+**/build/
+!**/src/**/build/
+
+# Logi i raporty
+*.log
+build/reports/
+build/outputs/
+
+# OS – dodatki
+Thumbs.db
+ehthumbs.db
+Desktop.ini

@@ -1,0 +1,54 @@
+package com.example.workoutapp.database
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.example.workoutapp.data.Exercise
+import com.example.workoutapp.data.ExerciseMuscleGroup
+import com.example.workoutapp.data.MuscleGroup
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface ExerciseDao {
+
+    // cwiki
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertExercise(exercise: Exercise)
+
+    @Update
+    suspend fun updateExercise(exercise: Exercise)
+
+    @Query("UPDATE exercises SET isActive = 0 WHERE id = :exerciseId")
+    suspend fun deleteExercise(exerciseId: Long)
+
+    @Query("SELECT * FROM exercises WHERE isActive = 1")
+    fun getActiveExercises(): Flow<List<Exercise>>
+
+    @Query("SELECT * FROM exercises WHERE id = :exerciseId")
+    fun getExerciseById(exerciseId: Long): Flow<List<Exercise>>
+
+    // grupy mies
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMuscleGroup(muscleGroup: MuscleGroup)
+
+    @Query("SELECT * FROM muscle_groups")
+    fun getAllMuscleGroups(): Flow<List<MuscleGroup>>
+
+    // cwiki + grupy mies
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertExerciseMuscleGroupCrossRef(crossRef: ExerciseMuscleGroup)
+
+    @Delete
+    suspend fun deleteExerciseMuscleGroupCrossRef(crossRef: ExerciseMuscleGroup)
+
+    // join - cwiki dla podanej grupy mies
+    @Query("""
+    	SELECT e.* FROM exercises e
+    	INNER JOIN exercise_muscle_groups emg ON e.id = emg.exerciseId
+    	WHERE emg.muscleGroupId = :muscleGroupId
+	""")
+    fun getExercisesForMuscleGroup(muscleGroupId: Long): Flow<List<Exercise>>
+}
