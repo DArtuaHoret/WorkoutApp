@@ -1,5 +1,6 @@
 package com.example.workoutapp.ui.reusableContents.Section_2
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -114,7 +118,7 @@ fun ExerciseSetCardDetailed(
                     fontWeight = FontWeight.Bold,
                 )
             }
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -175,83 +179,151 @@ private fun PreviewExerciseSetCardDetailed() {
 
 
 @Composable
-fun ExerciseDescriptionDialog(
+fun ExerciseDescriptionContent(
     initialDescription: String,
+    onSave: (String) -> Unit,
     onDismiss: () -> Unit,
-    onSave: (String) -> Unit
+    modifier: Modifier = Modifier
 ) {
     var description by remember { mutableStateOf(initialDescription) }
     var isEditing by remember { mutableStateOf(false) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = "Szczegóły", style = MaterialTheme.typography.titleLarge)
-        },
-        text = {
-            Column {
-                if (isEditing) {
-                    OutlinedTextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        label = { Text("Opis ćwiczenia") },
-                        modifier = Modifier.fillMaxWidth().height(150.dp)
-                    )
-                } else {
-                    Text(
-                        text = description.ifEmpty { "Brak opisu." },
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
+    Column(
+        modifier = modifier
+            .background(Color(0xFF1A1A1A), RoundedCornerShape(28.dp))
+            .border(BorderStroke(2.dp, Color.White), RoundedCornerShape(28.dp))
+            .padding(24.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Szczegóły",
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.White,
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Zamknij",
+                tint = Color.White,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(24.dp)
+                    .clickable { onDismiss() }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        if (isEditing) {
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text("Opis ćwiczenia") },
+                modifier = Modifier.fillMaxWidth().height(150.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.Gray
+                )
+            )
+        } else {
+            Text(
+                text = description.ifEmpty { "Brak opisu." },
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color(0xFFE0E0E0),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        if (!isEditing) {
+            Button(
+                onClick = { isEditing = true },
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black,
+                ),
+
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+            ) {
+                Text(
+                    text = "EDYTUJ",
+                    style = MaterialTheme.typography.titleMedium,
+
+                )
             }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                if (isEditing) {
-                    onSave(description)
-                    isEditing = false
-                } else {
-                    isEditing = true
-                }
-            }) {
-                Text(if (isEditing) "Zapisz" else "Edytuj")
-            }
-        },
-        dismissButton = {
-            if (!isEditing) {
-                TextButton(onClick = onDismiss) { Text("Zamknij") }
-            } else {
-                TextButton(onClick = { isEditing = false }) { Text("Anuluj") }
+        } else {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                TextButton(onClick = { isEditing = false }) { Text("Anuluj", color = Color.Gray) }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = { onSave(description); isEditing = false },
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)
+                ) { Text("Zapisz") }
             }
         }
-    )
+    }
 }
 
-@Preview(showBackground = true, name = "Exercise Description Dialog Preview")
+
 @Composable
-private fun PreviewExerciseDescriptionDialog() {
-    var isDialogOpen by remember { mutableStateOf(true) }
-    var currentDescription by remember { mutableStateOf("To jest przykładowy opis ćwiczenia. Kliknij 'Edytuj', aby zmienić jego treść.") }
+fun CenteredDescriptionDialog(
+    initialDescription: String,
+    onVisibleChange: (Boolean) -> Unit,
+    onSave: (String) -> Unit
+) {
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.6f))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                onVisibleChange(false)
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        ExerciseDescriptionContent(
+            initialDescription = initialDescription,
+            onSave = onSave,
+            onDismiss = { onVisibleChange(false) },
+            modifier = Modifier
+                .fillMaxWidth(0.85f)
+                .wrapContentHeight()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Centered Dialog Preview")
+@Composable
+private fun PreviewCenteredDescriptionDialog() {
+    var isDialogVisible by remember { mutableStateOf(true) }
+    var currentDescription by remember {
+        mutableStateOf("To jest tekst w wycentrowanym kontenerze z przyciemnionym tłem (overlay).")
+    }
 
     MaterialTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.LightGray.copy(alpha = 0.5f)),
-            contentAlignment = Alignment.Center
-        ) {
-            if (isDialogOpen) {
-                ExerciseDescriptionDialog(
-                    initialDescription = currentDescription,
-                    onDismiss = { isDialogOpen = false },
-                    onSave = { updatedText ->
-                        currentDescription = updatedText
-                        isDialogOpen = false
-                    }
-                )
-            } else {
-                Button(onClick = { isDialogOpen = true }) {
-                    Text("Otwórz dialog ponownie")
+        Surface(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (isDialogVisible) {
+                    CenteredDescriptionDialog(
+                        initialDescription = currentDescription,
+                        onVisibleChange = { isDialogVisible = it },
+                        onSave = { currentDescription = it }
+                    )
                 }
             }
         }
