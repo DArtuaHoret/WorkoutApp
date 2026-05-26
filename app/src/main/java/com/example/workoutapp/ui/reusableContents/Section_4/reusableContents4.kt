@@ -2,6 +2,7 @@ package com.example.workoutapp.ui.reusableContents.Section_4
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.WaterDrop
@@ -57,9 +59,6 @@ private val LabelColor    = Color.White
 private val PlaceHolderColor = Color(0xFF888888)
 
 
-
-// ─── DODAJ POSIŁEK – reusable components ───────────────────────────────────
-
 @Composable
 fun ProductCard(
     productName: String,
@@ -88,7 +87,7 @@ fun ProductCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
-            // Name + description
+
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(2.dp),
@@ -114,7 +113,7 @@ fun ProductCard(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // + button – bordered square like in ExerciseSelectItem
+
             IconButton(
                 onClick = onAddClick,
                 modifier = Modifier
@@ -137,7 +136,6 @@ fun ProductCard(
 }
 
 
-// ─── PREVIEWS ───────────────────────────────────────────────────────────────
 
 @Preview(name = "ProductCard – search field", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
@@ -223,7 +221,7 @@ private fun PreviewProductCardList() {
 //-----------------------------------------------
 //--------------------------------------------------
 
-// ─── SZCZEGÓŁY PRODUKTU ──────────────────────────────────────────────────────
+
 
 @Composable
 fun ProductDetailHeaderCard(
@@ -333,7 +331,7 @@ fun NutrientCard(
 }
 
 
-// ─── PREVIEWS ────────────────────────────────────────────────────────────────
+
 
 @Preview(name = "ProductDetailHeaderCard", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
@@ -414,7 +412,7 @@ private fun PreviewFullProductDetail() {
 }
 
 
-// ─── EDYTOWALNE WERSJE (dodawanie własnego produktu) ─────────────────────────
+
 
 @Composable
 fun EditableProductDetailHeaderCard(
@@ -547,7 +545,6 @@ fun EditableNutrientCard(
 }
 
 
-// ─── PREVIEWS ────────────────────────────────────────────────────────────────
 
 @Preview(name = "EditableProductDetailHeaderCard – empty", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
@@ -661,5 +658,138 @@ private fun PreviewFullEditableProductForm() {
                 style = ActionButtonStyle.LightFilled,
             )
         }
+    }
+}
+
+@Composable
+fun NutrientChip(
+    label: String,
+    value: String,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = label,
+            color = Color(0xFF888888),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            text = value,
+            color = Color(0xFFCCCCCC),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
+@Composable
+fun FavoriteProductItemCard(
+    productName: String,
+    productDescription: String = "",
+    kcal: String,
+    protein: String,
+    fat: String,
+    carbs: String,
+    onCardClick: () -> Unit,
+    onRemoveFavoriteClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color(0xFF1A1A1A), shape = RoundedCornerShape(14.dp))
+            .border(width = 2.dp, color = Color.White, shape = RoundedCornerShape(14.dp))
+            .clickable(onClick = onCardClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = productName,
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (productDescription.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = productDescription,
+                        color = Color(0xFF888888),
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+
+
+            IconButton(
+                onClick = onRemoveFavoriteClick,
+                modifier = Modifier.size(32.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Usuń z ulubionych",
+                    tint = Color(0xFFFF4D4D),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            NutrientChip(label = "Kcal", value = kcal)
+            NutrientChip(label = "Białko", value = "${protein}g")
+            NutrientChip(label = "Tłuszcze", value = "${fat}g")
+            NutrientChip(label = "Węgl.", value = "${carbs}g")
+        }
+    }
+}
+
+@Preview(name = "FavoriteProductItemCard – with description", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewFavoriteCardWithDesc() {
+    MaterialTheme {
+        FavoriteProductItemCard(
+            productName = "Łosoś pieczony",
+            productDescription = "Dobre źródło kwasów Omega-3",
+            kcal = "208",
+            protein = "20",
+            fat = "13",
+            carbs = "0",
+            onCardClick = {},
+            onRemoveFavoriteClick = {},
+            modifier = Modifier.padding(16.dp),
+        )
+    }
+}
+
+@Preview(name = "FavoriteProductItemCard – no description", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewFavoriteCardNoDesc() {
+    MaterialTheme {
+        FavoriteProductItemCard(
+            productName = "Jabłko",
+            productDescription = "",
+            kcal = "52",
+            protein = "0.3",
+            fat = "0.2",
+            carbs = "14",
+            onCardClick = {},
+            onRemoveFavoriteClick = {},
+            modifier = Modifier.padding(16.dp),
+        )
     }
 }

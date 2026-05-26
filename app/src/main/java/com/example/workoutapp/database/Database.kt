@@ -33,16 +33,15 @@ class Converters {
     version = 1,
     exportSchema = false
 )
-@TypeConverters(Converters::class) // Rejestracja konwertera dat
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
-    // Definiujesz tyle DAO, ile potrzebujesz
     abstract fun exerciseDao(): ExerciseDao
     abstract fun workoutTemplateDao(): WorkoutTemplateDao
     abstract fun workoutSessionDao(): WorkoutSessionDao
     abstract fun foodDao(): FoodDao
 
-    // Opcjonalnie: wzorzec Singleton dla bazy danych (DataBuilder)
+
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
