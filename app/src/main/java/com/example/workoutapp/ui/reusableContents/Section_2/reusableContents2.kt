@@ -129,7 +129,7 @@ fun ExerciseSetCardDetailed(
                 ) {
                     AdjustableRow(label = "CIĘŻAR:", value = weight, onValueChange = onWeightChange, step = 5, unit = "kg")
                     AdjustableRow(label = "POWTÓRZENIA:", value = reps, onValueChange = onRepsChange, step = 1, minValue = 1)
-                    AdjustableRow(label = "ODPOCZYNEK:", value = rest, onValueChange = onRestChange, step = 15, unit = "s")
+                    AdjustableRow(label = "CZAS:", value = rest, onValueChange = onRestChange, step = 15, unit = "s")
                 }
 
                 Spacer(modifier = Modifier.width(24.dp))
@@ -333,18 +333,21 @@ private fun PreviewCenteredDescriptionDialog() {
 
 
 @Composable
-fun RestTimer(
+fun ExerciseTimer(
+    title: String,
     initialSeconds: Int = 59,
-    onTimerFinished: () -> Unit = {}
+    initialIsRunning: Boolean = true,
+    onTimerFinished: () -> Unit = {},
+    onFinishClick: () -> Unit = {}
 ) {
     var timeLeft by remember { mutableIntStateOf(initialSeconds) }
-    var isRunning by remember { mutableStateOf(true) }
+    var isRunning by remember { mutableStateOf(initialIsRunning) }
 
     LaunchedEffect(key1 = timeLeft, key2 = isRunning) {
         if (isRunning && timeLeft > 0) {
             delay(1000L)
             timeLeft--
-        } else if (timeLeft == 0) {
+        } else if (timeLeft == 0 && isRunning) {
             isRunning = false
             onTimerFinished()
         }
@@ -359,7 +362,7 @@ fun RestTimer(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "ODPOCZYNEK",
+            text = title,
             color = Color.White,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -369,7 +372,15 @@ fun RestTimer(
         Spacer(modifier = Modifier.height(32.dp))
 
         Box(
-            modifier = Modifier.size(300.dp),
+            modifier = Modifier
+                .size(300.dp)
+                .clickable(
+                    enabled = timeLeft <= 0,
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    onFinishClick()
+                },
             contentAlignment = Alignment.Center
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
@@ -379,39 +390,52 @@ fun RestTimer(
                 )
             }
 
-            Text(
-                text = timeLeft.toString(),
-                color = Color.White,
-                fontSize = 120.sp,
-                fontWeight = FontWeight.Bold
-            )
+            if (timeLeft > 0) {
+                Text(
+                    text = timeLeft.toString(),
+                    color = Color.White,
+                    fontSize = 120.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            } else {
+                Text(
+                    text = "Skończono",
+                    color = Color.White,
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 40.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextButton(onClick = { if (timeLeft > 0) timeLeft-- }) {
-                Text("−", color = Color.White, fontSize = 60.sp)
-            }
+        if (timeLeft > 0) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 40.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = { if (timeLeft > 0) timeLeft-- }) {
+                    Text("−", color = Color.White, fontSize = 60.sp)
+                }
 
-            TextButton(onClick = { isRunning = !isRunning }) {
-                Icon(
-                    imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    contentDescription = if (isRunning) "Pauza" else "Start",
-                    tint = Color.White,
-                    modifier = Modifier.size(40.dp)
-                )
-            }
+                TextButton(onClick = { isRunning = !isRunning }) {
+                    Icon(
+                        imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        contentDescription = if (isRunning) "Pauza" else "Start",
+                        tint = Color.White,
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
 
-            TextButton(onClick = { timeLeft++ }) {
-                Text("+", color = Color.White, fontSize = 60.sp)
+                TextButton(onClick = { timeLeft++ }) {
+                    Text("+", color = Color.White, fontSize = 60.sp)
+                }
             }
+        } else {
+            Spacer(modifier = Modifier.height(64.dp))
         }
     }
 }
@@ -419,5 +443,5 @@ fun RestTimer(
 @Preview(showBackground = true)
 @Composable
 private fun PreviewRestTimer() {
-    RestTimer(initialSeconds = 59)
+    ExerciseTimer(title = "ODPOCZYNEK", initialSeconds = 59)
 }
