@@ -330,6 +330,100 @@ private fun PreviewCenteredDescriptionDialog() {
     }
 }
 
+@Preview(showBackground = true, name = "Dialog Content - Edycja")
+@Composable
+private fun PreviewExerciseDescriptionContentEditing() {
+    var currentDescription by remember {
+        mutableStateOf("To jest tekst opisu, który zaraz będziemy edytować w podglądzie.")
+    }
+
+    MaterialTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.6f))
+                .padding(20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            PreviewEditingContentWrapper(
+                initialDescription = currentDescription,
+                onSave = { currentDescription = it },
+                onDismiss = {}
+            )
+        }
+    }
+}
+
+@Composable
+private fun PreviewEditingContentWrapper(
+    initialDescription: String,
+    onSave: (String) -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var description by remember { mutableStateOf(initialDescription) }
+    val isEditing = true
+
+    Column(
+        modifier = modifier
+            .background(Color(0xFF1A1A1A), RoundedCornerShape(28.dp))
+            .border(BorderStroke(2.dp, Color.White), RoundedCornerShape(28.dp))
+            .padding(24.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Szczegóły",
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.White,
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Zamknij",
+                tint = Color.White,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(24.dp)
+                    .clickable { onDismiss() }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        OutlinedTextField(
+            value = description,
+            onValueChange = { description = it },
+            modifier = Modifier.fillMaxWidth().height(150.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.Gray,
+                unfocusedTextColor = Color.White
+            )
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = { onSave(description) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color.Black,
+            ),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+        ) {
+            Text(
+                text = "ZAPISZ",
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
+    }
+}
+
 
 
 @Composable

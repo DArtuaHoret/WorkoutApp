@@ -121,17 +121,6 @@ private fun PreviewWorkoutCalendar() {
         LocalDate.of(2026, 10, 15)
     )
 
-    val mockRestDays = setOf(
-        LocalDate.of(2026, 10, 3),
-        LocalDate.of(2026, 10, 4),
-        LocalDate.of(2026, 10, 6),
-        LocalDate.of(2026, 10, 7),
-        LocalDate.of(2026, 10, 11),
-        LocalDate.of(2026, 10, 13),
-        LocalDate.of(2026, 10, 16),
-        LocalDate.of(2026, 10, 17),
-        LocalDate.of(2026, 10, 18)
-    )
 
     MaterialTheme {
         Column(

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Timer
@@ -120,7 +121,7 @@ fun TrainingProgressCard(
                     Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
-                        text = "ZREALIZOWANO\nTRENINGÓW",
+                        text = "ZREALIZOWANO TRENINGÓW",
                         color = Color.White,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
@@ -437,6 +438,7 @@ fun CompletedWorkoutCard(
     workoutName: String,
     timeRange: String,
     icon: ImageVector,
+    isCompleted: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -468,7 +470,6 @@ fun CompletedWorkoutCard(
 
             Spacer(modifier = Modifier.width(20.dp))
 
-
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
@@ -480,9 +481,8 @@ fun CompletedWorkoutCard(
                     fontWeight = FontWeight.Bold
                 )
 
-
                 Text(
-                    text = "Zrealizowano: $timeRange",
+                    text = if (isCompleted) "Zrealizowano: $timeRange" else "Zaplanowano: $timeRange",
                     color = Color(0xFF888888),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
@@ -490,17 +490,16 @@ fun CompletedWorkoutCard(
 
                 Spacer(modifier = Modifier.height(2.dp))
 
-
                 Box(
                     modifier = Modifier
                         .background(
-                            color = Color(0xFF5E9C52),
+                            color = if (isCompleted) Color(0xFF5E9C52) else Color(0xFFD32F2F),
                             shape = RoundedCornerShape(6.dp)
                         )
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "ZREALIZOWANY",
+                        text = if (isCompleted) "ZREALIZOWANO" else "NIEZREALIZOWANO",
                         color = Color.White,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.ExtraBold
@@ -510,6 +509,7 @@ fun CompletedWorkoutCard(
         }
     }
 }
+
 
 @Preview(name = "Single CompletedWorkoutCard - Preview", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
@@ -523,7 +523,27 @@ private fun PreviewSingleCompletedWorkoutCard() {
             CompletedWorkoutCard(
                 workoutName = "GÓRA CIAŁA",
                 timeRange = "18:30 - 19:45",
-                icon = Icons.Filled.FitnessCenter
+                icon = Icons.Filled.FitnessCenter,
+                isCompleted = true
+            )
+        }
+    }
+}
+
+@Preview(name = "Single UncompletedWorkoutCard - Preview", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewSingleUncompletedWorkoutCard() {
+    MaterialTheme {
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            CompletedWorkoutCard(
+                workoutName = "NOGI",
+                timeRange = "17:00 - 18:15",
+                icon = Icons.Filled.FitnessCenter,
+                isCompleted = false
             )
         }
     }
@@ -533,25 +553,24 @@ private fun PreviewSingleCompletedWorkoutCard() {
 @Composable
 private fun PreviewCompletedWorkoutsList() {
     MaterialTheme {
-
         Column(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
             CompletedWorkoutCard(
                 workoutName = "GÓRA CIAŁA",
                 timeRange = "18:30 - 19:45",
-                icon = Icons.Default.FitnessCenter
+                icon = Icons.Default.FitnessCenter,
+                isCompleted = true
             )
-
 
             CompletedWorkoutCard(
                 workoutName = "TRENING CARDIO",
                 timeRange = "07:00 - 07:45",
-                icon = Icons.Default.DirectionsRun
+                icon = Icons.AutoMirrored.Filled.DirectionsRun,
+                isCompleted = false
             )
         }
     }
