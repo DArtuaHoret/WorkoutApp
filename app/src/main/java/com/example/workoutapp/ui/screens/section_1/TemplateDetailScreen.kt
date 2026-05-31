@@ -127,16 +127,6 @@ fun TemplateDetailScreen(
                 AddExerciseCard(onAddClick = onAddExerciseClick)
             }
 
-            // Save button
-            item {
-                Spacer(modifier = Modifier.height(4.dp))
-                ActionButton(
-                    onClick = {},
-                    label = "ZAPISZ SZABLON",
-                    icon = null,
-                    style = ActionButtonStyle.LightFilled,
-                )
-            }
         }
     }
 }
