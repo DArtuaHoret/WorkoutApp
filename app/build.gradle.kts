@@ -76,4 +76,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.icons.extended)
     implementation(libs.compose.material.icons.extended)
+    implementation(libs.wheel.picker.compose)
 }

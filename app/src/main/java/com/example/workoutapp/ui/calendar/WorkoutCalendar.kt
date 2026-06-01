@@ -20,18 +20,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.TextStyle
 import java.util.Locale
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun WorkoutCalendar(
-    selectedDate: LocalDate,
+    selectedDate: LocalDate?,
     onDateSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     workoutDays: Set<LocalDate> = emptySet()
 ) {
-    var currentYearMonth by remember { mutableStateOf(YearMonth.from(selectedDate)) }
+
+    var currentYearMonth by remember {
+        mutableStateOf(selectedDate?.let { YearMonth.from(it) } ?: YearMonth.now())
+    }
 
     val localePl = Locale.forLanguageTag("pl")
     val formatter = DateTimeFormatter.ofPattern("LLLL yyyy", localePl)
@@ -49,17 +51,19 @@ fun WorkoutCalendar(
         val prevMonth = currentYearMonth.minusMonths(1)
         val prevMonthLength = prevMonth.lengthOfMonth()
 
-        for (i in (prevMonthLength - daysFromPreviousMonth + 1)..prevMonthLength) {
-            cells.add(prevMonth.atDay(i))
-        }
-        for (i in 1..totalDaysInMonth) {
-            cells.add(currentYearMonth.atDay(i))
-        }
-        val nextMonth = currentYearMonth.plusMonths(1)
-        var nextMonthDay = 1
-        while (cells.size % 7 != 0) {
-            cells.add(nextMonth.atDay(nextMonthDay))
-            nextMonthDay++
+        if (currentYearMonth.year > 1900 && currentYearMonth.year < 2100) {
+            for (i in (prevMonthLength - daysFromPreviousMonth + 1)..prevMonthLength) {
+                cells.add(prevMonth.atDay(i))
+            }
+            for (i in 1..totalDaysInMonth) {
+                cells.add(currentYearMonth.atDay(i))
+            }
+            val nextMonth = currentYearMonth.plusMonths(1)
+            var nextMonthDay = 1
+            while (cells.size % 7 != 0) {
+                cells.add(nextMonth.atDay(nextMonthDay))
+                nextMonthDay++
+            }
         }
         cells
     }
@@ -90,13 +94,11 @@ fun WorkoutCalendar(
                     CalendarDaySlot(
                         dayNumber = date.dayOfMonth,
                         isCurrentMonth = isCurrentMonth,
-                        isSelected = date == selectedDate && isCurrentMonth,
+
+                        isSelected = (date == selectedDate && isCurrentMonth),
                         hasWorkout = workoutDays.contains(date),
-                        onClick = {
-                            if (isCurrentMonth) {
-                                onDateSelected(date)
-                            }
-                        },
+
+                        onClick = { onDateSelected(date) },
                         modifier = Modifier.weight(1f)
                     )
                 }

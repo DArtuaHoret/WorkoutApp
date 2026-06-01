@@ -1,5 +1,6 @@
 package com.example.workoutapp.ui.reusableContents.Section_3
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsRun
-import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
@@ -35,6 +35,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.window.Dialog
+import java.time.LocalDate
+import com.commandiron.wheel_picker_compose.WheelDatePicker
+import com.commandiron.wheel_picker_compose.core.WheelPickerDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material3.*
+import java.time.format.DateTimeFormatter
+
+
 
 // -----------------Anzh-----------
 @Composable
@@ -605,7 +622,168 @@ private fun PreviewWorkoutActionButtons() {
 }
 
 
+@Composable
+fun DateSelectionDialog(
+    onDismissRequest: () -> Unit,
+    onDateSelected: (LocalDate) -> Unit
+) {
+    var tempDate by remember { mutableStateOf(LocalDate.now()) }
+
+    Dialog(onDismissRequest = onDismissRequest) {
+        Card(
+            modifier = Modifier.fillMaxWidth()
+                .border(
+                    width = 2.dp,
+                    color = Color.White,
+                    shape = RoundedCornerShape(14.dp),
+                ),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Wybierz datę",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                
+                WheelDatePicker(
+                    startDate = LocalDate.now(),
+                    textColor = Color.White,
+                    selectorProperties = WheelPickerDefaults.selectorProperties(
+                        color = Color(0xFFD7DAD7).copy(alpha = 0.2f),
+                        border = BorderStroke(width = 1.dp, color = Color(0xFFFFFFFF))
+                    ),
+                    onSnappedDate = { snappedDate ->
+                        tempDate = snappedDate
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                ActionButton(
+                    onClick = {onDateSelected(tempDate)},
+                    label = "ZATWIERDŹ",
+                    icon = null,
+                    style = ActionButtonStyle.LightFilled
+                )
+            }
+        }
+    }
+}
+
+@Preview(name = "Date Selection Dialog Preview", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewDateSelectionDialog() {
+    MaterialTheme {
+        DateSelectionDialog(
+            onDismissRequest = {},
+            onDateSelected = {}
+        )
+    }
+}
 
 
+
+
+@Composable
+fun DateRangeSelector(
+    initialStartDate: LocalDate? = LocalDate.now().minusWeeks(1),
+    initialEndDate: LocalDate? = LocalDate.now(),
+    onDateRangeConfirmed: (LocalDate, LocalDate) -> Unit
+) {
+    var startDate by remember { mutableStateOf(initialStartDate) }
+    var endDate by remember { mutableStateOf(initialEndDate) }
+
+    var showStartDialog by remember { mutableStateOf(false) }
+    var showEndDialog by remember { mutableStateOf(false) }
+
+    if (showStartDialog) {
+        DateSelectionDialog(onDismissRequest = { showStartDialog = false }, onDateSelected = { startDate = it; showStartDialog = false })
+    }
+    if (showEndDialog) {
+        DateSelectionDialog(onDismissRequest = { showEndDialog = false }, onDateSelected = { endDate = it; showEndDialog = false })
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .background(color = Color(0xFF1A1A1A), shape = RoundedCornerShape(14.dp))
+            .border(
+                width = 2.dp,
+                color = Color.White,
+                shape = RoundedCornerShape(14.dp)
+            )
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "Wybierz interesujący przedział dat",
+            color = Color.White,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            DateBox(label = "Od", date = startDate, onClick = { showStartDialog = true }, modifier = Modifier.weight(1f))
+            DateBox(label = "Do", date = endDate, onClick = { showEndDialog = true }, modifier = Modifier.weight(1f))
+        }
+
+        ActionButton(
+            onClick = {
+                if (startDate != null && endDate != null) {
+                    onDateRangeConfirmed(startDate!!, endDate!!)
+                }
+            },
+            label = "ZATWIERDŹ ZAKRES",
+            icon = null,
+            style = ActionButtonStyle.LightFilled
+        )
+    }
+}
+
+@Composable
+fun DateBox(label: String, date: LocalDate?, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier = modifier
+        .border(1.dp, Color(0xFF444444), RoundedCornerShape(8.dp))
+        .clickable { onClick() }
+        .padding(12.dp)
+    ) {
+        Text(text = label, color = Color(0xFFAAAAAA), fontSize = 12.sp)
+        Text(
+            text = date?.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) ?: "Wybierz",
+            color = if (date == null) Color.Gray else Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Preview(name = "Wypełnione Daty", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+fun PreviewDateRangeSelector() {
+    MaterialTheme {
+        DateRangeSelector(onDateRangeConfirmed = { _, _ -> })
+    }
+}
+
+@Preview(name = "Puste Daty", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewDateRangeEmpty() {
+    MaterialTheme {
+        DateRangeSelector(
+            initialStartDate = null,
+            initialEndDate = null,
+            onDateRangeConfirmed = { _, _ -> }
+        )
+    }
+}
 
 
