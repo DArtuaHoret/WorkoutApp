@@ -27,13 +27,10 @@ fun TemplateListScreen(
     onCreateNewClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        containerColor = Color.Black,
-    ) { innerPadding ->
+
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .padding(horizontal = 16.dp),
         ) {
             LazyColumn(
@@ -101,5 +98,4 @@ fun TemplateListScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
         }
-    }
 }

@@ -53,16 +53,6 @@ fun WorkoutHistoryScreen(
                         letterSpacing = 0.5.sp
                     )
                 },
-                navigationIcon = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Powrót",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clickable { onBackClick() }
-                    )
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Black
                 )
