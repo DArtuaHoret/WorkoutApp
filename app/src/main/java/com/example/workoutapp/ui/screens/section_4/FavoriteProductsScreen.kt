@@ -6,15 +6,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.workoutapp.WorkoutAppViewModelProvider
 import com.example.workoutapp.ui.reusableContents.Section_4.FavoriteProductItemCard
+import com.example.workoutapp.ui.reusableContents.Section_4.LibraryTabButton
 
 data class FavoriteProductItem(
     val id: String,
@@ -26,80 +28,101 @@ data class FavoriteProductItem(
     val carbs: String,
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteProductsScreen(
-    favoriteProducts: List<FavoriteProductItem>,
+    viewModel: FavoriteProductsViewModel = viewModel(factory = WorkoutAppViewModelProvider.Factory),
     onBackClick: () -> Unit,
     onProductClick: (FavoriteProductItem) -> Unit,
-    onRemoveFavoriteClick: (FavoriteProductItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Ulubione produkty",
-                        color = Color.White,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Wróć",
-                            tint = Color.White,
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black,
-                ),
+    val uiState by viewModel.uiState.collectAsState()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+    ) {
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.offset(x = (-12).dp),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Wróć",
+                    tint = Color.White,
+                )
+            }
+            Text(
+                text = "Biblioteka",
+                color = Color.White,
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.offset(x = (-8).dp),
             )
-        },
-        containerColor = Color.Black,
-    ) { innerPadding ->
-        if (favoriteProducts.isEmpty()) {
-            // Empty state
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            LibraryTabButton(
+                label = "Ulubione",
+                selected = uiState is FavoriteProductsUiState.Favorites,
+                onClick = { viewModel.onShowFavorites() },
+                modifier = Modifier.weight(1f),
+            )
+            LibraryTabButton(
+                label = "Moje produkty",
+                selected = uiState is FavoriteProductsUiState.MyProducts,
+                onClick = { viewModel.onShowMyProducts() },
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val currentList = when (val state = uiState) {
+            is FavoriteProductsUiState.Favorites  -> state.favorites
+            is FavoriteProductsUiState.MyProducts -> state.myProducts
+        }
+
+        if (currentList.isEmpty()) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text(text = "🤍", fontSize = 48.sp)
                     Text(
-                        text = "Brak ulubionych produktów",
-                        color = Color(0xFF888888),
-                        fontSize = 16.sp,
+                        text = if (uiState is FavoriteProductsUiState.Favorites) "🤍" else "📦",
+                        fontSize = 48.sp,
                     )
                     Text(
-                        text = "Dodaj produkt do ulubionych,\nprzeglądając jego szczegóły.",
-                        color = Color(0xFF555555),
-                        fontSize = 13.sp,
+                        text = if (uiState is FavoriteProductsUiState.Favorites)
+                            "Brak ulubionych produktów"
+                        else
+                            "Brak własnych produktów",
+                        color = Color(0xFF888888),
+                        fontSize = 16.sp,
                     )
                 }
             }
         } else {
             LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(vertical = 12.dp),
+                contentPadding = PaddingValues(bottom = 16.dp),
             ) {
-                items(
-                    items = favoriteProducts,
-                    key = { it.id },
-                ) { product ->
+                items(items = currentList, key = { it.id }) { product ->
                     FavoriteProductItemCard(
                         productName = product.name,
                         productDescription = product.description,
@@ -108,12 +131,10 @@ fun FavoriteProductsScreen(
                         fat = product.fat,
                         carbs = product.carbs,
                         onCardClick = { onProductClick(product) },
-                        onRemoveFavoriteClick = { onRemoveFavoriteClick(product) },
+                        onRemoveFavoriteClick = { viewModel.onRemoveFavorite(product) },
                     )
                 }
             }
         }
     }
 }
-
-

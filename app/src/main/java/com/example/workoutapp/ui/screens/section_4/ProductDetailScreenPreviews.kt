@@ -1,5 +1,5 @@
 package com.example.workoutapp.ui.screens.section_4
-
+/*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -96,3 +96,4 @@ private fun PreviewDetailViewIsFavorite() {
         )
     }
 }
+*/

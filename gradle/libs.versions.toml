@@ -11,6 +11,8 @@ composeBom = "2026.02.01"
 room = "2.6.1"
 wheelpicker = "1.1.11"
 navigationCompose = "2.8.9"
+retrofitVersion = "2.10.0"
+moshiVersion = "1.15.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,7 +37,9 @@ compose-material-icons-extended = { group = "androidx.compose.material", name = 
 icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 wheel-picker-compose = { module = "com.github.commandiron:WheelPickerCompose", version.ref = "wheelpicker" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
-
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
+retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi",  version.ref = "retrofitVersion"  }
+moshi-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshiVersion"  }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

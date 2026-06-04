@@ -1,5 +1,6 @@
 package com.example.workoutapp.ui.reusableContents.Section_4
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,6 +23,8 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -62,7 +65,8 @@ private val PlaceHolderColor = Color(0xFF888888)
 @Composable
 fun ProductCard(
     productName: String,
-    productDescription: String = "",
+    productDescription: String,
+    onCardClick: () -> Unit,   // ← nowy
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -73,7 +77,8 @@ fun ProductCard(
                 width = 2.dp,
                 color = Color.White,
                 shape = RoundedCornerShape(14.dp),
-            ),
+            )
+            .clickable { onCardClick() },  // ← dodaj to
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF1A1A1A),
@@ -161,6 +166,7 @@ private fun PreviewProductCardSingle() {
             productName = "Jabłko",
             productDescription = "Bogate w błonnik i witaminę C",
             onAddClick = {},
+            onCardClick = {},
             modifier = Modifier.padding(16.dp),
         )
     }
@@ -200,6 +206,7 @@ private fun PreviewProductCardList() {
                     productName = name,
                     productDescription = desc,
                     onAddClick = {},
+                    onCardClick = {},
                 )
             }
 
@@ -791,5 +798,26 @@ private fun PreviewFavoriteCardNoDesc() {
             onRemoveFavoriteClick = {},
             modifier = Modifier.padding(16.dp),
         )
+    }
+}
+
+@Composable
+fun LibraryTabButton(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(40.dp),
+        shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (selected) Color.White else Color(0xFF1A1A1A),
+            contentColor   = if (selected) Color.Black else Color.White,
+        ),
+        border = if (!selected) BorderStroke(2.dp, Color.White) else null,
+    ) {
+        Text(text = label, fontSize = 13.sp, fontWeight = FontWeight.Bold)
     }
 }

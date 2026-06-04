@@ -22,11 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.workoutapp.WorkoutAppViewModelProvider
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.example.workoutapp.ui.reusableContents.Section_4.*
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.ui.Alignment
 
-// Dane produktu przekazywane przez nawigację
 data class ProductDetailArgs(
     val id: String,
     val name: String,
@@ -38,96 +41,80 @@ data class ProductDetailArgs(
 )
 
 sealed interface ProductDetailMode {
-    // Podgląd istniejącego produktu – wymagane args
     data class View(val args: ProductDetailArgs) : ProductDetailMode
-    // Tworzenie nowego produktu – pola puste, edytowalne
     data object Create : ProductDetailMode
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailScreen(
-    mode: ProductDetailMode,
-    // View mode
-    onAddToMealClick: () -> Unit = {},
+    viewModel: ProductDetailViewModel = viewModel(factory = WorkoutAppViewModelProvider.Factory),
     onBackClick: () -> Unit,
-    isFavorite: Boolean = false,               // ← NOWE
-    onFavoriteClick: () -> Unit = {},
-    // Create mode
-    productName: String = "",
-    onProductNameChange: (String) -> Unit = {},
-    productDescription: String = "",
-    onProductDescriptionChange: (String) -> Unit = {},
-    kcal: String = "",
-    onKcalChange: (String) -> Unit = {},
-    protein: String = "",
-    onProteinChange: (String) -> Unit = {},
-    fat: String = "",
-    onFatChange: (String) -> Unit = {},
-    carbs: String = "",
-    onCarbsChange: (String) -> Unit = {},
     onSaveProductClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = when (mode) {
-                            is ProductDetailMode.Create -> "Dodaj produkt"
-                            is ProductDetailMode.View   -> "Szczegóły produktu"
-                        },
-                        color = Color.White,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
+    val uiState by viewModel.uiState.collectAsState()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+    ) {
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Nagłówek z przyciskiem wstecz
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(onClick = onBackClick,  modifier = Modifier.offset(x = (-12).dp),) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Wróć",
+                    tint = Color.White,
+                )
+            }
+
+            Text(
+                text = when (uiState) {
+                    is ProductDetailUiState.Create -> "Dodaj produkt"
+                    is ProductDetailUiState.View   -> "Szczegóły produktu"
                 },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Wróć",
-                            tint = Color.White,
-                        )
-                    }
-                },
-                // ── Serduszko – tylko w trybie View ──────────────────────
-                actions = {
-                    if (mode is ProductDetailMode.View) {
-                        IconButton(onClick = onFavoriteClick) {
-                            Icon(
-                                imageVector = if (isFavorite)
-                                    Icons.Default.Favorite
-                                else
-                                    Icons.Default.FavoriteBorder,
-                                contentDescription = if (isFavorite) "Usuń z ulubionych" else "Dodaj do ulubionych",
-                                tint = if (isFavorite) Color(0xFFFF4D4D) else Color.White,
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black,
-                ),
+
+                color = Color.White,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.offset(x = (-16).dp)
             )
-        },
-        containerColor = Color.Black,
-    ) { innerPadding ->
+
+            if (uiState is ProductDetailUiState.View) {
+                Spacer(modifier = Modifier.weight(1f))
+                val viewState = uiState as ProductDetailUiState.View
+                IconButton(onClick = viewModel::onFavoriteClick) {
+                    Icon(
+                        imageVector = if (viewState.isFavorite)
+                            Icons.Default.Favorite
+                        else
+                            Icons.Default.FavoriteBorder,
+                        contentDescription = null,
+                        tint = if (viewState.isFavorite) Color(0xFFFF4D4D) else Color.White,
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Treść
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(innerPadding)               // ← respektuje wysokość TopAppBar
-                .padding(horizontal = 16.dp),
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Spacer(modifier = Modifier.height(4.dp))
-
-            when (mode) {
-
-                // ── TRYB PODGLĄDU ─────────────────────────────────────────────
-                is ProductDetailMode.View -> {
-                    val args = mode.args
+            when (val state = uiState) {
+                is ProductDetailUiState.View -> {
+                    val args = state.args
 
                     ProductDetailHeaderCard(
                         productName = args.name,
@@ -138,96 +125,65 @@ fun ProductDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        NutrientCard(
-                            label = "ENERGIA",
-                            value = "${args.kcal} KCAL",
-                            modifier = Modifier.weight(1f),
-                        ) { Text("⚡", fontSize = 22.sp) }
-
-                        NutrientCard(
-                            label = "BIAŁKO",
-                            value = "${args.protein} g",
-                            modifier = Modifier.weight(1f),
-                        ) { Text("💪", fontSize = 22.sp) }
+                        NutrientCard(label = "ENERGIA", value = "${args.kcal} KCAL", modifier = Modifier.weight(1f)) {
+                            Text("⚡", fontSize = 22.sp)
+                        }
+                        NutrientCard(label = "BIAŁKO", value = "${args.protein} g", modifier = Modifier.weight(1f)) {
+                            Text("💪", fontSize = 22.sp)
+                        }
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        NutrientCard(
-                            label = "TŁUSZCZE",
-                            value = "${args.fat} g",
-                            modifier = Modifier.weight(1f),
-                        ) { Text("🫙", fontSize = 22.sp) }
-
-                        NutrientCard(
-                            label = "WĘGLOWODANY",
-                            value = "${args.carbs} g",
-                            modifier = Modifier.weight(1f),
-                        ) { Text("🌾", fontSize = 22.sp) }
+                        NutrientCard(label = "TŁUSZCZE", value = "${args.fat} g", modifier = Modifier.weight(1f)) {
+                            Text("🫙", fontSize = 22.sp)
+                        }
+                        NutrientCard(label = "WĘGLOWODANY", value = "${args.carbs} g", modifier = Modifier.weight(1f)) {
+                            Text("🌾", fontSize = 22.sp)
+                        }
                     }
-
-                    ActionButton(
-                        onClick = onAddToMealClick,
-                        label = "DODAJ DO POSIŁKU",
-                        icon = null,
-                        style = ActionButtonStyle.LightFilled,
-                    )
                 }
 
-                // ── TRYB TWORZENIA ────────────────────────────────────────────
-                is ProductDetailMode.Create -> {
-
+                is ProductDetailUiState.Create -> {
                     EditableProductDetailHeaderCard(
-                        productName = productName,
-                        onProductNameChange = onProductNameChange,
-                        productDescription = productDescription,
-                        onProductDescriptionChange = onProductDescriptionChange,
+                        productName = state.productName,
+                        onProductNameChange = viewModel::onProductNameChange,
+                        productDescription = state.productDescription,
+                        onProductDescriptionChange = viewModel::onProductDescriptionChange,
                     )
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        EditableNutrientCard(
-                            label = "ENERGIA",
-                            value = kcal,
-                            onValueChange = onKcalChange,
-                            modifier = Modifier.weight(1f),
-                        ) { Text("⚡", fontSize = 22.sp) }
-
-                        EditableNutrientCard(
-                            label = "BIAŁKO",
-                            value = protein,
-                            onValueChange = onProteinChange,
-                            modifier = Modifier.weight(1f),
-                        ) { Text("💪", fontSize = 22.sp) }
+                        EditableNutrientCard(label = "ENERGIA", value = state.kcal, onValueChange = viewModel::onKcalChange, modifier = Modifier.weight(1f)) {
+                            Text("⚡", fontSize = 22.sp)
+                        }
+                        EditableNutrientCard(label = "BIAŁKO", value = state.protein, onValueChange = viewModel::onProteinChange, modifier = Modifier.weight(1f)) {
+                            Text("💪", fontSize = 22.sp)
+                        }
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        EditableNutrientCard(
-                            label = "TŁUSZCZE",
-                            value = fat,
-                            onValueChange = onFatChange,
-                            modifier = Modifier.weight(1f),
-                        ) { Text("🫙", fontSize = 22.sp) }
-
-                        EditableNutrientCard(
-                            label = "WĘGLOWODANY",
-                            value = carbs,
-                            onValueChange = onCarbsChange,
-                            modifier = Modifier.weight(1f),
-                        ) { Text("🌾", fontSize = 22.sp) }
+                        EditableNutrientCard(label = "TŁUSZCZE", value = state.fat, onValueChange = viewModel::onFatChange, modifier = Modifier.weight(1f)) {
+                            Text("🫙", fontSize = 22.sp)
+                        }
+                        EditableNutrientCard(label = "WĘGLOWODANY", value = state.carbs, onValueChange = viewModel::onCarbsChange, modifier = Modifier.weight(1f)) {
+                            Text("🌾", fontSize = 22.sp)
+                        }
                     }
 
                     ActionButton(
-                        onClick = onSaveProductClick,
+                        onClick = {
+                            viewModel.onSaveProductClick()
+                            onSaveProductClick()
+                        },
                         label = "ZAPISZ PRODUKT",
-                        icon = null,
                         style = ActionButtonStyle.LightFilled,
                     )
                 }

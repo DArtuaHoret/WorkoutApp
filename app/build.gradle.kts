@@ -68,9 +68,19 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.moshi)
+    ksp(libs.moshi.codegen)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation(libs.androidx.navigation.compose)
+    // ML Kit Barcode Scanning
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+
+// CameraX - potrzebny do podglądu kamery
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
     implementation(libs.androidx.compose.material.icons)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

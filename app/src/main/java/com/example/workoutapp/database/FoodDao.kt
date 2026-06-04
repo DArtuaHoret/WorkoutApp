@@ -14,21 +14,44 @@ import kotlinx.coroutines.flow.Flow
 interface FoodDao {
 
     // produkt
+//DD
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertProduct(product: FoodProduct): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertProduct(product: FoodProduct)
+    // Używane gdy API zwróciło zaktualizowane dane — przenosimy isFavorite na nowy rekord
+    @Query("SELECT * FROM food_products WHERE name = :name AND isActive = 1 LIMIT 1")
+    suspend fun findActiveByName(name: String): FoodProduct?
 
-    @Update
-    suspend fun updateProduct(product: FoodProduct)
+    @Query("""
+        SELECT * FROM food_products
+        WHERE name = :name
+        AND calories = :calories
+        AND protein = :protein
+        AND fat = :fat
+        AND carbs = :carbs
+        AND isActive = 1
+        LIMIT 1
+    """)
+    suspend fun findExactMatch(
+        name: String,
+        calories: Double,
+        protein: Double,
+        fat: Double,
+        carbs: Double,
+    ): FoodProduct?
 
-    @Query("SELECT * FROM food_products WHERE isActive = 1")
-    fun getActiveProducts(): Flow<List<FoodProduct>>
+    // Soft delete — historia w kalendarzu zostaje nienaruszona
+    @Query("UPDATE food_products SET isActive = 0 WHERE id = :productId")
+    suspend fun deactivateProduct(productId: Long)
 
-    @Query("SELECT * FROM food_products WHERE id = :productId")
-    fun getProductById(productId: Long): Flow<List<FoodProduct>>
+    @Query("UPDATE food_products SET isFavorite = :isFavorite WHERE id = :productId")
+    suspend fun setFavorite(productId: Long, isFavorite: Boolean)
 
-    @Query("SELECT * FROM food_products WHERE name LIKE '%' || :request || '%'")
-    fun searchProducts(request: String): Flow<List<FoodProduct>>
+    // Ulubione i własne — dla FavoriteProductsScreen
+    @Query("SELECT * FROM food_products WHERE (isFavorite = 1 OR isCustom = 1) AND isActive = 1")
+    fun getFavoriteAndCustomProducts(): Flow<List<FoodProduct>>
+
+
 
 
     // komponenty

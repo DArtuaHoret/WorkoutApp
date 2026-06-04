@@ -1,5 +1,5 @@
 package com.example.workoutapp.ui.screens.section_4
-
+/*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -42,4 +42,4 @@ private fun PreviewFavoriteScreenEmpty() {
         )
     }
 }
-
+*/

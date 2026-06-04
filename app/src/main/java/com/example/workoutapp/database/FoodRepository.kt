@@ -9,44 +9,79 @@ import java.util.Calendar
 import java.util.Date
 
 interface FoodRepository {
-    fun getActiveProducts(): Flow<List<FoodProduct>>
-    fun searchProducts(query: String): Flow<List<FoodProduct>>
-    fun getProductById(id: Long): Flow<List<FoodProduct>>
-    suspend fun saveProduct(product: FoodProduct)
-    suspend fun updateProduct(product: FoodProduct)
-    fun getEntriesForDate(date: Date): Flow<List<FoodEntry>>
-    suspend fun saveEntry(entry: FoodEntry)
+
+    // Produkty
+    suspend fun insertProduct(product: FoodProduct): Long
+    suspend fun findActiveByName(name: String): FoodProduct?
+    suspend fun findExactMatch(name: String, calories: Double, protein: Double, fat: Double, carbs: Double): FoodProduct?
+    suspend fun deactivateProduct(productId: Long)
+    suspend fun setFavorite(productId: Long, isFavorite: Boolean)
+    fun getFavoriteAndCustomProducts(): Flow<List<FoodProduct>>
+
+    // Wpisy
+    suspend fun insertEntry(entry: FoodEntry)
     suspend fun updateEntry(entry: FoodEntry)
     suspend fun deleteEntry(entry: FoodEntry)
-
+    fun getEntriesForDate(date: Date): Flow<List<FoodEntry>>
 }
-
 
 
 class FoodRepositoryImpl(private val foodDao: FoodDao) : FoodRepository {
 
-    override fun getActiveProducts(): Flow<List<FoodProduct>> =
-        foodDao.getActiveProducts()
+    // ── Produkty ──────────────────────────────────────────────────────────────
 
-    override fun searchProducts(query: String): Flow<List<FoodProduct>> =
-        foodDao.searchProducts(query)
-
-    override fun getProductById(id: Long): Flow<List<FoodProduct>> =
-        foodDao.getProductById(id)
-
-    override suspend fun saveProduct(product: FoodProduct) {
+    override suspend fun insertProduct(product: FoodProduct): Long =
         withContext(Dispatchers.IO) {
             foodDao.insertProduct(product)
         }
-    }
 
-    override suspend fun updateProduct(product: FoodProduct) {
+    override suspend fun findActiveByName(name: String): FoodProduct? =
         withContext(Dispatchers.IO) {
-            foodDao.updateProduct(product)
+            foodDao.findActiveByName(name)
         }
-    }
 
-    // zakres czasowy dnia
+    override suspend fun findExactMatch(
+        name: String,
+        calories: Double,
+        protein: Double,
+        fat: Double,
+        carbs: Double,
+    ): FoodProduct? =
+        withContext(Dispatchers.IO) {
+            foodDao.findExactMatch(name, calories, protein, fat, carbs)
+        }
+
+    override suspend fun deactivateProduct(productId: Long) =
+        withContext(Dispatchers.IO) {
+            foodDao.deactivateProduct(productId)
+        }
+
+    override suspend fun setFavorite(productId: Long, isFavorite: Boolean) =
+        withContext(Dispatchers.IO) {
+            foodDao.setFavorite(productId, isFavorite)
+        }
+
+    override fun getFavoriteAndCustomProducts(): Flow<List<FoodProduct>> =
+        foodDao.getFavoriteAndCustomProducts()
+
+
+    // ── Wpisy ─────────────────────────────────────────────────────────────────
+
+    override suspend fun insertEntry(entry: FoodEntry) =
+        withContext(Dispatchers.IO) {
+            foodDao.insertEntry(entry)
+        }
+
+    override suspend fun updateEntry(entry: FoodEntry) =
+        withContext(Dispatchers.IO) {
+            foodDao.updateEntry(entry)
+        }
+
+    override suspend fun deleteEntry(entry: FoodEntry) =
+        withContext(Dispatchers.IO) {
+            foodDao.deleteEntry(entry)
+        }
+
     override fun getEntriesForDate(date: Date): Flow<List<FoodEntry>> {
         val calendar = Calendar.getInstance().apply { time = date }
 
@@ -65,23 +100,5 @@ class FoodRepositoryImpl(private val foodDao: FoodDao) : FoodRepository {
         }.timeInMillis
 
         return foodDao.getEntriesForDate(startOfDay, endOfDay)
-    }
-
-    override suspend fun saveEntry(entry: FoodEntry) {
-        withContext(Dispatchers.IO) {
-            foodDao.insertEntry(entry)
-        }
-    }
-
-    override suspend fun updateEntry(entry: FoodEntry) {
-        withContext(Dispatchers.IO) {
-            foodDao.updateEntry(entry)
-        }
-    }
-
-    override suspend fun deleteEntry(entry: FoodEntry) {
-        withContext(Dispatchers.IO) {
-            foodDao.deleteEntry(entry)
-        }
     }
 }
