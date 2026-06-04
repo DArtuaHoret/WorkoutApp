@@ -1,8 +1,5 @@
 package com.example.workoutapp
 
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,24 +14,55 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
+import com.example.workoutapp.ui.screens.section_1.ExerciseDetailScreen
+import com.example.workoutapp.ui.screens.section_1.ExerciseDetailViewModel
+import com.example.workoutapp.ui.screens.section_1.ExerciseSearchScreen
+import com.example.workoutapp.ui.screens.section_1.ExerciseSearchViewModel
+import com.example.workoutapp.ui.screens.section_1.TemplateDetailScreen
+import com.example.workoutapp.ui.screens.section_1.TemplateDetailViewModel
 import com.example.workoutapp.ui.screens.section_1.TemplateListScreen
+import com.example.workoutapp.ui.screens.section_1.TemplateListViewModel
 import com.example.workoutapp.ui.screens.section_3.WorkoutHistoryScreen
 import com.example.workoutapp.ui.screens.section_4.AddMealSearchScreen
 import com.example.workoutapp.ui.screens.section_4.FavoriteProductsScreen
-import com.example.workoutapp.ui.screens.section_4.FavoriteProductsViewModel
-import com.example.workoutapp.ui.screens.section_4.ProductDetailArgs
 import com.example.workoutapp.ui.screens.section_4.ProductDetailScreen
-import com.example.workoutapp.ui.screens.section_4.ProductDetailUiState
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
 // --- Type-safe destinations ---
 sealed interface Destinations {
-    @Serializable data object Templates : Destinations
-    @Serializable data object Workout   : Destinations
-    @Serializable data object History   : Destinations
 
-    // ── Sekcja 4 – zagnieżdżony graf ─────────────────────────────────────
+    // ── Sekcja 1 – zagnieżdżony graf szablonów ───────────────────────────
+    /** Korzeń zagnieżdżonego grafu szablonów – nie jest osobnym screenem. */
+    @Serializable data object TemplatesGraph : Destinations
+
+    /** Lista szablonów – startDestination grafu szablonów. */
+    @Serializable data object Templates : Destinations
+
+    /** Podgląd / edycja pojedynczego szablonu. */
+    @Serializable data class TemplateDetail(
+        val id: String,          // pusty string oznacza nowy szablon
+        val name: String,
+    ) : Destinations
+
+    @Serializable data class ExerciseSearch(
+        val templateId: String,
+    ) : Destinations
+
+    @Serializable data class ExerciseDetail(
+        val templateId: String,
+        val exerciseId: String,
+        val exerciseName: String,
+    ) : Destinations
+
+
+    // ── Sekcja 2 ─────────────────────────────────────────────────────────
+    @Serializable data object Workout : Destinations
+
+    // ── Sekcja 3 ─────────────────────────────────────────────────────────
+    @Serializable data object History : Destinations
+
+    // ── Sekcja 4 – zagnieżdżony graf diety ───────────────────────────────
     /** Korzeń zagnieżdżonego grafu diety – nie jest osobnym screenem. */
     @Serializable data object DietGraph : Destinations
 
@@ -67,10 +95,10 @@ data class BottomNavItem(
 )
 
 val bottomNavItems = listOf(
-    BottomNavItem(Destinations.Templates, "📋", "Szablony"),
-    BottomNavItem(Destinations.Workout,   "🏋️", "Trening"),
-    BottomNavItem(Destinations.History,   "📅", "Historia"),
-    BottomNavItem(Destinations.DietGraph, "🍎", "Dieta"),
+    BottomNavItem(Destinations.TemplatesGraph, "📋", "Szablony"),
+    BottomNavItem(Destinations.Workout,        "🏋️", "Trening"),
+    BottomNavItem(Destinations.History,        "📅", "Historia"),
+    BottomNavItem(Destinations.DietGraph,      "🍎", "Dieta"),
 )
 
 @Composable
@@ -114,25 +142,117 @@ fun AppNavigation() {
 
         NavHost(
             navController = navController,
-            startDestination = Destinations.Templates,
-            modifier = Modifier
-                .padding(innerPadding)
+            startDestination = Destinations.TemplatesGraph,
+            modifier = Modifier.padding(innerPadding)
         ) {
-            composable<Destinations.Templates> {
-                TemplateListScreen(
-                    templates = emptyList(),
-                    onTemplateClick = {},
-                    onCreateNewClick = {}
-                )
+
+            // ── Zagnieżdżony graf sekcji 1 ───────────────────────────────
+            navigation<Destinations.TemplatesGraph>(
+                startDestination = Destinations.Templates,
+            ) {
+                composable<Destinations.Templates> { backStackEntry ->
+
+                    TemplateListScreen(
+                        viewModel = viewModel(
+                            viewModelStoreOwner = backStackEntry,
+                            factory = WorkoutAppViewModelProvider.Factory
+                        ),
+                        onTemplateClick = { template ->
+                            navController.navigate(
+                                Destinations.TemplateDetail(id = template.id, name = template.name)
+                            )
+                        },
+                        onCreateNewClick = {
+                            navController.navigate(
+                                Destinations.TemplateDetail(id = "", name = "")
+                            )
+                        },
+                    )
+                }
+
+
+                composable<Destinations.TemplateDetail> { backStackEntry ->
+                    TemplateDetailScreen(
+                        viewModel = viewModel(
+                            viewModelStoreOwner = backStackEntry,
+                        factory = WorkoutAppViewModelProvider.Factory
+                        ),
+                        onBackClick = { navController.popBackStack() },
+                        onAddExerciseClick = {
+                            val templateId = backStackEntry.toRoute<Destinations.TemplateDetail>().id
+                            navController.navigate(Destinations.ExerciseSearch(templateId = templateId))
+                        },
+                        onEditExercise = { exercise ->
+                            val templateId = backStackEntry.toRoute<Destinations.TemplateDetail>().id
+                            navController.navigate(
+                                Destinations.ExerciseDetail(
+                                    templateId   = templateId,
+                                    exerciseId   = exercise.id,
+                                    exerciseName = exercise.name,
+                                )
+                            )
+                        },
+                    )
+                }
+
+                composable<Destinations.ExerciseSearch> { backStackEntry ->
+                    ExerciseSearchScreen(
+                        viewModel = viewModel(
+                            viewModelStoreOwner = backStackEntry,
+                            factory = WorkoutAppViewModelProvider.Factory
+                        ),
+                        onBackClick = { navController.popBackStack() },
+                        onExerciseClick = { exercise ->
+                            val templateId = backStackEntry.toRoute<Destinations.ExerciseSearch>().templateId
+                            navController.navigate(
+                                Destinations.ExerciseDetail(
+                                    templateId   = templateId,
+                                    exerciseId   = exercise.id,
+                                    exerciseName = exercise.name,
+                                )
+                            )
+                        },
+                        onAddCustomExercise = {
+                            val templateId = backStackEntry.toRoute<Destinations.ExerciseSearch>().templateId
+                            navController.navigate(
+                                Destinations.ExerciseDetail(
+                                    templateId   = templateId,
+                                    exerciseId   = "",        // pusty = nowe ćwiczenie
+                                    exerciseName = "",
+                                )
+                            )
+                        },
+                    )
+                }
+
+
+                composable<Destinations.ExerciseDetail> { backStackEntry ->
+                    ExerciseDetailScreen(
+                        viewModel = viewModel(
+                            viewModelStoreOwner = backStackEntry,
+                            factory = WorkoutAppViewModelProvider.Factory
+                        ),
+                        onBackClick = { navController.popBackStack() },
+                        onSaveClick = {
+                            navController.popBackStack<Destinations.TemplateDetail>(inclusive = false)
+                        },
+                    )
+                }
+
+
             }
+
+            // ── Sekcja 2 ─────────────────────────────────────────────────
             composable<Destinations.Workout> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Trening - wkrótce", color = Color.White)
+                    Text("Trening – wkrótce", color = Color.White)
                 }
             }
+
+            // ── Sekcja 3 ─────────────────────────────────────────────────
             composable<Destinations.History> {
                 WorkoutHistoryScreen(
                     selectedDate = selectedDate,
@@ -153,7 +273,7 @@ fun AppNavigation() {
                     AddMealSearchScreen(
                         viewModel = viewModel(
                             viewModelStoreOwner = backStackEntry,
-                            factory = WorkoutAppViewModelProvider.Factory   // ← dodaj fabrykę
+                            factory = WorkoutAppViewModelProvider.Factory
                         ),
                         onProductCardClick = { product ->
                             navController.navigate(
@@ -168,9 +288,7 @@ fun AppNavigation() {
                                 )
                             )
                         },
-                        onProductQuickAddClick = { product ->      // klik w + → np. dodaj bezpośrednio do posiłku
-                            // TODO: logika szybkiego dodania
-                        },
+                        onProductQuickAddClick = { /* TODO */ },
                         onScanBarcodeClick = {},
                         onAddCustomProductClick = {
                             navController.navigate(Destinations.ProductCreate)
@@ -180,6 +298,7 @@ fun AppNavigation() {
                         },
                     )
                 }
+
                 composable<Destinations.ProductDetail> { backStackEntry ->
                     ProductDetailScreen(
                         viewModel = viewModel(
@@ -189,7 +308,8 @@ fun AppNavigation() {
                         onBackClick = { navController.popBackStack() },
                     )
                 }
-                composable<Destinations.ProductCreate> {  backStackEntry ->
+
+                composable<Destinations.ProductCreate> { backStackEntry ->
                     ProductDetailScreen(
                         viewModel = viewModel(
                             viewModelStoreOwner = backStackEntry,

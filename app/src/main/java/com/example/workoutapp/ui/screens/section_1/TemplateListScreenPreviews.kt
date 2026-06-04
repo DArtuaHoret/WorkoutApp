@@ -5,7 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 
-
+/*
 
 @Preview(name = "TemplateListScreen – with items", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
@@ -37,3 +37,4 @@ private fun PreviewTemplateListEmpty() {
         )
     }
 }
+*/

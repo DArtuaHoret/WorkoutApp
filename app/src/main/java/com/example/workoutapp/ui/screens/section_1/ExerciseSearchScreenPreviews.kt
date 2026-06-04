@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.workoutapp.ui.reusableContents.Section_1.*
 
-
+/*
 private val sampleExercises = listOf(
     ExerciseOption("1",  "Wyciskanie na płasko",         "Klatka piersiowa"),
     ExerciseOption("2",  "Wyciskanie na skosie",          "Klatka piersiowa"),
@@ -63,3 +63,4 @@ private fun PreviewExerciseSearchEmpty() {
         )
     }
 }
+*/

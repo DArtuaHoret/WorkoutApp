@@ -35,47 +35,49 @@ data class ExerciseEntry(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TemplateDetailScreen(
-    templateName: String,
-    onTemplateNameChange: (String) -> Unit,
-    exercises: List<ExerciseEntry>,
+    viewModel: TemplateDetailViewModel,
     onBackClick: () -> Unit,
     onAddExerciseClick: () -> Unit,
     onEditExercise: (ExerciseEntry) -> Unit,
-    onDeleteExercise: (ExerciseEntry) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Przegląd szablonu",
-                        color = Color.White,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Wróć",
-                            tint = Color.White,
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black,
-                ),
+    val templateName by viewModel.templateName.collectAsState()
+    val exercises    by viewModel.exercises.collectAsState()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+    ) {
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.offset(x = (-12).dp),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Wróć",
+                    tint = Color.White,
+                )
+            }
+            Text(
+                text = "Przegląd szablonu",
+                color = Color.White,
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.offset(x = (-16).dp),
             )
-        },
-        containerColor = Color.Black,
-    ) { innerPadding ->
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(vertical = 16.dp),
         ) {
@@ -90,7 +92,7 @@ fun TemplateDetailScreen(
                     )
                     WorkoutTextField(
                         value = templateName,
-                        onValueChange = onTemplateNameChange,
+                        onValueChange = viewModel::onTemplateNameChange,
                     )
                 }
             }
@@ -118,7 +120,7 @@ fun TemplateDetailScreen(
                     restTime = exercise.restTime,
                     note = exercise.note,
                     onEditClick = { onEditExercise(exercise) },
-                    onDeleteClick = { onDeleteExercise(exercise) },
+                    onDeleteClick = { viewModel.deleteExercise(exercise) },
                 )
             }
 

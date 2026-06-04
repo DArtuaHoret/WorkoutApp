@@ -29,82 +29,64 @@ data class ExerciseOption(
     val muscleGroup: String,
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseSearchScreen(
-    exercises: List<ExerciseOption>,
+    viewModel: ExerciseSearchViewModel,
     onBackClick: () -> Unit,
-    onAddExercise: (ExerciseOption) -> Unit,
+    onExerciseClick: (ExerciseOption) -> Unit,
     onAddCustomExercise: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var query by remember { mutableStateOf("") }
+    val query             by viewModel.query.collectAsState()
+    val filteredExercises by viewModel.filteredExercises.collectAsState()
 
-    val filtered = remember(query, exercises) {
-        if (query.isBlank()) exercises
-        else exercises.filter { it.name.contains(query, ignoreCase = true) }
+    val grouped = remember(filteredExercises) {
+        filteredExercises.groupBy { it.muscleGroup }
     }
 
-    // Group by muscle group; preserve insertion order
-    val grouped = remember(filtered) {
-        filtered.groupBy { it.muscleGroup }
-    }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+    ) {
+        Spacer(modifier = Modifier.height(24.dp))
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Wyszukiwanie ćwiczeń",
-                        color = Color.White,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Wróć",
-                            tint = Color.White,
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black,
-                ),
-            )
-        },
-        bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Black)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+        // Nagłówek
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.offset(x = (-12).dp),
             ) {
-                ActionButton(
-                    onClick = onAddCustomExercise,
-                    label = "DODAJ WŁASNE ĆWICZENIE",
-                    icon = Icons.Default.Add,
-                    style = ActionButtonStyle.DarkOutlined,
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Wróć",
+                    tint = Color.White,
                 )
             }
-        },
-        containerColor = Color.Black,
-    ) { innerPadding ->
+            Text(
+                text = "Wyszukiwanie ćwiczeń",
+                color = Color.White,
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.offset(x = (-16).dp),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Lista
         LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(vertical = 12.dp),
         ) {
-            // Search field
             item {
                 WorkoutTextField(
                     value = query,
-                    onValueChange = { query = it },
+                    onValueChange = viewModel::onQueryChange,
                     placeholder = "np. Przysiad, Wyciskanie",
                     showSearchIcon = true,
                 )
@@ -121,13 +103,12 @@ fun ExerciseSearchScreen(
                         Text(
                             text = "Brak wyników dla \"$query\"",
                             color = Color(0xFF888888),
-                            fontSize = 15.sp
+                            fontSize = 15.sp,
                         )
                     }
                 }
             } else {
                 grouped.forEach { (muscleGroup, groupExercises) ->
-                    // Muscle group header
                     item(key = "header_$muscleGroup") {
                         Text(
                             text = muscleGroup.uppercase(),
@@ -138,22 +119,30 @@ fun ExerciseSearchScreen(
                             modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
                         )
                     }
-
-                    // Exercises in this group
                     items(
                         items = groupExercises,
                         key = { it.id },
                     ) { exercise ->
                         ExerciseSelectItem(
                             exerciseName = exercise.name,
-                            onAddClick = { onAddExercise(exercise) },
+                            onAddClick = { onExerciseClick(exercise) },
                         )
                     }
                 }
             }
 
-            // Bottom spacing so last item isn't hidden behind bottom bar
             item { Spacer(modifier = Modifier.height(8.dp)) }
         }
+
+        // Przycisk na dole
+        Spacer(modifier = Modifier.height(12.dp))
+        ActionButton(
+            onClick = onAddCustomExercise,
+            label = "DODAJ WŁASNE ĆWICZENIE",
+            icon = Icons.Default.Add,
+            style = ActionButtonStyle.DarkOutlined,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
+

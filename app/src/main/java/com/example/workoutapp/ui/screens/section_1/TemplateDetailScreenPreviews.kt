@@ -1,5 +1,5 @@
 package com.example.workoutapp.ui.screens.section_1
-
+/*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -59,3 +59,4 @@ private fun PreviewTemplateDetailEmpty() {
         )
     }
 }
+*/

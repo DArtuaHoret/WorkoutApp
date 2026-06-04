@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import kotlin.collections.plus
-
+/*
 
 @Preview(name = "ExerciseDetailScreen", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
@@ -148,3 +148,5 @@ private fun PreviewExerciseDetailOneSet() {
         )
     }
 }
+
+*/

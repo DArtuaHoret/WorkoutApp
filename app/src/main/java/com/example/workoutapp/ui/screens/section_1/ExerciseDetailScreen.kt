@@ -24,145 +24,143 @@ data class ExerciseSetState(
     val rest: Int = 60,
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseDetailScreen(
-    exerciseName: String,
-    onExerciseNameChange: (String) -> Unit,
-    selectedMuscleGroups: Set<String>,
-    onMuscleGroupsChange: (Set<String>) -> Unit,
-    sets: List<ExerciseSetState>,
-    onSetChange: (index: Int, ExerciseSetState) -> Unit,
-    onAddSet: () -> Unit,
-    onDeleteSet: (index: Int) -> Unit,
-    onSaveClick: () -> Unit,
+    viewModel: ExerciseDetailViewModel,
     onBackClick: () -> Unit,
-    imageContent: @Composable BoxScope.() -> Unit = { ExerciseImagePlaceholder() },
+    onSaveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Ćwiczenie",
-                        color = Color.White,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Wróć",
-                            tint = Color.White,
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black,
-                ),
-            )
-        },
-        containerColor = Color.Black,
-    ) { innerPadding ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp),
+    val exerciseName        by viewModel.exerciseName.collectAsState()
+    val selectedMuscleGroups by viewModel.selectedMuscleGroups.collectAsState()
+    val sets                by viewModel.sets.collectAsState()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+    ) {
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Nagłówek
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(vertical = 16.dp),
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.offset(x = (-12).dp),
             ) {
-                // Exercise image
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        imageContent()
-                    }
-                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Wróć",
+                    tint = Color.White,
+                )
+            }
+            Text(
+                text = "Ćwiczenie",
+                color = Color.White,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.offset(x = (-16).dp),
+            )
+        }
 
-                // Exercise name
-                item {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(
-                            text = "Nazwa ćwiczenia",
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                        )
-                        WorkoutTextField(
-                            value = exerciseName,
-                            onValueChange = onExerciseNameChange,
-                            placeholder = "np. Martwy ciąg",
-                        )
-                    }
-                }
+        Spacer(modifier = Modifier.height(12.dp))
 
-                // Muscle groups
-                item {
-                    MuscleGroupSelector(
-                        selectedGroups = selectedMuscleGroups,
-                        onSelectionChange = onMuscleGroupsChange,
-                    )
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(vertical = 16.dp),
+        ) {
+            // Exercise image
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    ExerciseImagePlaceholder()
                 }
+            }
 
-                // Sets header
-                item {
+            // Exercise name
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text = "Serie",
+                        text = "Nazwa ćwiczenia",
                         color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 4.dp),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
                     )
-                }
-
-                // Set cards
-                itemsIndexed(
-                    items = sets,
-                    key = { _, set -> set.id },
-                ) { index, set ->
-                    ExerciseSetCard(
-                        setNumber = index + 1,
-                        weight = set.weight,
-                        onWeightChange = { onSetChange(index, set.copy(weight = it)) },
-                        reps = set.reps,
-                        onRepsChange = { onSetChange(index, set.copy(reps = it)) },
-                        rest = set.rest,
-                        onRestChange = { onSetChange(index, set.copy(rest = it)) },
-                        onDelete = if (sets.size > 1) ({ onDeleteSet(index) }) else null,
-                    )
-                }
-
-                // Add set button
-                item {
-                    ActionButton(
-                        onClick = onAddSet,
-                        label = "DODAJ SERIĘ",
-                        style = ActionButtonStyle.DarkOutlined,
+                    WorkoutTextField(
+                        value = exerciseName,
+                        onValueChange = viewModel::onExerciseNameChange,
+                        placeholder = "np. Martwy ciąg",
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            // Muscle groups
+            item {
+                MuscleGroupSelector(
+                    selectedGroups = selectedMuscleGroups,
+                    onSelectionChange = viewModel::onMuscleGroupsChange,
+                )
+            }
 
-            ActionButton(
-                onClick = onSaveClick,
-                label = "ZAPISZ ĆWICZENIE",
-                icon = null,
-                style = ActionButtonStyle.LightFilled,
-            )
+            // Sets header
+            item {
+                Text(
+                    text = "Serie",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // Set cards
+            itemsIndexed(
+                items = sets,
+                key = { _, set -> set.id },
+            ) { index, set ->
+                ExerciseSetCard(
+                    setNumber = index + 1,
+                    weight = set.weight,
+                    onWeightChange = { viewModel.onSetChange(index, set.copy(weight = it)) },
+                    reps = set.reps,
+                    onRepsChange = { viewModel.onSetChange(index, set.copy(reps = it)) },
+                    rest = set.rest,
+                    onRestChange = { viewModel.onSetChange(index, set.copy(rest = it)) },
+                    onDelete = if (sets.size > 1) ({ viewModel.onDeleteSet(index) }) else null,
+                )
+            }
+
+            // Add set button
+            item {
+                ActionButton(
+                    onClick = viewModel::onAddSet,
+                    label = "DODAJ SERIĘ",
+                    style = ActionButtonStyle.DarkOutlined,
+                )
+            }
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        ActionButton(
+            onClick = {
+                viewModel.saveExercise()
+                onSaveClick()
+            },
+            label = "ZAPISZ ĆWICZENIE",
+            icon = null,
+            style = ActionButtonStyle.LightFilled,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
+

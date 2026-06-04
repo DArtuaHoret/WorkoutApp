@@ -22,11 +22,12 @@ data class WorkoutTemplate(
 
 @Composable
 fun TemplateListScreen(
-    templates: List<WorkoutTemplate>,
+    viewModel: TemplateListViewModel,
     onTemplateClick: (WorkoutTemplate) -> Unit,
     onCreateNewClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val templates by viewModel.templates.collectAsState()
 
         Column(
             modifier = modifier
