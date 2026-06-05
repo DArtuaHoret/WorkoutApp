@@ -11,6 +11,12 @@ import com.example.workoutapp.data.ExerciseMuscleGroup
 import com.example.workoutapp.data.MuscleGroup
 import kotlinx.coroutines.flow.Flow
 
+data class ExerciseWithMuscleGroup(
+    val exerciseId: Long,
+    val exerciseName: String,
+    val muscleGroupName: String,
+)
+
 @Dao
 interface ExerciseDao {
 
@@ -51,4 +57,25 @@ interface ExerciseDao {
     	WHERE emg.muscleGroupId = :muscleGroupId
 	""")
     fun getExercisesForMuscleGroup(muscleGroupId: Long): Flow<List<Exercise>>
+
+    @Query("""
+    SELECT 
+        e.id   AS exerciseId,
+        e.name AS exerciseName,
+        COALESCE(mg.name, 'Inne') AS muscleGroupName
+    FROM exercises e
+    LEFT JOIN exercise_muscle_groups emg ON emg.exerciseId = e.id
+    LEFT JOIN muscle_groups mg ON mg.id = emg.muscleGroupId
+    WHERE e.isActive = 1
+    GROUP BY e.id
+    ORDER BY mg.name ASC, e.name ASC
+""")
+    fun getActiveExercisesWithMuscleGroup(): Flow<List<ExerciseWithMuscleGroup>>
+
+    @Query("""
+    SELECT mg.* FROM muscle_groups mg
+    INNER JOIN exercise_muscle_groups emg ON mg.id = emg.muscleGroupId
+    WHERE emg.exerciseId = :exerciseId
+""")
+    fun getMuscleGroupsForExercise(exerciseId: Long): Flow<List<MuscleGroup>>
 }

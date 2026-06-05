@@ -778,8 +778,7 @@ fun MuscleGroupSelector(
 
 /** Domyślna lista grup mięśniowych — podmień na dane z Room gdy będą gotowe. */
 val defaultMuscleGroups = listOf(
-    "Klatka", "Plecy", "Barki", "Biceps", "Triceps",
-    "Brzuch", "Nogi", "Pośladki", "Łydki",
+    "GGGG"
 )
 
 

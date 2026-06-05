@@ -31,6 +31,7 @@ data class WorkoutTemplateSet(
     var setNumber: Int,
     var reps: Int,
     var weight: Double,
+    var restTime: Int = 60,
     var note: String? = null,
     var workoutTemplateItemId: Long,
     @PrimaryKey(autoGenerate = true)

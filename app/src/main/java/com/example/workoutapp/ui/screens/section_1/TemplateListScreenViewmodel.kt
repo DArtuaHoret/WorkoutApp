@@ -1,30 +1,31 @@
 package com.example.workoutapp.ui.screens.section_1
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import com.example.workoutapp.database.WorkoutTemplateRepository
+import com.example.workoutapp.data.WorkoutTemplate as DbWorkoutTemplate
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-class TemplateListViewModel : ViewModel() {
+// TemplateListViewModel.kt
+class TemplateListViewModel(
+    private val templateRepository: WorkoutTemplateRepository,
+) : ViewModel() {
 
-    private val _templates = MutableStateFlow<List<WorkoutTemplate>>(emptyList())
-    val templates: StateFlow<List<WorkoutTemplate>> = _templates.asStateFlow()
-
-    init {
-        loadTemplates()
-    }
-
-    fun loadTemplates() {
-        // TODO: _templates.value = templateRepository.getAll()
-        _templates.value = listOf(
-            WorkoutTemplate(id = "1", name = "Push Day A"),
-            WorkoutTemplate(id = "2", name = "Pull Day B"),
-            WorkoutTemplate(id = "3", name = "Nogi"),
-        )
-    }
+    val templates: StateFlow<List<WorkoutTemplate>> =
+        templateRepository.getActiveTemplates()
+            .map { list -> list.map { WorkoutTemplate(id = it.id.toString(), name = it.name) } }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun deleteTemplate(template: WorkoutTemplate) {
-        // TODO: templateRepository.delete(template)
-        _templates.value = _templates.value.filter { it.id != template.id }
+        viewModelScope.launch {
+            templateRepository.deleteTemplate(
+                DbWorkoutTemplate(name = template.name, id = template.id.toLong())
+            )
+        }
     }
+
+    // Zwraca ID zamiast przyjmować callback
+    suspend fun createTemplate(): String =
+        templateRepository.saveTemplate(DbWorkoutTemplate(name = "")).toString()
 }

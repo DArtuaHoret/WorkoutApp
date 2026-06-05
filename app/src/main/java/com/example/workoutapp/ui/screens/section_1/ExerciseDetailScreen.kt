@@ -30,10 +30,12 @@ fun ExerciseDetailScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier,
+
 ) {
     val exerciseName        by viewModel.exerciseName.collectAsState()
     val selectedMuscleGroups by viewModel.selectedMuscleGroups.collectAsState()
     val sets                by viewModel.sets.collectAsState()
+    val muscleGroups by viewModel.muscleGroups.collectAsState()
 
     Column(
         modifier = modifier
@@ -107,6 +109,7 @@ fun ExerciseDetailScreen(
                 MuscleGroupSelector(
                     selectedGroups = selectedMuscleGroups,
                     onSelectionChange = viewModel::onMuscleGroupsChange,
+                    allGroups = muscleGroups,
                 )
             }
 

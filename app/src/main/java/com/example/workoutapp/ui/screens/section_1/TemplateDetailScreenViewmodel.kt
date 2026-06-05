@@ -2,47 +2,71 @@ package com.example.workoutapp.ui.screens.section_1
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.workoutapp.Destinations
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.example.workoutapp.data.WorkoutTemplate
+import com.example.workoutapp.database.TemplateExerciseEntry
+import com.example.workoutapp.database.WorkoutTemplateRepository
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
+// TemplateDetailViewModel.kt
 class TemplateDetailViewModel(
     savedStateHandle: SavedStateHandle,
+    private val templateRepository: WorkoutTemplateRepository,
 ) : ViewModel() {
 
     private val args = savedStateHandle.toRoute<Destinations.TemplateDetail>()
-    val isNewTemplate: Boolean = args.id.isEmpty()
+
+    // Jeden StateFlow dla ID — null oznacza "jeszcze nie zapisano"
+    private val _dbId = MutableStateFlow<Long?>(args.id.toLongOrNull())
+    val dbId: StateFlow<Long?> = _dbId.asStateFlow()
 
     private val _templateName = MutableStateFlow(args.name)
     val templateName: StateFlow<String> = _templateName.asStateFlow()
 
-    private val _exercises = MutableStateFlow<List<ExerciseEntry>>(emptyList())
-    val exercises: StateFlow<List<ExerciseEntry>> = _exercises.asStateFlow()
+    val exercises: StateFlow<List<ExerciseEntry>> = _dbId
+        .flatMapLatest { id ->
+            if (id == null) flowOf(emptyList())
+            else templateRepository.getExerciseEntriesForTemplate(id)
+                .map { list -> list.map { it.toExerciseEntry() } }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
-        if (!isNewTemplate) loadExercises(args.id)
+        if (_dbId.value == null) {
+            viewModelScope.launch {
+                _dbId.value = templateRepository.saveTemplate(WorkoutTemplate(name = ""))
+            }
+        }
     }
 
-    fun onTemplateNameChange(newName: String) {
-        _templateName.value = newName
+    fun onTemplateNameChange(newName: String) { _templateName.value = newName }
+
+    fun saveTemplate() {
+        val id = _dbId.value ?: return
+        viewModelScope.launch {
+            templateRepository.updateTemplate(WorkoutTemplate(name = _templateName.value, id = id))
+        }
     }
 
     fun deleteExercise(exercise: ExerciseEntry) {
-        // TODO: templateRepository.deleteExercise(exercise)
-        _exercises.value = _exercises.value.filter { it.id != exercise.id }
-    }
-
-    fun saveTemplate() {
-        // TODO: templateRepository.save(id = args.id, name = _templateName.value, exercises = _exercises.value)
-    }
-
-    private fun loadExercises(templateId: String) {
-        // TODO: _exercises.value = templateRepository.getExercises(templateId)
-        _exercises.value = listOf(
-            ExerciseEntry(id = "1", name = "Wyciskanie sztangi", series = "4", weight = "80kg", restTime = "90s"),
-            ExerciseEntry(id = "2", name = "Rozpiętki", series = "3", weight = "20kg", restTime = "60s"),
-        )
+        val itemId = exercise.id.toLong()
+        viewModelScope.launch {
+            templateRepository.deleteSetsForItem(itemId)
+            templateRepository.deleteTemplateItem(itemId)
+        }
     }
 }
+
+// Mapper poza klasą — czytelniejszy
+private fun TemplateExerciseEntry.toExerciseEntry() = ExerciseEntry(
+    id         = itemId.toString(),
+    exerciseId = exerciseId.toString(),
+    name       = exerciseName,
+    series     = setCount.toString(),
+    weight     = "${weight.toInt()}kg",
+    restTime   = "${restTime}s",
+    note       = note ?: "",
+)

@@ -1,47 +1,29 @@
 package com.example.workoutapp.ui.screens.section_1
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import com.example.workoutapp.database.ExerciseRepository
+import kotlinx.coroutines.flow.*
 
-class ExerciseSearchViewModel : ViewModel() {
+// ExerciseSearchViewModel.kt
+class ExerciseSearchViewModel(
+    private val exerciseRepository: ExerciseRepository,
+) : ViewModel() {
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
 
-    private val allExercises = MutableStateFlow<List<ExerciseOption>>(emptyList())
+    // Bezpośrednio combine bez pośredniego StateFlow
+    val filteredExercises: StateFlow<List<ExerciseOption>> =
+        combine(
+            exerciseRepository.getActiveExercisesWithMuscleGroup(),
+            _query,
+        ) { exercises, query ->
+            exercises
+                .map { ExerciseOption(id = it.exerciseId.toString(), name = it.exerciseName, muscleGroup = it.muscleGroupName) }
+                .filter { query.isBlank() || it.name.contains(query, ignoreCase = true) }
+        }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    private val _filteredExercises = MutableStateFlow<List<ExerciseOption>>(emptyList())
-    val filteredExercises: StateFlow<List<ExerciseOption>> = _filteredExercises.asStateFlow()
-
-    init {
-        loadExercises()
-    }
-
-    fun onQueryChange(newQuery: String) {
-        _query.value = newQuery
-        applyFilter()
-    }
-
-    private fun loadExercises() {
-        // TODO: allExercises.value = exerciseRepository.getAll()
-        allExercises.value = listOf(
-            ExerciseOption(id = "1", name = "Wyciskanie sztangi",    muscleGroup = "Klatka piersiowa"),
-            ExerciseOption(id = "2", name = "Rozpiętki",             muscleGroup = "Klatka piersiowa"),
-            ExerciseOption(id = "3", name = "Wiosłowanie sztangą",   muscleGroup = "Plecy"),
-            ExerciseOption(id = "4", name = "Podciąganie",           muscleGroup = "Plecy"),
-            ExerciseOption(id = "5", name = "Przysiad ze sztangą",   muscleGroup = "Nogi"),
-            ExerciseOption(id = "6", name = "Martwy ciąg",           muscleGroup = "Nogi"),
-            ExerciseOption(id = "7", name = "Uginanie ramion",       muscleGroup = "Biceps"),
-            ExerciseOption(id = "8", name = "Wyciskanie francuskie", muscleGroup = "Triceps"),
-        )
-        applyFilter()
-    }
-
-    private fun applyFilter() {
-        val q = _query.value
-        _filteredExercises.value = if (q.isBlank()) allExercises.value
-        else allExercises.value.filter { it.name.contains(q, ignoreCase = true) }
-    }
+    fun onQueryChange(newQuery: String) { _query.value = newQuery }
 }

@@ -26,6 +26,8 @@ import com.example.workoutapp.ui.screens.section_3.WorkoutHistoryScreen
 import com.example.workoutapp.ui.screens.section_4.AddMealSearchScreen
 import com.example.workoutapp.ui.screens.section_4.FavoriteProductsScreen
 import com.example.workoutapp.ui.screens.section_4.ProductDetailScreen
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
@@ -53,6 +55,7 @@ sealed interface Destinations {
         val templateId: String,
         val exerciseId: String,
         val exerciseName: String,
+        val itemId: String = "",
     ) : Destinations
 
 
@@ -151,44 +154,50 @@ fun AppNavigation() {
                 startDestination = Destinations.Templates,
             ) {
                 composable<Destinations.Templates> { backStackEntry ->
-
+                    val viewModel: TemplateListViewModel = viewModel(
+                        viewModelStoreOwner = backStackEntry,
+                        factory = WorkoutAppViewModelProvider.Factory
+                    )
+                    val coroutineScope = rememberCoroutineScope()
                     TemplateListScreen(
-                        viewModel = viewModel(
-                            viewModelStoreOwner = backStackEntry,
-                            factory = WorkoutAppViewModelProvider.Factory
-                        ),
+                        viewModel = viewModel,
                         onTemplateClick = { template ->
                             navController.navigate(
                                 Destinations.TemplateDetail(id = template.id, name = template.name)
                             )
                         },
                         onCreateNewClick = {
-                            navController.navigate(
-                                Destinations.TemplateDetail(id = "", name = "")
-                            )
+                            coroutineScope.launch {
+                                val id = viewModel.createTemplate()
+                                navController.navigate(Destinations.TemplateDetail(id = id, name = ""))
+                            }
                         },
                     )
                 }
 
 
                 composable<Destinations.TemplateDetail> { backStackEntry ->
-                    TemplateDetailScreen(
-                        viewModel = viewModel(
-                            viewModelStoreOwner = backStackEntry,
+                    val templateDetailViewModel: TemplateDetailViewModel = viewModel(
+                        viewModelStoreOwner = backStackEntry,
                         factory = WorkoutAppViewModelProvider.Factory
-                        ),
+                    )
+                    val dbId by templateDetailViewModel.dbId.collectAsState()
+
+                    TemplateDetailScreen(
+                        viewModel = templateDetailViewModel,
                         onBackClick = { navController.popBackStack() },
                         onAddExerciseClick = {
-                            val templateId = backStackEntry.toRoute<Destinations.TemplateDetail>().id
-                            navController.navigate(Destinations.ExerciseSearch(templateId = templateId))
+                            navController.navigate(
+                                Destinations.ExerciseSearch(templateId = dbId.toString())
+                            )
                         },
                         onEditExercise = { exercise ->
-                            val templateId = backStackEntry.toRoute<Destinations.TemplateDetail>().id
                             navController.navigate(
                                 Destinations.ExerciseDetail(
-                                    templateId   = templateId,
-                                    exerciseId   = exercise.id,
+                                    templateId   = dbId.toString(),
+                                    exerciseId   = exercise.exerciseId,
                                     exerciseName = exercise.name,
+                                    itemId       = exercise.id, // ← dodaj
                                 )
                             )
                         },

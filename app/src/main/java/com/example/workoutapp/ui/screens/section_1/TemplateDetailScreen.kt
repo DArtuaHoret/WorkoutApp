@@ -24,7 +24,8 @@ import com.example.workoutapp.ui.reusableContents.Section_1.*
 
 
 data class ExerciseEntry(
-    val id: String,
+    val id: String,        // itemId (WorkoutTemplateItem)
+    val exerciseId: String, // ← nowe pole
     val name: String,
     val series: String,
     val weight: String,
@@ -77,7 +78,7 @@ fun TemplateDetailScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.weight(1f), // ← zamiast fillMaxSize()
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(vertical = 16.dp),
         ) {
@@ -129,6 +130,18 @@ fun TemplateDetailScreen(
                 AddExerciseCard(onAddClick = onAddExerciseClick)
             }
 
+
+
         }
+        ActionButton(
+            onClick = {
+                viewModel.saveTemplate()
+                onBackClick()
+            },
+            label = "ZAPISZ SZABLON",
+            style = ActionButtonStyle.LightFilled,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
