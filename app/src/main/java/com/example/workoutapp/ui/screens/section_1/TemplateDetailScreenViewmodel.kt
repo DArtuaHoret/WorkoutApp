@@ -26,6 +26,9 @@ class TemplateDetailViewModel(
     private val _templateName = MutableStateFlow(args.name)
     val templateName: StateFlow<String> = _templateName.asStateFlow()
 
+    private val _templateDescription = MutableStateFlow(args.description ?: "")
+    val templateDescription: StateFlow<String> = _templateDescription.asStateFlow()
+
     val exercises: StateFlow<List<ExerciseEntry>> = _dbId
         .flatMapLatest { id ->
             if (id == null) flowOf(emptyList())
@@ -39,6 +42,13 @@ class TemplateDetailViewModel(
             viewModelScope.launch {
                 _dbId.value = templateRepository.saveTemplate(WorkoutTemplate(name = ""))
             }
+        } else {
+            viewModelScope.launch {
+                templateRepository.getTemplateById(_dbId.value!!)?.let { template ->
+                    _templateName.value = template.name
+                    _templateDescription.value = template.description ?: ""
+                }
+            }
         }
     }
 
@@ -47,7 +57,13 @@ class TemplateDetailViewModel(
     fun saveTemplate() {
         val id = _dbId.value ?: return
         viewModelScope.launch {
-            templateRepository.updateTemplate(WorkoutTemplate(name = _templateName.value, id = id))
+            templateRepository.updateTemplate(
+                WorkoutTemplate(
+                    name        = _templateName.value,
+                    description = _templateDescription.value.ifBlank { null },
+                    id          = id,
+                )
+            )
         }
     }
 
@@ -58,6 +74,9 @@ class TemplateDetailViewModel(
             templateRepository.deleteTemplateItem(itemId)
         }
     }
+
+
+    fun onTemplateDescriptionChange(newDesc: String) { _templateDescription.value = newDesc }
 }
 
 // Mapper poza klasą — czytelniejszy

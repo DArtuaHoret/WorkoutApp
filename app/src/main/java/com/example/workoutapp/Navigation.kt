@@ -45,6 +45,7 @@ sealed interface Destinations {
     @Serializable data class TemplateDetail(
         val id: String,          // pusty string oznacza nowy szablon
         val name: String,
+        val description: String = "",
     ) : Destinations
 
     @Serializable data class ExerciseSearch(
@@ -56,6 +57,7 @@ sealed interface Destinations {
         val exerciseId: String,
         val exerciseName: String,
         val itemId: String = "",
+        val note: String = "",
     ) : Destinations
 
 
@@ -198,6 +200,7 @@ fun AppNavigation() {
                                     exerciseId   = exercise.exerciseId,
                                     exerciseName = exercise.name,
                                     itemId       = exercise.id, // ← dodaj
+                                    note         = exercise.note,
                                 )
                             )
                         },

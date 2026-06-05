@@ -34,6 +34,9 @@ class ExerciseDetailViewModel(
     )
     val sets: StateFlow<List<ExerciseSetState>> = _sets.asStateFlow()
 
+    private val _exerciseNote = MutableStateFlow(args.note ?: "")
+    val exerciseNote: StateFlow<String> = _exerciseNote.asStateFlow()
+
     val muscleGroups: StateFlow<List<String>> =
         exerciseRepository.getAllMuscleGroups()
             .map { list -> list.map { it.name } }
@@ -64,8 +67,20 @@ class ExerciseDetailViewModel(
             val templateId = args.templateId.toLongOrNull() ?: return@launch
             val isEditing = args.itemId.isNotEmpty()
 
+
+
             if (isEditing) {
                 val itemId = args.itemId.toLong()
+                val exerciseId = args.exerciseId.toLong()
+
+                // Zaktualizuj grupy mięśniowe
+                exerciseRepository.unlinkAllMuscleGroupsForExercise(exerciseId)  // ← usuń stare
+                val allGroups = exerciseRepository.getAllMuscleGroups().first()
+                _selectedMuscleGroups.value.forEach { groupName ->
+                    val group = allGroups.firstOrNull { it.name == groupName } ?: return@forEach
+                    exerciseRepository.linkExerciseToMuscleGroup(exerciseId, group.id)
+                }
+
                 // Usuń stare sety i wstaw nowe
                 templateRepository.deleteSetsForItem(itemId)
                 _sets.value.forEachIndexed { index, setState ->
@@ -106,6 +121,7 @@ class ExerciseDetailViewModel(
                     workoutTemplateId = templateId,
                     exerciseId        = exerciseId,
                     orderIndex        = orderIndex,
+                    note              = _exerciseNote.value.ifBlank { null },
                 )
                 val itemId = templateRepository.saveTemplateItem(item)
 
@@ -124,6 +140,8 @@ class ExerciseDetailViewModel(
             }
         }
     }
+
+    fun onExerciseNoteChange(newNote: String) { _exerciseNote.value = newNote }
 
     private fun loadExercise(exerciseId: String) {
         viewModelScope.launch {

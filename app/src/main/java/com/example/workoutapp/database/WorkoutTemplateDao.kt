@@ -36,6 +36,8 @@ interface WorkoutTemplateDao {
     @Query("UPDATE workout_templates SET isActive = 0 WHERE id = :templateId")
     suspend fun deleteWorkoutTemplate(templateId: Long)
 
+    @Query("SELECT * FROM workout_templates WHERE id = :templateId")
+    suspend fun getTemplateById(templateId: Long): WorkoutTemplate?
     @Query("SELECT * FROM workout_templates WHERE isActive = 1 ORDER BY createdAt DESC")
     fun getActiveTemplates(): Flow<List<WorkoutTemplate>>
 

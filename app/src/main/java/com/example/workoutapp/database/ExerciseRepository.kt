@@ -17,6 +17,7 @@ interface ExerciseRepository {
     suspend fun saveMuscleGroup(muscleGroup: MuscleGroup)
     fun getMuscleGroupsForExercise(exerciseId: Long): Flow<List<MuscleGroup>>
     suspend fun linkExerciseToMuscleGroup(exerciseId: Long, muscleGroupId: Long)
+    suspend fun unlinkAllMuscleGroupsForExercise(exerciseId: Long)
     suspend fun unlinkExerciseFromMuscleGroup(exerciseId: Long, muscleGroupId: Long)
     fun getExercisesForMuscleGroup(muscleGroupId: Long): Flow<List<Exercise>>
     fun getActiveExercisesWithMuscleGroup(): Flow<List<ExerciseWithMuscleGroup>>
@@ -68,6 +69,10 @@ class ExerciseRepositoryImpl(private val exerciseDao: ExerciseDao) : ExerciseRep
 
     override fun getExercisesForMuscleGroup(muscleGroupId: Long): Flow<List<Exercise>> =
         exerciseDao.getExercisesForMuscleGroup(muscleGroupId)
+    override suspend fun unlinkAllMuscleGroupsForExercise(exerciseId: Long) =
+        withContext(Dispatchers.IO) {
+            exerciseDao.deleteAllMuscleGroupsForExercise(exerciseId)
+        }
 
     override fun getActiveExercisesWithMuscleGroup() =
         exerciseDao.getActiveExercisesWithMuscleGroup()

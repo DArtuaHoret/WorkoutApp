@@ -72,6 +72,9 @@ interface ExerciseDao {
 """)
     fun getActiveExercisesWithMuscleGroup(): Flow<List<ExerciseWithMuscleGroup>>
 
+    @Query("DELETE FROM exercise_muscle_groups WHERE exerciseId = :exerciseId")
+    suspend fun deleteAllMuscleGroupsForExercise(exerciseId: Long)
+
     @Query("""
     SELECT mg.* FROM muscle_groups mg
     INNER JOIN exercise_muscle_groups emg ON mg.id = emg.muscleGroupId

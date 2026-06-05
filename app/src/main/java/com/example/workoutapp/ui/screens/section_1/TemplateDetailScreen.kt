@@ -44,7 +44,7 @@ fun TemplateDetailScreen(
 ) {
     val templateName by viewModel.templateName.collectAsState()
     val exercises    by viewModel.exercises.collectAsState()
-
+    val templateDescription by viewModel.templateDescription.collectAsState()
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -94,6 +94,22 @@ fun TemplateDetailScreen(
                     WorkoutTextField(
                         value = templateName,
                         onValueChange = viewModel::onTemplateNameChange,
+                    )
+                }
+            }
+
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        text = "Opis szablonu",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                    WorkoutTextField(
+                        value = templateDescription,
+                        onValueChange = viewModel::onTemplateDescriptionChange,
+                        placeholder = "np. Plan na masę, 3 dni w tygodniu...",
                     )
                 }
             }

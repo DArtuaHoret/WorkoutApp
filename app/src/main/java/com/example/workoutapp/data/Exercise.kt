@@ -18,7 +18,6 @@ data class Exercise(
     var name: String,
     var isCustom: Boolean = false,
     var isActive: Boolean = true,
-    var description: String? = null,
     var photoUrl: String? = null,
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0

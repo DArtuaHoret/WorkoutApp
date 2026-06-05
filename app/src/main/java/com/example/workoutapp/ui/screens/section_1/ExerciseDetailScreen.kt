@@ -36,6 +36,7 @@ fun ExerciseDetailScreen(
     val selectedMuscleGroups by viewModel.selectedMuscleGroups.collectAsState()
     val sets                by viewModel.sets.collectAsState()
     val muscleGroups by viewModel.muscleGroups.collectAsState()
+    val exerciseNote by viewModel.exerciseNote.collectAsState()
 
     Column(
         modifier = modifier
@@ -100,6 +101,22 @@ fun ExerciseDetailScreen(
                         value = exerciseName,
                         onValueChange = viewModel::onExerciseNameChange,
                         placeholder = "np. Martwy ciąg",
+                    )
+                }
+            }
+
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        text = "Opis / notatka",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                    WorkoutTextField(
+                        value = exerciseNote,
+                        onValueChange = viewModel::onExerciseNoteChange,
+                        placeholder = "np. Trzymaj plecy proste...",
                     )
                 }
             }

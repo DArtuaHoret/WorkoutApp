@@ -17,6 +17,7 @@ interface WorkoutTemplateRepository {
     suspend fun deleteTemplateItem(itemId: Long)
     suspend fun updateTemplateItem(item: WorkoutTemplateItem)
     suspend fun saveTemplateSet(set: WorkoutTemplateSet)
+    suspend fun getTemplateById(id: Long): WorkoutTemplate?
     suspend fun updateTemplateSet(set: WorkoutTemplateSet)
     suspend fun deleteSetsForItem(itemId: Long)
 }
@@ -55,6 +56,11 @@ class WorkoutTemplateRepositoryImpl(
     override suspend fun saveTemplateItem(item: WorkoutTemplateItem): Long =
         withContext(Dispatchers.IO) {
             templateDao.insertWorkoutTemplateItem(item)
+        }
+
+    override suspend fun getTemplateById(id: Long): WorkoutTemplate? =
+        withContext(Dispatchers.IO) {
+            templateDao.getTemplateById(id)
         }
 
     override suspend fun deleteTemplateItem(itemId: Long) =
