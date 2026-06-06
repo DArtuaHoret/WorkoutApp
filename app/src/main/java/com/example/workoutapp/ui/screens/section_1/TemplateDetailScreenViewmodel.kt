@@ -38,11 +38,6 @@ class TemplateDetailViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
-        if (_dbId.value == null) {
-            viewModelScope.launch {
-                _dbId.value = templateRepository.saveTemplate(WorkoutTemplate(name = ""))
-            }
-        } else {
             viewModelScope.launch {
                 templateRepository.getTemplateById(_dbId.value!!)?.let { template ->
                     _templateName.value = template.name
@@ -50,11 +45,13 @@ class TemplateDetailViewModel(
                 }
             }
         }
-    }
+
 
     fun onTemplateNameChange(newName: String) { _templateName.value = newName }
 
     fun saveTemplate() {
+        if (_templateName.value.isBlank()) return
+
         val id = _dbId.value ?: return
         viewModelScope.launch {
             templateRepository.updateTemplate(

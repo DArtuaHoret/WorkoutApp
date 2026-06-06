@@ -24,6 +24,7 @@ import com.example.workoutapp.ui.screens.section_1.TemplateListScreen
 import com.example.workoutapp.ui.screens.section_1.TemplateListViewModel
 import com.example.workoutapp.ui.screens.section_3.WorkoutHistoryScreen
 import com.example.workoutapp.ui.screens.section_4.AddMealSearchScreen
+import com.example.workoutapp.ui.screens.section_4.BarcodeScannerScreen
 import com.example.workoutapp.ui.screens.section_4.FavoriteProductsScreen
 import com.example.workoutapp.ui.screens.section_4.ProductDetailScreen
 import kotlinx.coroutines.coroutineScope
@@ -72,8 +73,9 @@ sealed interface Destinations {
     @Serializable data object DietGraph : Destinations
 
     /** Lista produktów – startDestination grafu diety. */
-    @Serializable data object Diet : Destinations
+    @Serializable data class Diet(val initialQuery: String = "") : Destinations
 
+    @Serializable data object BarcodeScanner : Destinations
     /** Podgląd istniejącego produktu. */
     @Serializable data class ProductDetail(
         val id: String,
@@ -279,7 +281,7 @@ fun AppNavigation() {
 
             // ── Zagnieżdżony graf sekcji 4 ───────────────────────────────
             navigation<Destinations.DietGraph>(
-                startDestination = Destinations.Diet,
+                startDestination = Destinations.Diet(),
             ) {
                 composable<Destinations.Diet> { backStackEntry ->
                     AddMealSearchScreen(
@@ -301,12 +303,29 @@ fun AppNavigation() {
                             )
                         },
                         onProductQuickAddClick = { /* TODO */ },
-                        onScanBarcodeClick = {},
                         onAddCustomProductClick = {
                             navController.navigate(Destinations.ProductCreate)
                         },
                         onLibraryClick = {
                             navController.navigate(Destinations.Library)
+                        },
+                        onScanBarcodeClick = {
+                            navController.navigate(Destinations.BarcodeScanner)
+                        },
+                    )
+                }
+
+                composable<Destinations.BarcodeScanner> { backStackEntry ->
+                    BarcodeScannerScreen(
+                        viewModel = viewModel(
+                            viewModelStoreOwner = backStackEntry,
+                            factory = WorkoutAppViewModelProvider.Factory
+                        ),
+                        onBackClick = { navController.popBackStack() },
+                        onBarcodeScanned = { barcode ->
+                            navController.navigate(Destinations.Diet(initialQuery = barcode)) {
+                                popUpTo(Destinations.Diet::class) { inclusive = true }
+                            }
                         },
                     )
                 }

@@ -1,7 +1,10 @@
 package com.example.workoutapp.ui.screens.section_4
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.example.workoutapp.Destinations
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,8 +17,11 @@ sealed interface AddMealSearchUiState {
 }
 
 
-class AddMealSearchViewModel : ViewModel() {
-    private val _query = MutableStateFlow("")
+class AddMealSearchViewModel(
+    savedStateHandle: SavedStateHandle,
+) : ViewModel() {
+    private val args = savedStateHandle.toRoute<Destinations.Diet>()
+    private val _query = MutableStateFlow(args.initialQuery)
     val query: StateFlow<String> = _query.asStateFlow()
     private val _uiState = MutableStateFlow<AddMealSearchUiState>(AddMealSearchUiState.Idle)
     val uiState: StateFlow<AddMealSearchUiState> = _uiState.asStateFlow()
@@ -60,5 +66,9 @@ class AddMealSearchViewModel : ViewModel() {
         ).filter { it.name.contains(query, ignoreCase = true) }
 
         _uiState.value = AddMealSearchUiState.Success(stub)
+    }
+
+    init {
+        if (args.initialQuery.isNotBlank()) searchProducts(args.initialQuery)
     }
 }

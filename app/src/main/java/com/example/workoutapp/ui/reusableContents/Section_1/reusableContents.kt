@@ -573,6 +573,7 @@ enum class ActionButtonStyle {
 fun ActionButton(
     onClick: () -> Unit,
     label: String,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
     icon: ImageVector? = Icons.Default.Add,
     height: Dp = 52.dp,

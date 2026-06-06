@@ -38,7 +38,7 @@ interface WorkoutTemplateDao {
 
     @Query("SELECT * FROM workout_templates WHERE id = :templateId")
     suspend fun getTemplateById(templateId: Long): WorkoutTemplate?
-    @Query("SELECT * FROM workout_templates WHERE isActive = 1 ORDER BY createdAt DESC")
+    @Query("SELECT * FROM workout_templates WHERE isActive = 1 AND name != '' ORDER BY createdAt DESC")
     fun getActiveTemplates(): Flow<List<WorkoutTemplate>>
 
     // ── Template Items ────────────────────────────────────────────────────────

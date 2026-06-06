@@ -11,6 +11,7 @@ import com.example.workoutapp.ui.screens.section_1.ExerciseSearchViewModel
 import com.example.workoutapp.ui.screens.section_1.TemplateDetailViewModel
 import com.example.workoutapp.ui.screens.section_1.TemplateListViewModel
 import com.example.workoutapp.ui.screens.section_4.AddMealSearchViewModel
+import com.example.workoutapp.ui.screens.section_4.BarcodeScannerViewModel
 import com.example.workoutapp.ui.screens.section_4.FavoriteProductsViewModel
 import com.example.workoutapp.ui.screens.section_4.ProductDetailViewModel
 
@@ -45,7 +46,9 @@ object WorkoutAppViewModelProvider {
         }
 
         initializer<AddMealSearchViewModel> {
-            AddMealSearchViewModel()
+            AddMealSearchViewModel(
+                savedStateHandle = this.createSavedStateHandle()
+            )
         }
 
         initializer<ProductDetailViewModel> {
@@ -58,6 +61,10 @@ object WorkoutAppViewModelProvider {
             FavoriteProductsViewModel(
                 savedStateHandle = this.createSavedStateHandle()
             )
+        }
+
+        initializer<BarcodeScannerViewModel> {
+            BarcodeScannerViewModel()
         }
     }
 }

@@ -45,6 +45,7 @@ fun TemplateDetailScreen(
     val templateName by viewModel.templateName.collectAsState()
     val exercises    by viewModel.exercises.collectAsState()
     val templateDescription by viewModel.templateDescription.collectAsState()
+    val canSave = templateName.isNotBlank()
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -95,8 +96,17 @@ fun TemplateDetailScreen(
                         value = templateName,
                         onValueChange = viewModel::onTemplateNameChange,
                     )
+                    if (templateName.isBlank()) {
+                        Text(
+                            text = "Nazwa jest wymagana",
+                            color = Color.Red,
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
+
+
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -151,10 +161,13 @@ fun TemplateDetailScreen(
         }
         ActionButton(
             onClick = {
+                if (!(templateName.isNotBlank())) return@ActionButton
+
                 viewModel.saveTemplate()
                 onBackClick()
             },
             label = "ZAPISZ SZABLON",
+            enabled = canSave,
             style = ActionButtonStyle.LightFilled,
         )
 
