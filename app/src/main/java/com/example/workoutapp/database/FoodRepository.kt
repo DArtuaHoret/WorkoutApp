@@ -15,6 +15,7 @@ interface FoodRepository {
     suspend fun findActiveByName(name: String): FoodProduct?
     suspend fun findExactMatch(name: String, calories: Double, protein: Double, fat: Double, carbs: Double): FoodProduct?
     suspend fun deactivateProduct(productId: Long)
+    suspend fun updateProduct(product: FoodProduct)
     suspend fun setFavorite(productId: Long, isFavorite: Boolean)
     fun getFavoriteAndCustomProducts(): Flow<List<FoodProduct>>
 
@@ -39,6 +40,9 @@ class FoodRepositoryImpl(private val foodDao: FoodDao) : FoodRepository {
         withContext(Dispatchers.IO) {
             foodDao.findActiveByName(name)
         }
+
+    override suspend fun updateProduct(product: FoodProduct) =
+        withContext(Dispatchers.IO) { foodDao.updateProduct(product) }
 
     override suspend fun findExactMatch(
         name: String,

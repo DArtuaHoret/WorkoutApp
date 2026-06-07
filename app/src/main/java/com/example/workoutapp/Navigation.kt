@@ -88,7 +88,17 @@ sealed interface Destinations {
     ) : Destinations
 
     /** Tworzenie nowego produktu. */
-    @Serializable data object ProductCreate : Destinations
+    @Serializable data class ProductCreate(
+        val id: String = "",
+        val name: String = "",
+        val description: String = "",
+        val kcal: String = "",
+        val protein: String = "",
+        val fat: String = "",
+        val carbs: String = "",
+        val isEditMode: Boolean = false,    // ← NOWE
+        val isFavorite: Boolean = false,    // ← NOWE
+    ) : Destinations
 
     @Serializable data object Library : Destinations
 }
@@ -295,16 +305,16 @@ fun AppNavigation() {
                                     id          = product.id,
                                     name        = product.name,
                                     description = product.description,
-                                    kcal        = "",
-                                    protein     = "",
-                                    fat         = "",
-                                    carbs       = "",
+                                    kcal        = product.kcal,
+                                    protein     = product.protein,
+                                    fat         = product.fat,
+                                    carbs       = product.carbs,
                                 )
                             )
                         },
                         onProductQuickAddClick = { /* TODO */ },
                         onAddCustomProductClick = {
-                            navController.navigate(Destinations.ProductCreate)
+                            navController.navigate(Destinations.ProductCreate())  // ← poprawne
                         },
                         onLibraryClick = {
                             navController.navigate(Destinations.Library)
@@ -368,6 +378,21 @@ fun AppNavigation() {
                                     protein     = product.protein,
                                     fat         = product.fat,
                                     carbs       = product.carbs,
+                                )
+                            )
+                        },
+                        onEditClick = { product ->
+                            navController.navigate(
+                                Destinations.ProductCreate(
+                                    id          = product.id,
+                                    name        = product.name,
+                                    description = product.description,
+                                    kcal        = product.kcal,
+                                    protein     = product.protein,
+                                    fat         = product.fat,
+                                    carbs       = product.carbs,
+                                    isEditMode  = true,                 // ← NOWE
+                                    isFavorite  = product.isFavorite,   // ← NOWE
                                 )
                             )
                         },

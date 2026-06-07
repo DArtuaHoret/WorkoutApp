@@ -1,5 +1,6 @@
 package com.example.workoutapp.ui.screens.section_4
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +29,7 @@ import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.example.workoutapp.ui.reusableContents.Section_4.*
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 
 data class ProductDetailArgs(
@@ -178,14 +180,33 @@ fun ProductDetailScreen(
                         }
                     }
 
-                    ActionButton(
-                        onClick = {
-                            viewModel.onSaveProductClick()
-                            onSaveProductClick()
-                        },
-                        label = "ZAPISZ PRODUKT",
-                        style = ActionButtonStyle.LightFilled,
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        ActionButton(
+                            onClick = {
+                                viewModel.onSaveProductClick()
+                                onSaveProductClick()
+                            },
+                            label = "ZAPISZ PRODUKT",
+                            style = ActionButtonStyle.LightFilled,
+                            modifier = Modifier.weight(1f),
+                        )
+                        IconButton(
+                            onClick = viewModel::onToggleCreateFavorite,
+                            modifier = Modifier
+                                .size(52.dp)
+                                .border(2.dp, Color.White, RoundedCornerShape(14.dp)),
+                        ) {
+                            Icon(
+                                imageVector = if (state.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Ulubione",
+                                tint = if (state.isFavorite) Color(0xFFFF4D4D) else Color.White,
+                            )
+                        }
+                    }
                 }
             }
 

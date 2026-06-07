@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.moshi)
     ksp(libs.moshi.codegen)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation(libs.androidx.navigation.compose)

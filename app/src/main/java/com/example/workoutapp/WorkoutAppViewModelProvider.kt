@@ -53,13 +53,15 @@ object WorkoutAppViewModelProvider {
 
         initializer<ProductDetailViewModel> {
             ProductDetailViewModel(
-                savedStateHandle = this.createSavedStateHandle()
+                savedStateHandle = this.createSavedStateHandle(),
+                foodRepository   = workoutApp().foodRepository,
             )
         }
 
         initializer<FavoriteProductsViewModel> {
             FavoriteProductsViewModel(
-                savedStateHandle = this.createSavedStateHandle()
+                savedStateHandle = this.createSavedStateHandle(),
+                foodRepository   = workoutApp().foodRepository,
             )
         }
 

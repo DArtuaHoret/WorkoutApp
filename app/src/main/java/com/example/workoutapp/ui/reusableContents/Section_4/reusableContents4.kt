@@ -19,7 +19,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.WaterDrop
@@ -697,9 +699,12 @@ fun FavoriteProductItemCard(
     protein: String,
     fat: String,
     carbs: String,
+    isFavorite: Boolean = true,
     onCardClick: () -> Unit,
+    onEditClick: () -> Unit,           // ← NOWE
     onRemoveFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isCustom: Boolean = false,
 ) {
     Column(
         modifier = modifier
@@ -736,15 +741,29 @@ fun FavoriteProductItemCard(
                 }
             }
 
+            if (isCustom) {
+                IconButton(
+                    onClick = onEditClick,
+                    modifier = Modifier.size(32.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edytuj",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
+
 
             IconButton(
                 onClick = onRemoveFavoriteClick,
                 modifier = Modifier.size(32.dp),
             ) {
                 Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Usuń z ulubionych",
-                    tint = Color(0xFFFF4D4D),
+                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = "Ulubione",
+                    tint = if (isFavorite) Color(0xFFFF4D4D) else Color(0xFF888888),
                     modifier = Modifier.size(20.dp),
                 )
             }
@@ -764,7 +783,7 @@ fun FavoriteProductItemCard(
         }
     }
 }
-
+/*
 @Preview(name = "FavoriteProductItemCard – with description", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewFavoriteCardWithDesc() {
@@ -800,6 +819,8 @@ private fun PreviewFavoriteCardNoDesc() {
         )
     }
 }
+
+*/
 
 @Composable
 fun LibraryTabButton(

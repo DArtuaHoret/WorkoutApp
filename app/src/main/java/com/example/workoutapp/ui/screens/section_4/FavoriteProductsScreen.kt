@@ -26,6 +26,8 @@ data class FavoriteProductItem(
     val protein: String,
     val fat: String,
     val carbs: String,
+    val isFavorite: Boolean = false,
+    val isCustom: Boolean = false,   // ← NOWE
 )
 
 @Composable
@@ -33,6 +35,7 @@ fun FavoriteProductsScreen(
     viewModel: FavoriteProductsViewModel = viewModel(factory = WorkoutAppViewModelProvider.Factory),
     onBackClick: () -> Unit,
     onProductClick: (FavoriteProductItem) -> Unit,
+    onEditClick: (FavoriteProductItem) -> Unit,   // ← NOWE
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -130,8 +133,11 @@ fun FavoriteProductsScreen(
                         protein = product.protein,
                         fat = product.fat,
                         carbs = product.carbs,
+                        isFavorite = product.isFavorite,
+                        isCustom = product.isCustom,
                         onCardClick = { onProductClick(product) },
-                        onRemoveFavoriteClick = { viewModel.onRemoveFavorite(product) },
+                        onEditClick = { onEditClick(product) },        // ← NOWE
+                        onRemoveFavoriteClick = { viewModel.onToggleFavorite(product) },
                     )
                 }
             }

@@ -3,6 +3,7 @@ package com.example.workoutapp
 import android.app.Application
 import com.example.workoutapp.database.AppDatabase
 import com.example.workoutapp.database.ExerciseRepositoryImpl
+import com.example.workoutapp.database.FoodRepositoryImpl
 import com.example.workoutapp.database.WorkoutTemplateRepositoryImpl
 
 class WorkoutApp : Application() {
@@ -12,6 +13,10 @@ class WorkoutApp : Application() {
 
     val workoutTemplateRepository by lazy {
         WorkoutTemplateRepositoryImpl(AppDatabase.getDatabase(this).workoutTemplateDao())
+    }
+
+    val foodRepository by lazy {
+        FoodRepositoryImpl(AppDatabase.getDatabase(this).foodDao())
     }
     override fun onCreate() {
         super.onCreate()

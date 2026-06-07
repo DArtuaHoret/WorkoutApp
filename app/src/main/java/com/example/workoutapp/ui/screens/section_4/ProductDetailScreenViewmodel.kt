@@ -2,13 +2,13 @@ package com.example.workoutapp.ui.screens.section_4
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.workoutapp.data.FoodProduct
+import com.example.workoutapp.database.FoodRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
-// ---------------------------------------------------------------------------
-// UI State
-// ---------------------------------------------------------------------------
+import kotlinx.coroutines.launch
 
 sealed interface ProductDetailUiState {
     data class View(
@@ -17,70 +17,126 @@ sealed interface ProductDetailUiState {
     ) : ProductDetailUiState
 
     data class Create(
-        val productName: String = "",
+        val productName: String        = "",
         val productDescription: String = "",
-        val kcal: String = "",
-        val protein: String = "",
-        val fat: String = "",
-        val carbs: String = "",
+        val kcal: String               = "",
+        val protein: String            = "",
+        val fat: String                = "",
+        val carbs: String              = "",
+        val isFavorite: Boolean        = false,
+        val editId: String?            = null,
     ) : ProductDetailUiState
 }
 
-// ---------------------------------------------------------------------------
-// ViewModel
-// ---------------------------------------------------------------------------
-
 class ProductDetailViewModel(
     private val savedStateHandle: SavedStateHandle,
+    private val foodRepository: FoodRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<ProductDetailUiState>(
-        if (savedStateHandle.contains("id")) {
-            ProductDetailUiState.View(
-                args = ProductDetailArgs(
-                    id          = savedStateHandle["id"]          ?: "",
-                    name        = savedStateHandle["name"]        ?: "",
-                    description = savedStateHandle["description"] ?: "",
-                    kcal        = savedStateHandle["kcal"]        ?: "",
-                    protein     = savedStateHandle["protein"]     ?: "",
-                    fat         = savedStateHandle["fat"]         ?: "",
-                    carbs       = savedStateHandle["carbs"]       ?: "",
-                )
-            )
-        } else {
-            ProductDetailUiState.Create()
-        }
-    )
+    private val _uiState = MutableStateFlow<ProductDetailUiState>(buildInitialState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
 
-    // ── Tryb View ───────────────────────────────────────────────────────────
+    init {
+        val current = _uiState.value as? ProductDetailUiState.View
+        if (current != null) {
+            viewModelScope.launch {
+                val existing = foodRepository.findActiveByName(current.args.name)
+                if (existing != null) _uiState.value = current.copy(isFavorite = existing.isFavorite)
+            }
+        }
+    }
+
+    // ── View ────────────────────────────────────────────────────────────────
 
     fun onFavoriteClick() {
         val current = _uiState.value as? ProductDetailUiState.View ?: return
-        _uiState.value = current.copy(isFavorite = !current.isFavorite)
+        val newFavorite = !current.isFavorite
+        _uiState.value = current.copy(isFavorite = newFavorite)
+        viewModelScope.launch {
+            val args = current.args
+            val existing = foodRepository.findExactMatch(
+                name     = args.name,
+                calories = args.kcal.toDoubleOrNull() ?: 0.0,
+                protein  = args.protein.toDoubleOrNull() ?: 0.0,
+                fat      = args.fat.toDoubleOrNull() ?: 0.0,
+                carbs    = args.carbs.toDoubleOrNull() ?: 0.0,
+            )
+            val productId = existing?.id ?: foodRepository.insertProduct(
+                FoodProduct(
+                    name     = args.name,
+                    calories = args.kcal.toDoubleOrNull() ?: 0.0,
+                    protein  = args.protein.toDoubleOrNull() ?: 0.0,
+                    fat      = args.fat.toDoubleOrNull() ?: 0.0,
+                    carbs    = args.carbs.toDoubleOrNull() ?: 0.0,
+                )
+            )
+            foodRepository.setFavorite(productId, newFavorite)
+        }
     }
 
-    // ── Tryb Create ─────────────────────────────────────────────────────────
+    // ── Create / Edit ────────────────────────────────────────────────────────
 
-    fun onProductNameChange(value: String) = updateCreate { copy(productName = value) }
+    fun onProductNameChange(value: String)        = updateCreate { copy(productName = value) }
     fun onProductDescriptionChange(value: String) = updateCreate { copy(productDescription = value) }
-    fun onKcalChange(value: String) = updateCreate { copy(kcal = value) }
-    fun onProteinChange(value: String) = updateCreate { copy(protein = value) }
-    fun onFatChange(value: String) = updateCreate { copy(fat = value) }
-    fun onCarbsChange(value: String) = updateCreate { copy(carbs = value) }
+    fun onKcalChange(value: String)               = updateCreate { copy(kcal = value) }
+    fun onProteinChange(value: String)            = updateCreate { copy(protein = value) }
+    fun onFatChange(value: String)                = updateCreate { copy(fat = value) }
+    fun onCarbsChange(value: String)              = updateCreate { copy(carbs = value) }
+    fun onToggleCreateFavorite()                  = updateCreate { copy(isFavorite = !isFavorite) }
 
     fun onSaveProductClick() {
         val current = _uiState.value as? ProductDetailUiState.Create ?: return
-        // TODO: walidacja + zapis do repozytorium
-        //   viewModelScope.launch {
-        //       productRepository.save(current.toProduct())
-        //   }
+        viewModelScope.launch {
+            val editId = current.editId?.toLongOrNull()
+            val product = FoodProduct(
+                id          = editId ?: 0L,
+                name        = current.productName,
+                description = current.productDescription,
+                calories    = current.kcal.toDoubleOrNull() ?: 0.0,
+                protein     = current.protein.toDoubleOrNull() ?: 0.0,
+                fat         = current.fat.toDoubleOrNull() ?: 0.0,
+                carbs       = current.carbs.toDoubleOrNull() ?: 0.0,
+                isCustom    = true,
+                isFavorite  = current.isFavorite,
+            )
+            if (editId != null) foodRepository.updateProduct(product)
+            else foodRepository.insertProduct(product)
+        }
     }
 
-    // ── Helper ──────────────────────────────────────────────────────────────
+    // ── Helpers ──────────────────────────────────────────────────────────────
 
     private fun updateCreate(block: ProductDetailUiState.Create.() -> ProductDetailUiState.Create) {
         val current = _uiState.value as? ProductDetailUiState.Create ?: return
         _uiState.value = current.block()
+    }
+
+    private fun buildInitialState(): ProductDetailUiState {
+        val id          = savedStateHandle.get<String>("id")          ?: ""
+        val name        = savedStateHandle.get<String>("name")        ?: ""
+        val description = savedStateHandle.get<String>("description") ?: ""
+        val kcal        = savedStateHandle.get<String>("kcal")        ?: ""
+        val protein     = savedStateHandle.get<String>("protein")     ?: ""
+        val fat         = savedStateHandle.get<String>("fat")         ?: ""
+        val carbs       = savedStateHandle.get<String>("carbs")       ?: ""
+        val isEditMode  = savedStateHandle.get<Boolean>("isEditMode") ?: false
+        val isFavorite  = savedStateHandle.get<Boolean>("isFavorite") ?: false
+
+        return when {
+            isEditMode -> ProductDetailUiState.Create(
+                productName        = name,
+                productDescription = description,
+                kcal               = kcal,
+                protein            = protein,
+                fat                = fat,
+                carbs              = carbs,
+                editId             = id.takeIf { it.isNotEmpty() },
+                isFavorite         = isFavorite,
+            )
+            id.isNotEmpty() -> ProductDetailUiState.View(
+                args = ProductDetailArgs(id, name, description, kcal, protein, fat, carbs)
+            )
+            else -> ProductDetailUiState.Create()
+        }
     }
 }

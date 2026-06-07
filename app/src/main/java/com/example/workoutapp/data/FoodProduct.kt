@@ -24,6 +24,7 @@ data class FoodProduct(
     var protein: Double,
     var fat: Double,
     var carbs: Double,
+    var description: String = "",   // ← NOWE
     var isActive: Boolean = true,
     var isFavorite: Boolean = false,
     var isCustom: Boolean = false,

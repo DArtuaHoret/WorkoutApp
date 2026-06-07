@@ -44,6 +44,9 @@ interface FoodDao {
     @Query("UPDATE food_products SET isActive = 0 WHERE id = :productId")
     suspend fun deactivateProduct(productId: Long)
 
+    @Update
+    suspend fun updateProduct(product: FoodProduct)
+
     @Query("UPDATE food_products SET isFavorite = :isFavorite WHERE id = :productId")
     suspend fun setFavorite(productId: Long, isFavorite: Boolean)
 

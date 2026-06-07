@@ -27,6 +27,10 @@ data class ProductSearchItem(
     val id: String,
     val name: String,
     val description: String,
+    val kcal: String = "",
+    val protein: String = "",
+    val fat: String = "",
+    val carbs: String = "",
 )
 
 @Composable
