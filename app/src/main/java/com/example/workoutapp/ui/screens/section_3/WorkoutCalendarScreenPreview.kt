@@ -1,12 +1,17 @@
 package com.example.workoutapp.ui.screens.section_3
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.workoutapp.ui.reusableContents.Section_3.CenteredDateRangeSelector
+import com.example.workoutapp.ui.reusableContents.Section_3.CenteredDateSelectionDialog
 import java.time.LocalDate
 
 @Preview(name = "Workout History Screen - Preview", showBackground = true, backgroundColor = 0xFF000000)
@@ -30,10 +35,11 @@ private fun PreviewWorkoutHistoryScreenOctober() {
         WorkoutHistoryScreen(
             selectedDate = selectedDate,
             workoutDays = mockWorkoutDays,
+            availableTemplates = emptyList(), // POPRAWIONE
             onDateSelected = { selectedDate = it },
             onBackClick = {},
-            onAssignWorkoutClick = {},
-            onViewStatsClick = {},
+            onAssignWorkoutClick = { _ -> }, // POPRAWIONE
+            onViewStatsClick = { _, _ -> },
             onViewWorkoutDetailsClick = {}
         )
     }
@@ -57,10 +63,11 @@ private fun PreviewWorkoutHistoryScreenMay() {
         WorkoutHistoryScreen(
             selectedDate = selectedDate,
             workoutDays = mockWorkoutDays,
+            availableTemplates = emptyList(), // POPRAWIONE
             onDateSelected = { selectedDate = it },
             onBackClick = {},
-            onAssignWorkoutClick = {},
-            onViewStatsClick = {},
+            onAssignWorkoutClick = { _ -> }, // POPRAWIONE
+            onViewStatsClick = { _, _ -> },
             onViewWorkoutDetailsClick = {}
         )
     }
@@ -84,11 +91,65 @@ private fun PreviewWorkoutHistoryScreenJanuary() {
         WorkoutHistoryScreen(
             selectedDate = selectedDate,
             workoutDays = mockWorkoutDays,
+            availableTemplates = emptyList(), // POPRAWIONE
             onDateSelected = { selectedDate = it },
             onBackClick = {},
-            onAssignWorkoutClick = {},
-            onViewStatsClick = {},
+            onAssignWorkoutClick = { _ -> }, // POPRAWIONE
+            onViewStatsClick = { _, _ -> },
             onViewWorkoutDetailsClick = {}
         )
+    }
+}
+
+
+
+@Preview(name = "History with Date Selection Overlay", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewHistoryWithSelectionOverlay() {
+    MaterialTheme {
+        // Box służy do symulacji kontenera aplikacji
+        Box(modifier = Modifier.fillMaxSize()) {
+            WorkoutHistoryScreen(
+                selectedDate = LocalDate.now(),
+                workoutDays = setOf(LocalDate.now()),
+                availableTemplates = emptyList(), // POPRAWIONE
+                onDateSelected = {},
+                onBackClick = {},
+                onAssignWorkoutClick = { _ -> }, // POPRAWIONE
+                onViewStatsClick = { _, _ -> },
+                onViewWorkoutDetailsClick = {}
+            )
+
+            // Wymuszamy widoczność dialogu w Preview
+            CenteredDateSelectionDialog(
+                onVisibleChange = {},
+                onDateSelected = {}
+            )
+        }
+    }
+}
+
+
+@Preview(name = "History Screen - Range Selector Active", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewHistoryWithRangeActive() {
+    MaterialTheme {
+        Box(modifier = Modifier.fillMaxSize()) {
+            WorkoutHistoryScreen(
+                selectedDate = LocalDate.now(),
+                workoutDays = setOf(LocalDate.now()),
+                availableTemplates = emptyList(), // POPRAWIONE
+                onDateSelected = {},
+                onBackClick = {},
+                onAssignWorkoutClick = { _ -> }, // POPRAWIONE
+                onViewStatsClick = { _, _ -> },
+                onViewWorkoutDetailsClick = {}
+            )
+            // Wymuszenie renderowania otwartego selektora zakresu
+            CenteredDateRangeSelector(
+                onVisibleChange = {},
+                onDateRangeConfirmed = { _, _ -> }
+            )
+        }
     }
 }

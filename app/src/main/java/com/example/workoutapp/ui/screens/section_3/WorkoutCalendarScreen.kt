@@ -1,23 +1,9 @@
 package com.example.workoutapp.ui.screens.section_3
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -28,83 +14,99 @@ import java.time.LocalDate
 import com.example.workoutapp.ui.calendar.WorkoutCalendar
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
+import com.example.workoutapp.ui.reusableContents.Section_3.CenteredDateRangeSelector
+import com.example.workoutapp.ui.reusableContents.Section_3.CenteredTemplateSelectionDialog
+import com.example.workoutapp.ui.reusableContents.Section_3.TemplateSelectionItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutHistoryScreen(
     selectedDate: LocalDate?,
     workoutDays: Set<LocalDate>,
+    availableTemplates: List<TemplateSelectionItem>,
     onDateSelected: (LocalDate) -> Unit,
     onBackClick: () -> Unit,
-    onAssignWorkoutClick: () -> Unit,
-    onViewStatsClick: () -> Unit,
+    onAssignWorkoutClick: (String) -> Unit,
+    onViewStatsClick: (LocalDate, LocalDate) -> Unit, // Zmieniona sygnatura
     onViewWorkoutDetailsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Historia treningów",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black
+    var showStatsRangeSelector by remember { mutableStateOf(false) }
+    var showTemplateSelectionDialog by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Historia treningów", color = Color.White, fontWeight = FontWeight.Bold) },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
                 )
-            )
-        },
-        containerColor = Color.Black,
-        modifier = modifier
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-        ) {
-            Spacer(modifier = Modifier.height(24.dp))
-
-            WorkoutCalendar(
-                selectedDate = selectedDate,
-                onDateSelected = onDateSelected,
-                workoutDays = workoutDays
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
+            },
+            containerColor = Color.Black,
+            modifier = modifier
+        ) { paddingValues ->
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
             ) {
+                Spacer(modifier = Modifier.height(24.dp))
 
-                if (workoutDays.contains(selectedDate)) {
+                WorkoutCalendar(
+                    selectedDate = selectedDate,
+                    onDateSelected = onDateSelected,
+                    workoutDays = workoutDays
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (workoutDays.contains(selectedDate)) {
+                        ActionButton(
+                            onClick = onViewWorkoutDetailsClick,
+                            label = "ZOBACZ SZCZEGÓŁY TRENINGU",
+                            style = ActionButtonStyle.LightFilled
+                        )
+                    }
+
                     ActionButton(
-                        onClick = onViewWorkoutDetailsClick,
-                        label = "ZOBACZ SZCZEGÓŁY TRENINGU",
+                        onClick = { showTemplateSelectionDialog = true },
+                        label = "WYBIERZ I PRZYPISZ TRENING",
+                        style = ActionButtonStyle.LightFilled
+                    )
+
+                    ActionButton(
+                        onClick = { showStatsRangeSelector = true }, // Otwiera wybór zakresu
+                        label = "OBEJRZYJ STATYSTYKI",
                         style = ActionButtonStyle.LightFilled
                     )
                 }
-
-                ActionButton(
-                    onClick = onAssignWorkoutClick,
-                    label = "WYBIERZ I PRZYPISZ TRENING",
-                    style = ActionButtonStyle.LightFilled
-                )
-
-                ActionButton(
-                    onClick = onViewStatsClick,
-                    label = "OBEJRZYJ STATYSTYKI",
-                    icon = null,
-                    style = ActionButtonStyle.LightFilled
-                )
+                Spacer(modifier = Modifier.weight(1f))
             }
+        }
 
-            Spacer(modifier = Modifier.weight(1f))
+        if (showStatsRangeSelector) {
+            CenteredDateRangeSelector(
+                onVisibleChange = { showStatsRangeSelector = it },
+                onDateRangeConfirmed = { start, end ->
+                    showStatsRangeSelector = false
+                    onViewStatsClick(start, end) // Przekazuje wybrane daty do nawigacji
+                }
+            )
+        }
+
+        if (showTemplateSelectionDialog) {
+            CenteredTemplateSelectionDialog(
+                templates = availableTemplates, // <--- TUTAJ używamy przekazanej listy
+                onVisibleChange = { showTemplateSelectionDialog = it },
+                onTemplateSelected = { selectedTemplateId ->
+                    onAssignWorkoutClick(selectedTemplateId) // Przekazujemy ID wyżej
+                }
+            )
         }
     }
 }

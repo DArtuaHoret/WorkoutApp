@@ -624,10 +624,12 @@ private fun PreviewWorkoutActionButtons() {
 
 @Composable
 fun DateSelectionDialog(
+    initialDate: LocalDate = LocalDate.now(), // DODANO
     onDismissRequest: () -> Unit,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    var tempDate by remember { mutableStateOf(LocalDate.now()) }
+    var tempDate by remember { mutableStateOf(initialDate) }
+    val pickerStartDate = remember { initialDate } // ZAMROŻONY STAN
 
     Dialog(onDismissRequest = onDismissRequest) {
         Card(
@@ -640,7 +642,7 @@ fun DateSelectionDialog(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
 
-        ) {
+            ) {
             Column(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -652,9 +654,9 @@ fun DateSelectionDialog(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                
+
                 WheelDatePicker(
-                    startDate = LocalDate.now(),
+                    startDate = pickerStartDate, // BEZPIECZNIE PRZEKAZANA DATA
                     textColor = Color.White,
                     selectorProperties = WheelPickerDefaults.selectorProperties(
                         color = Color(0xFFD7DAD7).copy(alpha = 0.2f),
@@ -668,7 +670,7 @@ fun DateSelectionDialog(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 ActionButton(
-                    onClick = {onDateSelected(tempDate)},
+                    onClick = { onDateSelected(tempDate) },
                     label = "ZATWIERDŹ",
                     icon = null,
                     style = ActionButtonStyle.LightFilled
@@ -705,7 +707,10 @@ fun DateRangeSelector(
     var showEndDialog by remember { mutableStateOf(false) }
 
     if (showStartDialog) {
-        DateSelectionDialog(onDismissRequest = { showStartDialog = false }, onDateSelected = { startDate = it; showStartDialog = false })
+        CenteredDateSelectionDialog(
+            onVisibleChange = { showStartDialog = it },
+            onDateSelected = { startDate = it; showStartDialog = false }
+        )
     }
     if (showEndDialog) {
         DateSelectionDialog(onDismissRequest = { showEndDialog = false }, onDateSelected = { endDate = it; showEndDialog = false })
@@ -787,3 +792,359 @@ private fun PreviewDateRangeEmpty() {
 }
 
 
+
+
+
+
+
+@Composable
+fun CenteredDateSelectionDialog(
+    initialDate: LocalDate = LocalDate.now(), // 1. Przyjmujemy datę początkową
+    onVisibleChange: (Boolean) -> Unit,
+    onDateSelected: (LocalDate) -> Unit
+) {
+    // 2. tempDate zaczyna od przekazanej daty początkowej
+    var tempDate by remember { mutableStateOf(initialDate) }
+
+    // 3. Zamrażamy stan daty startowej dla samego pickera, aby chronić go przed rekompozycją podczas przewijania
+    val pickerStartDate = remember { initialDate }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.6f))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                onVisibleChange(false)
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(0.85f)
+                .wrapContentHeight()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {}
+                .border(2.dp, Color.White, RoundedCornerShape(14.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Wybierz datę",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                WheelDatePicker(
+                    startDate = pickerStartDate, // 4. Używamy bezpiecznej, zamrożonej daty
+                    textColor = Color.White,
+                    selectorProperties = WheelPickerDefaults.selectorProperties(
+                        color = Color(0xFFD7DAD7).copy(alpha = 0.2f),
+                        border = BorderStroke(width = 1.dp, color = Color(0xFFFFFFFF))
+                    ),
+                    onSnappedDate = { snappedDate ->
+                        tempDate = snappedDate
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                ActionButton(
+                    onClick = {
+                        onDateSelected(tempDate)
+                        onVisibleChange(false)
+                    },
+                    label = "ZATWIERDŹ",
+                    icon = null,
+                    style = ActionButtonStyle.LightFilled
+                )
+            }
+        }
+    }
+}
+
+@Preview(name = "Centered Date Selection Dialog - Preview", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewCenteredDateSelectionDialog() {
+    MaterialTheme {
+        CenteredDateSelectionDialog(
+            onVisibleChange = {},
+            onDateSelected = {}
+        )
+    }
+}
+
+
+
+
+
+@Composable
+fun CenteredDateRangeSelector(
+    initialStartDate: LocalDate = LocalDate.now().minusWeeks(1),
+    initialEndDate: LocalDate = LocalDate.now(),
+    onVisibleChange: (Boolean) -> Unit,
+    onDateRangeConfirmed: (LocalDate, LocalDate) -> Unit
+) {
+    var startDate by remember { mutableStateOf(initialStartDate) }
+    var endDate by remember { mutableStateOf(initialEndDate) }
+
+    var showStartDialog by remember { mutableStateOf(false) }
+    var showEndDialog by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.6f))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { onVisibleChange(false) },
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .wrapContentHeight()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {}
+                .border(2.dp, Color.White, RoundedCornerShape(14.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "WYBIERZ ZAKRES REPREZENTACJI DANYCH",
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+
+                // Pole wyboru daty "OD"
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showStartDialog = true }
+                        .padding(vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Data od:", color = Color.Gray, fontSize = 16.sp)
+                    Text(startDate.toString(), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                }
+
+                Divider(color = Color(0xFF333333), thickness = 1.dp)
+
+                // Pole wyboru daty "DO"
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showEndDialog = true }
+                        .padding(vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Data do:", color = Color.Gray, fontSize = 16.sp)
+                    Text(endDate.toString(), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                ActionButton(
+                    onClick = { onDateRangeConfirmed(startDate, endDate) },
+                    label = "ZATWIERDŹ ZAKRES",
+                    style = ActionButtonStyle.LightFilled
+                )
+            }
+        }
+    }
+
+    // --- POD-DIALOGI ---
+    if (showStartDialog) {
+        CenteredDateSelectionDialog(
+            initialDate = startDate, // Przekazujemy obecną datę "od"
+            onVisibleChange = { showStartDialog = it },
+            onDateSelected = {
+                startDate = it
+                showStartDialog = false
+            }
+        )
+    }
+
+    if (showEndDialog) {
+        CenteredDateSelectionDialog(
+            initialDate = endDate, // Przekazujemy obecną datę "do"
+            onVisibleChange = { showEndDialog = it },
+            onDateSelected = {
+                endDate = it
+                showEndDialog = false
+            }
+        )
+    }
+}
+
+@Preview(name = "Centered Date Range Selector - Preview", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewCenteredDateRangeSelector() {
+    MaterialTheme {
+        CenteredDateRangeSelector(
+            initialStartDate = LocalDate.now().minusWeeks(1),
+            initialEndDate = LocalDate.now(),
+            onVisibleChange = {},
+            onDateRangeConfirmed = { _, _ -> }
+        )
+    }
+}
+
+
+// Prosta klasa transferowa (DTO) reprezentująca pozycję na liście
+data class TemplateSelectionItem(
+    val id: String,
+    val name: String
+)
+
+@Composable
+fun CenteredTemplateSelectionDialog(
+    templates: List<TemplateSelectionItem>,
+    onVisibleChange: (Boolean) -> Unit,
+    onTemplateSelected: (String) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.6f))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                onVisibleChange(false)
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(0.85f)
+                .fillMaxHeight(0.65f) // Ograniczamy wysokość, aby lista mogła się swobodnie przewijać
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {} // Zabezpieczenie przed zamknięciem po kliknięciu w tło karty
+                .border(
+                    width = 2.dp,
+                    color = Color.White,
+                    shape = RoundedCornerShape(14.dp),
+                ),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Wybierz szablon",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                // Główna zawartość - lista szablonów lub informacja o ich braku
+                if (templates.isEmpty()) {
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Brak dostępnych szablonów.\nUtwórz je w sekcji Szablony.",
+                            color = Color(0xFF888888),
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    androidx.compose.foundation.lazy.LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(templates.size) { index ->
+                            val template = templates[index]
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onTemplateSelected(template.id)
+                                        onVisibleChange(false)
+                                    }
+                                    .border(1.dp, Color(0xFF444444), RoundedCornerShape(8.dp)),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFF222222))
+                            ) {
+                                Text(
+                                    text = template.name,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(16.dp),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                ActionButton(
+                    onClick = { onVisibleChange(false) },
+                    label = "ANULUJ",
+                    icon = null,
+                    style = ActionButtonStyle.LightFilled
+                )
+            }
+        }
+    }
+}
+
+@Preview(name = "Template Selection Dialog - Populated", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewCenteredTemplateSelectionDialogPopulated() {
+    val mockTemplates = listOf(
+        TemplateSelectionItem("1", "Trening FBW (Full Body Workout)"),
+        TemplateSelectionItem("2", "Push / Pull / Legs"),
+        TemplateSelectionItem("3", "Klatka + Triceps"),
+        TemplateSelectionItem("4", "Kardio 45 min")
+    )
+    MaterialTheme {
+        CenteredTemplateSelectionDialog(
+            templates = mockTemplates,
+            onVisibleChange = {},
+            onTemplateSelected = {}
+        )
+    }
+}
+
+@Preview(name = "Template Selection Dialog - Empty", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewCenteredTemplateSelectionDialogEmpty() {
+    MaterialTheme {
+        CenteredTemplateSelectionDialog(
+            templates = emptyList(),
+            onVisibleChange = {},
+            onTemplateSelected = {}
+        )
+    }
+}

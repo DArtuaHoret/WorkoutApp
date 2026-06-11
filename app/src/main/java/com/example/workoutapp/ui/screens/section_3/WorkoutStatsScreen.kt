@@ -30,10 +30,13 @@ import com.example.workoutapp.ui.reusableContents.Section_3.AverageTimeCard
 import com.example.workoutapp.ui.reusableContents.Section_3.MuscleGroupDistributionCard
 import com.example.workoutapp.ui.reusableContents.Section_3.MuscleGroupShare
 import com.example.workoutapp.ui.reusableContents.Section_3.TrainingProgressCard
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutStatsScreen(
+    startDate: LocalDate,
+    endDate: LocalDate,
     totalDays: Int,
     completedWorkouts: Int,
     muscleDistribution: List<MuscleGroupShare>,
@@ -42,30 +45,18 @@ fun WorkoutStatsScreen(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
+    val rangeFormatter = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = "STATYSTYKI",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
+                title = { Text("STATYSTYKI", color = Color.White, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Powrót",
-                            tint = Color.White
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Powrót", tint = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
             )
         },
         containerColor = Color.Black,
@@ -75,53 +66,30 @@ fun WorkoutStatsScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .verticalScroll(scrollState) // to umożliwia przewijanie ekranu
-                .padding(horizontal = 16.dp, vertical = 24.dp),
+                .verticalScroll(scrollState)
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            // Wyświetlenie wybranego zakresu dat pod TopAppBarem
+            Text(
+                text = "Zakres: ${startDate.format(rangeFormatter)} — ${endDate.format(rangeFormatter)}",
+                color = Color(0xFFAAAAAA),
+                fontSize = 14.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(
-                    text = "FREKWENCJA",
-                    color = Color(0xFFE5D5C5),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                TrainingProgressCard(
-                    totalDays = totalDays,
-                    completedWorkouts = completedWorkouts,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Text("FREKWENCJA", color = Color(0xFFE5D5C5), fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                TrainingProgressCard(totalDays = totalDays, completedWorkouts = completedWorkouts, modifier = Modifier.fillMaxWidth())
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(
-                    text = "ROZKŁAD & CZAS",
-                    color = Color(0xFFE5D5C5),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                MuscleGroupDistributionCard(
-                    distribution = muscleDistribution,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
+                Text("ROZKŁAD & CZAS", color = Color(0xFFE5D5C5), fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                MuscleGroupDistributionCard(distribution = muscleDistribution, modifier = Modifier.fillMaxWidth())
                 Spacer(modifier = Modifier.height(16.dp))
-
-                AverageTimeCard(
-                    averageTimeInSeconds = averageTimeInSeconds,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                AverageTimeCard(averageTimeInSeconds = averageTimeInSeconds, modifier = Modifier.fillMaxWidth())
             }
-
             Spacer(modifier = Modifier.height(32.dp))
         }
     }

@@ -5,11 +5,13 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.workoutapp.database.ExerciseRepositoryImpl
 import com.example.workoutapp.ui.screens.section_1.ExerciseDetailViewModel
 import com.example.workoutapp.ui.screens.section_1.ExerciseSearchViewModel
 import com.example.workoutapp.ui.screens.section_1.TemplateDetailViewModel
 import com.example.workoutapp.ui.screens.section_1.TemplateListViewModel
+import com.example.workoutapp.ui.screens.section_2.ExerciseTrackingViewModel
+import com.example.workoutapp.ui.screens.section_3.WorkoutCalendarViewModel
+import com.example.workoutapp.ui.screens.section_3.WorkoutStatsViewModel
 import com.example.workoutapp.ui.screens.section_4.AddMealSearchViewModel
 import com.example.workoutapp.ui.screens.section_4.BarcodeScannerViewModel
 import com.example.workoutapp.ui.screens.section_4.FavoriteProductsViewModel
@@ -67,6 +69,25 @@ object WorkoutAppViewModelProvider {
 
         initializer<BarcodeScannerViewModel> {
             BarcodeScannerViewModel()
+        }
+
+        initializer<WorkoutStatsViewModel> {
+            WorkoutStatsViewModel(
+                savedStateHandle = this.createSavedStateHandle()
+            )
+        }
+
+        initializer<WorkoutCalendarViewModel> {
+            WorkoutCalendarViewModel(
+                templateRepository = workoutApp().workoutTemplateRepository
+            )
+        }
+
+        initializer<ExerciseTrackingViewModel> {
+            ExerciseTrackingViewModel(
+                savedStateHandle = this.createSavedStateHandle(),
+                templateRepository = workoutApp().workoutTemplateRepository
+            )
         }
     }
 }

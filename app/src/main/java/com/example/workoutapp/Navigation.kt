@@ -15,22 +15,24 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
 import com.example.workoutapp.ui.screens.section_1.ExerciseDetailScreen
-import com.example.workoutapp.ui.screens.section_1.ExerciseDetailViewModel
 import com.example.workoutapp.ui.screens.section_1.ExerciseSearchScreen
-import com.example.workoutapp.ui.screens.section_1.ExerciseSearchViewModel
 import com.example.workoutapp.ui.screens.section_1.TemplateDetailScreen
 import com.example.workoutapp.ui.screens.section_1.TemplateDetailViewModel
 import com.example.workoutapp.ui.screens.section_1.TemplateListScreen
 import com.example.workoutapp.ui.screens.section_1.TemplateListViewModel
 import com.example.workoutapp.ui.screens.section_3.WorkoutHistoryScreen
+import com.example.workoutapp.ui.screens.section_3.WorkoutCalendarViewModel
+import com.example.workoutapp.ui.screens.section_3.WorkoutStatsScreen
+import com.example.workoutapp.ui.screens.section_3.WorkoutStatsViewModel
 import com.example.workoutapp.ui.screens.section_4.AddMealSearchScreen
 import com.example.workoutapp.ui.screens.section_4.BarcodeScannerScreen
 import com.example.workoutapp.ui.screens.section_4.FavoriteProductsScreen
 import com.example.workoutapp.ui.screens.section_4.ProductDetailScreen
-import kotlinx.coroutines.coroutineScope
+import com.example.workoutapp.ui.screens.section_2.ExerciseTrackingViewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
+
 
 // --- Type-safe destinations ---
 sealed interface Destinations {
@@ -64,10 +66,27 @@ sealed interface Destinations {
 
     // ── Sekcja 2 ─────────────────────────────────────────────────────────
     @Serializable data object Workout : Destinations
+    @Serializable data class ActiveWorkout(
+        val templateId: String,
+        val dateIso: String
+    ) : Destinations
+    // ── Sekcja 3 – zagnieżdżony graf historii ────────────────────────────
+    /** Korzeń grafu historii */
+    @Serializable data object HistoryGraph : Destinations
 
-    // ── Sekcja 3 ─────────────────────────────────────────────────────────
-    @Serializable data object History : Destinations
+    /** Ekran główny historii z kalendarzem */
+    @Serializable data object HistoryCalendar : Destinations
 
+    /** Ekran statystyk całego miesiąca/okresu */
+    @Serializable
+    data class HistoryStats(
+        val startDateIso: String,
+        val endDateIso: String
+    ) : Destinations
+    /** Ekran szczegółów treningów z konkretnego dnia */
+    @Serializable data class HistoryDetails(
+        val dateIsoString: String // Przekazujemy datę jako String, np. "2026-06-11"
+    ) : Destinations
     // ── Sekcja 4 – zagnieżdżony graf diety ───────────────────────────────
     /** Korzeń zagnieżdżonego grafu diety – nie jest osobnym screenem. */
     @Serializable data object DietGraph : Destinations
@@ -114,7 +133,7 @@ data class BottomNavItem(
 val bottomNavItems = listOf(
     BottomNavItem(Destinations.TemplatesGraph, "📋", "Szablony"),
     BottomNavItem(Destinations.Workout,        "🏋️", "Trening"),
-    BottomNavItem(Destinations.History,        "📅", "Historia"),
+    BottomNavItem(Destinations.HistoryGraph,        "📅", "Historia"),
     BottomNavItem(Destinations.DietGraph,      "🍎", "Dieta"),
 )
 
@@ -272,21 +291,124 @@ fun AppNavigation() {
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Trening – wkrótce", color = Color.White)
+                    Text("Ustaw trening w kalendarzu", color = Color.White)
                 }
             }
 
-            // ── Sekcja 3 ─────────────────────────────────────────────────
-            composable<Destinations.History> {
-                WorkoutHistoryScreen(
-                    selectedDate = selectedDate,
-                    workoutDays = workoutDays,
-                    onDateSelected = { selectedDate = it },
-                    onBackClick = {},
-                    onAssignWorkoutClick = {},
-                    onViewStatsClick = {},
-                    onViewWorkoutDetailsClick = {}
+            composable<Destinations.ActiveWorkout> { backStackEntry ->
+                // 1. Pobranie ViewModelu (z uwzględnieniem Twojej nazwy klasy)
+                val viewModel: ExerciseTrackingViewModel = viewModel(
+                    viewModelStoreOwner = backStackEntry,
+                    factory = WorkoutAppViewModelProvider.Factory
                 )
+
+                // 2. Obserwacja stanów z ViewModelu
+                val exerciseName by viewModel.exerciseName.collectAsState()
+                val exerciseDescription by viewModel.exerciseDescription.collectAsState()
+                val currentSet by viewModel.currentSet.collectAsState()
+                val reps by viewModel.reps.collectAsState()
+                val weight by viewModel.weight.collectAsState()
+                val restTime by viewModel.restTime.collectAsState()
+                val isResting by viewModel.isResting.collectAsState()
+
+                // 3. Renderowanie ekranu
+                com.example.workoutapp.ui.screens.active_workout.ActiveWorkoutScreen(
+                    exerciseName = exerciseName,
+                    exerciseDescription = exerciseDescription,
+                    currentSet = currentSet,
+                    reps = reps,
+                    weight = weight,
+                    restTime = restTime,
+                    isResting = isResting,
+                    onBackClick = { navController.popBackStack() },
+                    onRepsChange = viewModel::updateReps,
+                    onWeightChange = viewModel::updateWeight,
+                    onRestTimeChange = viewModel::updateRestTime,
+                    onTimerFinished = viewModel::onTimerFinished,
+                    onDoneClick = viewModel::onDoneClick,
+                    onSaveDescription = viewModel::updateDescription
+                )
+            }
+
+
+            // ── Sekcja 3 ─────────────────────────────────────────────────
+            navigation<Destinations.HistoryGraph>(
+                startDestination = Destinations.HistoryCalendar,
+            ) {
+
+                composable<Destinations.HistoryCalendar> { backStackEntry ->
+                    // Używamy WorkoutCalendarViewModel
+                    val viewModel: WorkoutCalendarViewModel = viewModel(
+                        viewModelStoreOwner = backStackEntry,
+                        factory = WorkoutAppViewModelProvider.Factory
+                    )
+
+                    val templates by viewModel.availableTemplates.collectAsState()
+
+                    WorkoutHistoryScreen(
+                        selectedDate = selectedDate,
+                        workoutDays = workoutDays,
+                        availableTemplates = templates,
+                        onDateSelected = { selectedDate = it },
+                        onBackClick = {},
+                        onAssignWorkoutClick = { templateId ->
+                            selectedDate?.let { date ->
+
+                                // 2. PRZEKIEROWANIE DO SEKCJI 2
+                                navController.navigate(
+                                    Destinations.ActiveWorkout(
+                                        templateId = templateId,
+                                        dateIso = date.toString()
+                                    )
+                                )
+                            }
+                        },
+                        onViewStatsClick = { startDate, endDate ->
+                            // Przejście do statystyk (jeśli masz dodaną tę trasę)
+                            navController.navigate(
+                                Destinations.HistoryStats(
+                                    startDateIso = startDate.toString(),
+                                    endDateIso = endDate.toString()
+                                )
+                            )
+                        },
+                        onViewWorkoutDetailsClick = {
+                            // Przejście do detali danego dnia (jeśli masz dodaną tę trasę)
+                            selectedDate?.let { date ->
+                                navController.navigate(
+                                    Destinations.HistoryDetails(dateIsoString = date.toString())
+                                )
+                            }
+                        }
+                    )
+                }
+
+                composable<Destinations.HistoryStats> { backStackEntry ->
+                    // 1. Inicjalizacja ViewModelu dla statystyk
+                    val viewModel: WorkoutStatsViewModel = viewModel(
+                        viewModelStoreOwner = backStackEntry,
+                        factory = WorkoutAppViewModelProvider.Factory
+                    )
+
+                    // 2. Obserwacja stanu wyliczeń (dni, treningi, procenty)
+                    val uiState by viewModel.uiState.collectAsState()
+
+                    // 3. Pobranie bezpiecznych argumentów z nawigacji
+                    val args = backStackEntry.toRoute<Destinations.HistoryStats>()
+                    val startDate = java.time.LocalDate.parse(args.startDateIso)
+                    val endDate = java.time.LocalDate.parse(args.endDateIso)
+
+                    // 4. Renderowanie ekranu UI
+                    com.example.workoutapp.ui.screens.section_3.WorkoutStatsScreen(
+                        startDate = startDate,
+                        endDate = endDate,
+                        totalDays = uiState.totalDays,
+                        completedWorkouts = uiState.completedWorkouts,
+                        muscleDistribution = uiState.muscleDistribution,
+                        averageTimeInSeconds = uiState.averageTimeInSeconds,
+                        onBackClick = { navController.popBackStack() } // Powrót strzałką
+                    )
+                }
             }
 
             // ── Zagnieżdżony graf sekcji 4 ───────────────────────────────
