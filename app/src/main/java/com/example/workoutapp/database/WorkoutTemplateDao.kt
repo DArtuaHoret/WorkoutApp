@@ -18,8 +18,10 @@ data class TemplateExerciseEntry(
     val orderIndex: Int,
     val note: String?,
     val setCount: Int,
-    val weight: Double,
-    val restTime: Int,
+    val minWeight: Double,  // było: weight
+    val maxWeight: Double,
+    val minRestTime: Int,   // było: restTime
+    val maxRestTime: Int,
 )
 
 @Dao
@@ -79,8 +81,10 @@ interface WorkoutTemplateDao {
             i.orderIndex,
             i.note,
             COUNT(s.id) AS setCount,
-            COALESCE(MAX(s.weight), 0.0) AS weight,
-            COALESCE(MAX(s.restTime), 60) AS restTime
+            COALESCE(MIN(s.weight), 0.0)   AS minWeight,
+            COALESCE(MAX(s.weight), 0.0)   AS maxWeight,
+            COALESCE(MIN(s.restTime), 60)  AS minRestTime,
+            COALESCE(MAX(s.restTime), 60)  AS maxRestTime
         FROM workout_template_items i
         JOIN exercises e ON e.id = i.exerciseId
         LEFT JOIN workout_template_sets s ON s.workoutTemplateItemId = i.id

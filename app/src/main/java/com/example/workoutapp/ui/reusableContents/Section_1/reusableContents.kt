@@ -492,8 +492,8 @@ fun ExerciseSelectItem(
             color = Color.White,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
+            //maxLines = 2,
+            //overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
 
@@ -1013,7 +1013,7 @@ fun ExerciseSetCard(
                 label = "ODPOCZYNEK",
                 value = rest,
                 onValueChange = onRestChange,
-                step = 15,
+                step = 10,
                 unit = "s",
             )
         }

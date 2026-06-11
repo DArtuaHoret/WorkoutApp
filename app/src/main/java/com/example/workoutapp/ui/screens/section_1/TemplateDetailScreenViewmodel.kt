@@ -82,7 +82,12 @@ private fun TemplateExerciseEntry.toExerciseEntry() = ExerciseEntry(
     exerciseId = exerciseId.toString(),
     name       = exerciseName,
     series     = setCount.toString(),
-    weight     = "${weight.toInt()}kg",
-    restTime   = "${restTime}s",
+    weight     = if (minWeight == maxWeight) "${minWeight.toInt()} kg"
+    else "${minWeight.toInt()}–${maxWeight.toInt()} kg",
+    restTime   = if (minRestTime == maxRestTime) formatTime(minRestTime)
+    else "${formatTime(minRestTime)}–${formatTime(maxRestTime)}",
     note       = note ?: "",
 )
+
+private fun formatTime(seconds: Int): String =
+    "%02d:%02d".format(seconds / 60, seconds % 60)
