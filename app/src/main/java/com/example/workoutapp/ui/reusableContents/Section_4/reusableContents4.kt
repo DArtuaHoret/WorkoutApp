@@ -705,6 +705,7 @@ fun FavoriteProductItemCard(
     onRemoveFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
     isCustom: Boolean = false,
+    onAddClick: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -767,6 +768,7 @@ fun FavoriteProductItemCard(
                     modifier = Modifier.size(20.dp),
                 )
             }
+
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -774,12 +776,36 @@ fun FavoriteProductItemCard(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            NutrientChip(label = "Kcal", value = kcal)
-            NutrientChip(label = "Białko", value = "${protein}g")
-            NutrientChip(label = "Tłuszcze", value = "${fat}g")
-            NutrientChip(label = "Węgl.", value = "${carbs}g")
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                NutrientChip(label = "Kcal", value = kcal)
+                NutrientChip(label = "Białko", value = "${protein}g")
+                NutrientChip(label = "Tłuszcze", value = "${fat}g")
+                NutrientChip(label = "Węgl.", value = "${carbs}g")
+            }
+
+            IconButton(
+                onClick = onAddClick,
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .size(32.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color.White,
+                        shape = RoundedCornerShape(8.dp),
+                    ),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Dodaj",
+                    tint = Color.White,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
         }
     }
 }

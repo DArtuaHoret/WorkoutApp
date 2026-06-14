@@ -138,6 +138,7 @@ fun FavoriteProductsScreen(
                         onCardClick = { onProductClick(product) },
                         onEditClick = { onEditClick(product) },        // ← NOWE
                         onRemoveFavoriteClick = { viewModel.onToggleFavorite(product) },
+                        onAddClick = { /* TODO */ }
                     )
                 }
             }
