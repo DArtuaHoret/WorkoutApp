@@ -27,6 +27,8 @@ data class ExerciseOption(
     val id: String,
     val name: String,
     val muscleGroup: String,
+    val isCustom: Boolean = false,
+    val photoUrl: String? = null,
 )
 
 @Composable
@@ -39,6 +41,7 @@ fun ExerciseSearchScreen(
 ) {
     val query             by viewModel.query.collectAsState()
     val filteredExercises by viewModel.filteredExercises.collectAsState()
+    val showOnlyCustom by viewModel.showOnlyCustom.collectAsState()
 
     val grouped = remember(filteredExercises) {
         filteredExercises.groupBy { it.muscleGroup }
@@ -51,7 +54,6 @@ fun ExerciseSearchScreen(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Nagłówek
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -71,7 +73,31 @@ fun ExerciseSearchScreen(
                 color = Color.White,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.offset(x = (-16).dp),
+                modifier = Modifier
+                    .offset(x = (-16).dp)
+                    .weight(1f),
+            )
+            FilterChip(
+                selected = showOnlyCustom,
+                onClick = viewModel::onToggleShowOnlyCustom,
+                label = {
+                    Text(
+                        text = "Własne",
+                        fontSize = 13.sp,
+                    )
+                },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = Color(0xFF3D3D3D),
+                    selectedLabelColor = Color.White,
+                    containerColor = Color(0xFF1E1E1E),
+                    labelColor = Color(0xFF888888),
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = showOnlyCustom,
+                    borderColor = Color(0xFF3D3D3D),
+                    selectedBorderColor = Color(0xFF555555),
+                ),
             )
         }
 
@@ -92,6 +118,8 @@ fun ExerciseSearchScreen(
                 )
             }
 
+
+
             if (grouped.isEmpty()) {
                 item {
                     Box(
@@ -101,7 +129,11 @@ fun ExerciseSearchScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "Brak wyników dla \"$query\"",
+                            text = if (showOnlyCustom) {
+                                "Brak własnych ćwiczeń dla \"$query\""
+                            } else {
+                                "Brak wyników dla \"$query\""
+                            },
                             color = Color(0xFF888888),
                             fontSize = 15.sp,
                         )
@@ -123,10 +155,38 @@ fun ExerciseSearchScreen(
                         items = groupExercises,
                         key = { it.id },
                     ) { exercise ->
-                        ExerciseSelectItem(
-                            exerciseName = exercise.name,
-                            onAddClick = { onExerciseClick(exercise) },
-                        )
+                        Box {
+                            ExerciseSelectItem(
+                                exerciseName = exercise.name,
+                                photoUrl = exercise.photoUrl,
+                                onAddClick = { onExerciseClick(exercise) },
+                            )
+                            if (!exercise.isCustom) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(top = 4.dp, end = 5.dp)
+                                        .background(
+                                            color = Color(0xFF3D3D3D),
+                                            shape = RoundedCornerShape(6.dp),
+                                        )
+                                        .border(
+                                            width = 1.dp,
+                                            color = Color(0xFF555555),
+                                            shape = RoundedCornerShape(6.dp),
+                                        )
+                                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                                ) {
+                                    Text(
+                                        text = "WŁASNE",
+                                        color = Color(0xFFCCCCCC),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 0.5.sp,
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

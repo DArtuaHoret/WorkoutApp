@@ -18,10 +18,11 @@ data class TemplateExerciseEntry(
     val orderIndex: Int,
     val note: String?,
     val setCount: Int,
-    val minWeight: Double,  // było: weight
+    val minWeight: Double,
     val maxWeight: Double,
-    val minRestTime: Int,   // było: restTime
+    val minRestTime: Int,
     val maxRestTime: Int,
+    val photoUrl: String?, // ← nowe
 )
 
 @Dao
@@ -78,6 +79,7 @@ interface WorkoutTemplateDao {
             i.id        AS itemId,
             e.id        AS exerciseId,
             e.name      AS exerciseName,
+            e.photoUrl  AS photoUrl,
             i.orderIndex,
             i.note,
             COUNT(s.id) AS setCount,

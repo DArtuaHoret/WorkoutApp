@@ -15,6 +15,8 @@ data class ExerciseWithMuscleGroup(
     val exerciseId: Long,
     val exerciseName: String,
     val muscleGroupName: String,
+    val isCustom: Boolean,
+    val photoUrl: String?,
 )
 
 @Dao
@@ -62,7 +64,9 @@ interface ExerciseDao {
     SELECT 
         e.id   AS exerciseId,
         e.name AS exerciseName,
-        COALESCE(mg.name, 'Inne') AS muscleGroupName
+        COALESCE(mg.name, 'Inne') AS muscleGroupName,
+        e.isCustom AS isCustom,
+        e.photoUrl AS photoUrl
     FROM exercises e
     LEFT JOIN exercise_muscle_groups emg ON emg.exerciseId = e.id
     LEFT JOIN muscle_groups mg ON mg.id = emg.muscleGroupId

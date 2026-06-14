@@ -1,21 +1,34 @@
 package com.example.workoutapp.ui.screens.section_1
 
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.example.workoutapp.drawableResIdByName
 import com.example.workoutapp.ui.reusableContents.Section_1.*
+import java.io.File
 
 data class ExerciseSetState(
     val id: String,
@@ -37,6 +50,13 @@ fun ExerciseDetailScreen(
     val sets                by viewModel.sets.collectAsState()
     val muscleGroups by viewModel.muscleGroups.collectAsState()
     val exerciseNote by viewModel.exerciseNote.collectAsState()
+    val photoUrl by viewModel.photoUrl.collectAsState()
+    val context = LocalContext.current
+
+    val pickImage = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri -> uri?.let { viewModel.onImagePicked(context, it) } }
+
 
     Column(
         modifier = modifier
@@ -78,14 +98,50 @@ fun ExerciseDetailScreen(
         ) {
             // Exercise image
             item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center,
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
                 ) {
-                    ExerciseImagePlaceholder()
-                }
+                    Box(
+                        modifier = Modifier
+                            .size(180.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFF2C2C2C))
+                            .clickable { pickImage.launch("image/*") },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                    val url = photoUrl
+                    val model: Any? = when {
+                        url.isNullOrBlank() -> null
+                        url.startsWith("/") -> File(url)
+                        else -> {
+                            val resId = remember(url) {
+                                context.resources.getIdentifier(url, "raw", context.packageName)
+                                    .takeIf { it != 0 }
+                            }
+                            resId
+                        }
+                    }
+
+                    if (model != null) {
+                        AsyncImage(
+                            model = model,
+                            contentDescription = exerciseName,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                        )
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            ExerciseImagePlaceholder()
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                "Dotknij, aby dodać zdjęcie/gif",
+                                color = Color(0xFF888888),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                } }
             }
 
             // Exercise name

@@ -87,6 +87,7 @@ private fun TemplateExerciseEntry.toExerciseEntry() = ExerciseEntry(
     restTime   = if (minRestTime == maxRestTime) formatTime(minRestTime)
     else "${formatTime(minRestTime)}–${formatTime(maxRestTime)}",
     note       = note ?: "",
+    photoUrl   = photoUrl ?: "", // ← dodaj, nazwa pola zależna od TemplateExerciseEntry
 )
 
 private fun formatTime(seconds: Int): String =

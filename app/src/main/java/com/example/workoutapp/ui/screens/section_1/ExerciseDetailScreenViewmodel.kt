@@ -1,5 +1,7 @@
 package com.example.workoutapp.ui.screens.section_1
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,8 +12,10 @@ import com.example.workoutapp.data.WorkoutTemplateItem
 import com.example.workoutapp.data.WorkoutTemplateSet
 import com.example.workoutapp.database.ExerciseRepository
 import com.example.workoutapp.database.WorkoutTemplateRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.UUID
 
 class ExerciseDetailViewModel(
@@ -36,6 +40,9 @@ class ExerciseDetailViewModel(
 
     private val _exerciseNote = MutableStateFlow(args.note ?: "")
     val exerciseNote: StateFlow<String> = _exerciseNote.asStateFlow()
+
+    private val _photoUrl = MutableStateFlow<String?>(null)
+    val photoUrl: StateFlow<String?> = _photoUrl.asStateFlow()
 
     val muscleGroups: StateFlow<List<String>> =
         exerciseRepository.getAllMuscleGroups()
@@ -73,15 +80,25 @@ class ExerciseDetailViewModel(
                 val itemId = args.itemId.toLong()
                 val exerciseId = args.exerciseId.toLong()
 
-                // Zaktualizuj grupy mięśniowe
-                exerciseRepository.unlinkAllMuscleGroupsForExercise(exerciseId)  // ← usuń stare
+                // Zaktualizuj exercise w bazie
+                val existingExercise = exerciseRepository.getExerciseById(exerciseId)
+                    .first().firstOrNull() ?: return@launch
+
+                exerciseRepository.updateExercise(   // ← updateExercise, NIE saveExercise
+                    existingExercise.copy(
+                        name     = _exerciseName.value,
+                        photoUrl = _photoUrl.value,
+                    )
+                )
+
+                // reszta bez zmian
+                exerciseRepository.unlinkAllMuscleGroupsForExercise(exerciseId)
                 val allGroups = exerciseRepository.getAllMuscleGroups().first()
                 _selectedMuscleGroups.value.forEach { groupName ->
                     val group = allGroups.firstOrNull { it.name == groupName } ?: return@forEach
                     exerciseRepository.linkExerciseToMuscleGroup(exerciseId, group.id)
                 }
 
-                // Usuń stare sety i wstaw nowe
                 templateRepository.deleteSetsForItem(itemId)
                 _sets.value.forEachIndexed { index, setState ->
                     templateRepository.saveTemplateSet(
@@ -99,7 +116,8 @@ class ExerciseDetailViewModel(
                 val exerciseId: Long = if (isNewExercise) {
                     val newExercise = Exercise(
                         name     = _exerciseName.value,
-                        isCustom = true,
+                        isCustom = false,
+                        photoUrl = _photoUrl.value,
                     )
                     exerciseRepository.saveExercise(newExercise)
                     exerciseRepository.getActiveExercises().first()
@@ -148,6 +166,7 @@ class ExerciseDetailViewModel(
             val id = exerciseId.toLongOrNull() ?: return@launch
             exerciseRepository.getExerciseById(id).first().firstOrNull()?.let { exercise ->
                 _exerciseName.value = exercise.name
+                _photoUrl.value = exercise.photoUrl
             }
             exerciseRepository.getMuscleGroupsForExercise(id)
                 .first()
@@ -167,6 +186,18 @@ class ExerciseDetailViewModel(
                     )
                 }
                 .let { if (it.isNotEmpty()) _sets.value = it }
+        }
+    }
+
+    fun onImagePicked(context: Context, uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val ext = if (context.contentResolver.getType(uri) == "image/gif") "gif" else "jpg"
+            val destFile =
+                File(context.filesDir, "custom_exercise_${System.currentTimeMillis()}.$ext")
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                destFile.outputStream().use { output -> input.copyTo(output) }
+            }
+            _photoUrl.value = destFile.absolutePath
         }
     }
 }

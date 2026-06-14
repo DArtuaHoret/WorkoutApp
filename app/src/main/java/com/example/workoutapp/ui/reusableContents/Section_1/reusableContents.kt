@@ -1,5 +1,7 @@
 package com.example.workoutapp.ui.reusableContents.Section_1
 
+import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -66,6 +68,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.DirectionsRun
+import coil.compose.AsyncImage
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import com.example.workoutapp.drawableResIdByName
+import java.io.File
 
 private val FieldShape    = RoundedCornerShape(14.dp)
 private val FieldBgColor  = Color(0xFF1A1A1A)
@@ -224,11 +233,15 @@ fun ExerciseItemCard(
     weight: String,
     restTime: String,
     note: String = "",
+    photoUrl: String? = null,
     imageContent: @Composable BoxScope.() -> Unit = { ExerciseImagePlaceholder() },
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val imageModel = remember(photoUrl) { resolveImageModel(context, photoUrl) }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -251,7 +264,16 @@ fun ExerciseItemCard(
                     .background(Color(0xFF2C2C2C)),
                 contentAlignment = Alignment.Center,
             ) {
-                imageContent()
+                if (imageModel != null) {
+                    AsyncImage(
+                        model = imageModel,
+                        contentDescription = exerciseName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit,
+                    )
+                } else {
+                    imageContent()
+                }
             }
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -305,7 +327,7 @@ fun ExerciseItemCard(
 @Composable
 fun ExerciseImagePlaceholder() {
     Text(
-        text = "🏋️",
+        text = "",
         fontSize = 28.sp,
     )
 }
@@ -463,16 +485,16 @@ fun ExerciseSelectItem(
     exerciseName: String,
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
+    photoUrl: String? = null,
     imageContent: @Composable BoxScope.() -> Unit = { ExerciseImagePlaceholder() },
 ) {
+    val context = LocalContext.current
+    val imageModel = remember(photoUrl) { resolveImageModel(context, photoUrl) }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .border(
-                width = 2.dp,
-                color = Color.White,
-                shape = RoundedCornerShape(14.dp),
-            )
+            .border(width = 2.dp, color = Color.White, shape = RoundedCornerShape(14.dp))
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -484,7 +506,16 @@ fun ExerciseSelectItem(
                 .background(Color(0xFF2C2C2C)),
             contentAlignment = Alignment.Center,
         ) {
-            imageContent()
+            if (imageModel != null) {
+                AsyncImage(
+                    model = imageModel,
+                    contentDescription = exerciseName,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                imageContent()
+            }
         }
 
         Text(
@@ -492,8 +523,6 @@ fun ExerciseSelectItem(
             color = Color.White,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
-            //maxLines = 2,
-            //overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
 
@@ -501,11 +530,7 @@ fun ExerciseSelectItem(
             onClick = onAddClick,
             modifier = Modifier
                 .size(56.dp)
-                .border(
-                    width = 2.dp,
-                    color = Color.White,
-                    shape = RoundedCornerShape(8.dp),
-                ),
+                .border(width = 2.dp, color = Color.White, shape = RoundedCornerShape(8.dp)),
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -1122,5 +1147,12 @@ private fun PreviewMultipleSets() {
 
         }
     }
+}
+
+fun resolveImageModel(context: Context, photoUrl: String?): Any? {
+    if (photoUrl.isNullOrBlank()) return null
+    if (photoUrl.startsWith("/")) return File(photoUrl)
+    val resId = context.resources.getIdentifier(photoUrl, "raw", context.packageName)
+    return if (resId != 0) resId else null
 }
 

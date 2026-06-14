@@ -24,13 +24,14 @@ import com.example.workoutapp.ui.reusableContents.Section_1.*
 
 
 data class ExerciseEntry(
-    val id: String,        // itemId (WorkoutTemplateItem)
-    val exerciseId: String, // ← nowe pole
+    val id: String,
+    val exerciseId: String,
     val name: String,
     val series: String,
     val weight: String,
     val restTime: String,
     val note: String = "",
+    val photoUrl: String = "", // ← nowe pole
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -146,6 +147,7 @@ fun TemplateDetailScreen(
                     weight = exercise.weight,
                     restTime = exercise.restTime,
                     note = exercise.note,
+                    photoUrl = exercise.photoUrl, // ← przekazanie
                     onEditClick = { onEditExercise(exercise) },
                     onDeleteClick = { viewModel.deleteExercise(exercise) },
                 )
