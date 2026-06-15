@@ -80,18 +80,16 @@ class ExerciseDetailViewModel(
                 val itemId = args.itemId.toLong()
                 val exerciseId = args.exerciseId.toLong()
 
-                // Zaktualizuj exercise w bazie
                 val existingExercise = exerciseRepository.getExerciseById(exerciseId)
                     .first().firstOrNull() ?: return@launch
 
-                exerciseRepository.updateExercise(   // ← updateExercise, NIE saveExercise
+                exerciseRepository.updateExercise(
                     existingExercise.copy(
                         name     = _exerciseName.value,
                         photoUrl = _photoUrl.value,
                     )
                 )
 
-                // reszta bez zmian
                 exerciseRepository.unlinkAllMuscleGroupsForExercise(exerciseId)
                 val allGroups = exerciseRepository.getAllMuscleGroups().first()
                 _selectedMuscleGroups.value.forEach { groupName ->
@@ -112,7 +110,6 @@ class ExerciseDetailViewModel(
                     )
                 }
             } else {
-                // 1. Zapisz lub pobierz exercise
                 val exerciseId: Long = if (isNewExercise) {
                     val newExercise = Exercise(
                         name     = _exerciseName.value,
@@ -126,14 +123,12 @@ class ExerciseDetailViewModel(
                     args.exerciseId.toLong()
                 }
 
-                // 2. Powiąż ćwiczenie z grupami mięśniowymi
                 val allGroups = exerciseRepository.getAllMuscleGroups().first()
                 _selectedMuscleGroups.value.forEach { groupName ->
                     val group = allGroups.firstOrNull { it.name == groupName } ?: return@forEach
                     exerciseRepository.linkExerciseToMuscleGroup(exerciseId, group.id)
                 }
 
-                // 3. Wstaw WorkoutTemplateItem
                 val orderIndex = templateRepository.getItemsForTemplate(templateId).first().size
                 val item = WorkoutTemplateItem(
                     workoutTemplateId = templateId,
@@ -143,7 +138,6 @@ class ExerciseDetailViewModel(
                 )
                 val itemId = templateRepository.saveTemplateItem(item)
 
-                // 4. Wstaw serie
                 _sets.value.forEachIndexed { index, setState ->
                     templateRepository.saveTemplateSet(
                         WorkoutTemplateSet(
@@ -161,6 +155,15 @@ class ExerciseDetailViewModel(
 
     fun onExerciseNoteChange(newNote: String) { _exerciseNote.value = newNote }
 
+    fun deleteExercise(onDeleted: () -> Unit) {
+        viewModelScope.launch {
+            val exerciseId = args.exerciseId.toLongOrNull() ?: return@launch
+            val exercise = exerciseRepository.getExerciseById(exerciseId).first().firstOrNull() ?: return@launch
+            exerciseRepository.deleteExercise(exercise)
+            onDeleted()
+        }
+    }
+
     private fun loadExercise(exerciseId: String) {
         viewModelScope.launch {
             val id = exerciseId.toLongOrNull() ?: return@launch
@@ -174,7 +177,7 @@ class ExerciseDetailViewModel(
                 .toSet()
                 .let { _selectedMuscleGroups.value = it }
 
-            // Załaduj sety jeśli to edycja istniejącego itemu
+
             val itemId = args.itemId.toLongOrNull() ?: return@launch
             templateRepository.getSetsForItem(itemId).first()
                 .mapIndexed { _, set ->
@@ -200,4 +203,6 @@ class ExerciseDetailViewModel(
             _photoUrl.value = destFile.absolutePath
         }
     }
+
+
 }

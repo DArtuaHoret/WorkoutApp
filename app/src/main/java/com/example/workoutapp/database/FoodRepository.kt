@@ -10,7 +10,6 @@ import java.util.Date
 
 interface FoodRepository {
 
-    // Produkty
     suspend fun insertProduct(product: FoodProduct): Long
     suspend fun findActiveByName(name: String): FoodProduct?
     suspend fun findExactMatch(name: String, calories: Double, protein: Double, fat: Double, carbs: Double): FoodProduct?
@@ -19,7 +18,6 @@ interface FoodRepository {
     suspend fun setFavorite(productId: Long, isFavorite: Boolean)
     fun getFavoriteAndCustomProducts(): Flow<List<FoodProduct>>
 
-    // Wpisy
     suspend fun insertEntry(entry: FoodEntry)
     suspend fun updateEntry(entry: FoodEntry)
     suspend fun deleteEntry(entry: FoodEntry)
@@ -29,7 +27,7 @@ interface FoodRepository {
 
 class FoodRepositoryImpl(private val foodDao: FoodDao) : FoodRepository {
 
-    // ── Produkty ──────────────────────────────────────────────────────────────
+
 
     override suspend fun insertProduct(product: FoodProduct): Long =
         withContext(Dispatchers.IO) {
@@ -69,7 +67,7 @@ class FoodRepositoryImpl(private val foodDao: FoodDao) : FoodRepository {
         foodDao.getFavoriteAndCustomProducts()
 
 
-    // ── Wpisy ─────────────────────────────────────────────────────────────────
+
 
     override suspend fun insertEntry(entry: FoodEntry) =
         withContext(Dispatchers.IO) {

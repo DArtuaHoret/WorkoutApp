@@ -7,7 +7,7 @@ import com.example.workoutapp.data.WorkoutTemplate as DbWorkoutTemplate
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-// TemplateListViewModel.kt
+
 class TemplateListViewModel(
     private val templateRepository: WorkoutTemplateRepository,
 ) : ViewModel() {
@@ -25,7 +25,7 @@ class TemplateListViewModel(
         }
     }
 
-    // Zwraca ID zamiast przyjmować callback
+
     suspend fun createTemplate(): String =
         templateRepository.saveTemplate(DbWorkoutTemplate(name = "")).toString()
 }

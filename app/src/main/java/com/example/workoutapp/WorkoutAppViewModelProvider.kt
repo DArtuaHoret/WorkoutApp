@@ -5,6 +5,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.workoutapp.ui.screens.SettingsViewModel
 import com.example.workoutapp.ui.screens.section_1.ExerciseDetailViewModel
 import com.example.workoutapp.ui.screens.section_1.ExerciseSearchViewModel
 import com.example.workoutapp.ui.screens.section_1.TemplateDetailViewModel
@@ -30,6 +31,12 @@ object WorkoutAppViewModelProvider {
             TemplateDetailViewModel(
                 savedStateHandle = this.createSavedStateHandle(),
                 templateRepository = workoutApp().workoutTemplateRepository,
+            )
+        }
+
+        initializer<SettingsViewModel> {
+            SettingsViewModel(
+                settingsRepository = workoutApp().settingsRepository,
             )
         }
 

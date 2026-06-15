@@ -1,3 +1,63 @@
 <resources>
+    <!-- Wspólne -->
     <string name="app_name">WorkoutApp</string>
+    <string name="back">Wróć</string>
+
+    <!-- Wspólne - reusable components -->
+    <string name="edit">Edytuj</string>
+    <string name="delete">Usuń</string>
+    <string name="search">Szukaj</string>
+    <string name="expand">Rozwiń</string>
+    <string name="add_exercise_to">Dodaj %s</string>
+    <string name="add_exercise_button">DODAJ ĆWICZENIE</string>
+    <string name="main_muscles_label">Główne Mięśnie:</string>
+    <string name="select_muscle_groups">Wybierz grupy mięśni...</string>
+    <string name="set_number">SERIA %d</string>
+    <string name="weight_label">CIĘŻAR</string>
+    <string name="reps_label">POWTÓRZENIA</string>
+    <string name="rest_label">ODPOCZYNEK</string>
+    <string name="weight_unit_format">%d kg</string>
+    <string name="sets_short_label">Serie</string>
+    <string name="weight_short_label">Ciężar</string>
+    <string name="rest_short_label">Odpoczynek</string>
+
+
+
+
+    <!-- ExerciseDetailScreen -->
+    <string name="exercise_title">Ćwiczenie</string>
+    <string name="exercise_photo_hint">Dotknij, aby dodać zdjęcie/gif</string>
+    <string name="exercise_name_label">Nazwa ćwiczenia</string>
+    <string name="exercise_name_placeholder">np. Martwy ciąg</string>
+    <string name="exercise_note_label">Opis / notatka</string>
+    <string name="exercise_note_placeholder">np. Trzymaj plecy proste...</string>
+    <string name="sets_title">Serie</string>
+    <string name="add_set">DODAJ SERIĘ</string>
+    <string name="delete_exercise">USUŃ ĆWICZENIE</string>
+    <string name="save_exercise">ZAPISZ ĆWICZENIE</string>
+
+    <!-- ExerciseSearchScreen -->
+    <string name="exercise_search_title">Wyszukiwanie ćwiczeń</string>
+    <string name="exercise_search_filter_custom">Własne</string>
+    <string name="exercise_search_placeholder">np. Przysiad, Wyciskanie</string>
+    <string name="exercise_search_empty_custom">Brak własnych ćwiczeń dla \"%s\"</string>
+    <string name="exercise_search_empty">Brak wyników dla \"%s\"</string>
+    <string name="exercise_search_custom_badge">WŁASNE</string>
+    <string name="add_custom_exercise">DODAJ WŁASNE ĆWICZENIE</string>
+
+    <!-- TemplateDetailScreen -->
+    <string name="template_detail_title">Przegląd szablonu</string>
+    <string name="template_name_label">Nazwa szablonu</string>
+    <string name="template_name_required">Nazwa jest wymagana</string>
+    <string name="template_description_label">Opis szablonu</string>
+    <string name="template_description_placeholder">np. Plan na masę, 3 dni w tygodniu...</string>
+    <string name="exercises_title">Ćwiczenia</string>
+    <string name="delete_template">USUŃ SZABLON</string>
+    <string name="save_template">ZAPISZ SZABLON</string>
+
+    <!-- TemplateListScreen -->
+    <string name="templates_title">Szablony</string>
+    <string name="templates_empty_title">Brak szablonów</string>
+    <string name="templates_empty_subtitle">Utwórz swój pierwszy plan treningowy.</string>
+    <string name="create_new">UTWÓRZ NOWY</string>
 </resources>

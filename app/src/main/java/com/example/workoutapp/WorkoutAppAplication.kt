@@ -9,6 +9,7 @@ import coil.decode.ImageDecoderDecoder
 import com.example.workoutapp.database.AppDatabase
 import com.example.workoutapp.database.ExerciseRepositoryImpl
 import com.example.workoutapp.database.FoodRepositoryImpl
+import com.example.workoutapp.database.SettingsRepository
 import com.example.workoutapp.database.WorkoutTemplateRepositoryImpl
 
 class WorkoutApp : Application(), ImageLoaderFactory {
@@ -22,6 +23,10 @@ class WorkoutApp : Application(), ImageLoaderFactory {
 
     val foodRepository by lazy {
         FoodRepositoryImpl(AppDatabase.getDatabase(this).foodDao())
+    }
+
+    val settingsRepository: SettingsRepository by lazy {
+        SettingsRepository(this)
     }
 
     override fun onCreate() {

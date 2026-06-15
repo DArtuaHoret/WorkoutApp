@@ -68,7 +68,7 @@ private val PlaceHolderColor = Color(0xFF888888)
 fun ProductCard(
     productName: String,
     productDescription: String,
-    onCardClick: () -> Unit,   // ← nowy
+    onCardClick: () -> Unit,
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -80,7 +80,7 @@ fun ProductCard(
                 color = Color.White,
                 shape = RoundedCornerShape(14.dp),
             )
-            .clickable { onCardClick() },  // ← dodaj to
+            .clickable { onCardClick() },
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF1A1A1A),
@@ -516,7 +516,7 @@ fun EditableNutrientCard(
                 TextField(
                     value = value,
                     onValueChange = { input ->
-                        // tylko cyfry i kropka/przecinek
+
                         if (input.all { it.isDigit() || it == '.' || it == ',' }) {
                             onValueChange(input)
                         }
@@ -701,7 +701,7 @@ fun FavoriteProductItemCard(
     carbs: String,
     isFavorite: Boolean = true,
     onCardClick: () -> Unit,
-    onEditClick: () -> Unit,           // ← NOWE
+    onEditClick: () -> Unit,
     onRemoveFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
     isCustom: Boolean = false,

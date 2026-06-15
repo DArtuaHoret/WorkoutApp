@@ -69,7 +69,7 @@ fun BarcodeScannerScreen(
         onBackClick()
     }
 
-    // Nawigacja po zeskanowaniu
+
     LaunchedEffect(uiState) {
         when (val state = uiState) {
             is BarcodeScannerUiState.Found    -> onBarcodeScanned(state.barcode)
@@ -113,7 +113,7 @@ fun BarcodeScannerScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Podgląd kamery lub komunikat o braku uprawnień
+
         if (hasCameraPermission && isCameraVisible) {
             CameraPreview(
                 onBarcodeDetected = viewModel::onBarcodeDetected,

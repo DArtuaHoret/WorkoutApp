@@ -61,6 +61,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -73,6 +74,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import com.example.workoutapp.R
 import com.example.workoutapp.drawableResIdByName
 import java.io.File
 
@@ -169,7 +171,7 @@ private fun PreviewTemplateCard() {
 fun AddExerciseCard(
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
-    buttonLabel: String = "DODAJ ĆWICZENIE",
+    buttonLabel: String = stringResource(R.string.add_exercise_button),
 ) {
     Card(
         onClick = onAddClick,
@@ -297,21 +299,21 @@ fun ExerciseItemCard(
                     )
                     Row {
                         IconButton(onClick = onEditClick, modifier = Modifier.size(30.dp)) {
-                            Icon(Icons.Default.Edit, "Edytuj", tint = Color.White, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Edit, stringResource(R.string.edit), tint = Color.White, modifier = Modifier.size(18.dp))
                         }
                         IconButton(onClick = onDeleteClick, modifier = Modifier.size(30.dp)) {
-                            Icon(Icons.Default.Delete, "Usuń", tint = Color.White, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Delete, stringResource(R.string.delete), tint = Color.White, modifier = Modifier.size(18.dp))
                         }
                     }
                 }
 
                 Column  {
                     Spacer(modifier = Modifier.height(2.dp))
-                    Text("Serie: $series", color = Color(0xFFCCCCCC), fontSize = 14.sp)
+                    Text("${stringResource(R.string.sets_short_label)}: $series", color = Color(0xFFCCCCCC), fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(2.dp))
-                    Text("Ciężar: $weight", color = Color(0xFFCCCCCC), fontSize = 14.sp)
+                    Text("${stringResource(R.string.weight_short_label)}: $weight", color = Color(0xFFCCCCCC), fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(2.dp))
-                    Text("Odpoczynek: $restTime", color = Color(0xFFCCCCCC), fontSize = 14.sp)
+                    Text("${stringResource(R.string.rest_short_label)}: $restTime", color = Color(0xFFCCCCCC), fontSize = 14.sp)
                 }
             }
         }
@@ -385,54 +387,54 @@ fun WorkoutTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "np. Pompki",
+    placeholder: String = stringResource(R.string.exercise_name_placeholder),
     showSearchIcon: Boolean = false,
     imeAction: ImeAction = ImeAction.Done,
     onImeAction: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
-        TextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = modifier
-                .fillMaxWidth()
-                .border(width = 2.dp, color = BorderColor, shape = FieldShape),
-            shape = FieldShape,
-            placeholder = {
-                Text(text = placeholder, color = PlaceHolderColor, fontSize = 14.sp)
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier
+            .fillMaxWidth()
+            .border(width = 2.dp, color = BorderColor, shape = FieldShape),
+        shape = FieldShape,
+        placeholder = {
+            Text(text = placeholder, color = PlaceHolderColor, fontSize = 14.sp)
+        },
+        leadingIcon = if (showSearchIcon) {
+            {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = stringResource(R.string.search),
+                    tint = PlaceHolderColor,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        } else null,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(imeAction = imeAction),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                focusManager.clearFocus()
+                onImeAction()
             },
-            leadingIcon = if (showSearchIcon) {
-                {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Szukaj",
-                        tint = PlaceHolderColor,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-            } else null,
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = imeAction),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    focusManager.clearFocus()
-                    onImeAction()
-                },
-                onSearch = {
-                    focusManager.clearFocus()
-                    onImeAction()
-                },
-            ),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor   = FieldBgColor,
-                unfocusedContainerColor = FieldBgColor,
-                focusedTextColor        = Color.White,
-                unfocusedTextColor      = Color.White,
-                cursorColor             = Color.White,
-                focusedIndicatorColor   = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-        )
+            onSearch = {
+                focusManager.clearFocus()
+                onImeAction()
+            },
+        ),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor   = FieldBgColor,
+            unfocusedContainerColor = FieldBgColor,
+            focusedTextColor        = Color.White,
+            unfocusedTextColor      = Color.White,
+            cursorColor             = Color.White,
+            focusedIndicatorColor   = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+        ),
+    )
 }
 
 @Preview(name = "WorkoutTextField – name input (no icon)", showBackground = true, backgroundColor = 0xFF000000)
@@ -534,7 +536,7 @@ fun ExerciseSelectItem(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Dodaj $exerciseName",
+                contentDescription = stringResource(R.string.add_exercise_to, exerciseName),
                 tint = Color.White,
                 modifier = Modifier.size(20.dp),
             )
@@ -592,6 +594,7 @@ private fun PreviewSearchWithList() {
 enum class ActionButtonStyle {
     DarkOutlined,
     LightFilled,
+    DangerFilled,
 }
 
 @Composable
@@ -605,26 +608,23 @@ fun ActionButton(
     style: ActionButtonStyle = ActionButtonStyle.DarkOutlined,
 ) {
 
-    val containerColor =
-        if (style == ActionButtonStyle.LightFilled) {
-            Color.White
-        } else {
-            Color(0xFF1A1A1A)
-        }
+    val containerColor = when (style) {
+        ActionButtonStyle.LightFilled  -> Color.White
+        ActionButtonStyle.DangerFilled -> Color(0xFFFF4444)
+        ActionButtonStyle.DarkOutlined -> Color(0xFF1A1A1A)
+    }
 
-    val contentColor =
-        if (style == ActionButtonStyle.LightFilled) {
-            Color.Black
-        } else {
-            Color.White
-        }
+    val contentColor = when (style) {
+        ActionButtonStyle.LightFilled  -> Color.Black
+        ActionButtonStyle.DangerFilled -> Color.White
+        ActionButtonStyle.DarkOutlined -> Color.White
+    }
 
-    val borderColor =
-        if (style == ActionButtonStyle.LightFilled) {
-            Color.Transparent
-        } else {
-            Color.White
-        }
+    val borderColor = when (style) {
+        ActionButtonStyle.LightFilled  -> Color.Transparent
+        ActionButtonStyle.DangerFilled -> Color.Transparent
+        ActionButtonStyle.DarkOutlined -> Color.White
+    }
 
     Button(
         onClick = onClick,
@@ -683,7 +683,7 @@ fun MuscleGroupSelector(
     selectedGroups: Set<String>,
     onSelectionChange: (Set<String>) -> Unit,
     modifier: Modifier = Modifier,
-    label: String = "Główne Mięśnie:",
+    label: String = stringResource(R.string.main_muscles_label),
     allGroups: List<String> = defaultMuscleGroups,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -714,7 +714,7 @@ fun MuscleGroupSelector(
                 ) {
                     if (selectedGroups.isEmpty()) {
                         Text(
-                            text = "Wybierz grupy mięśni...",
+                            text = stringResource(R.string.select_muscle_groups),
                             color = PlaceHolderColor,
                             fontSize = 14.sp,
                         )
@@ -752,7 +752,7 @@ fun MuscleGroupSelector(
                 ) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Rozwiń",
+                        contentDescription = stringResource(R.string.expand),
                         tint = Color.White,
                         modifier = Modifier.size(22.dp),
                     )
@@ -802,7 +802,7 @@ fun MuscleGroupSelector(
     }
 }
 
-/** Domyślna lista grup mięśniowych — podmień na dane z Room gdy będą gotowe. */
+
 val defaultMuscleGroups = listOf(
     "GGGG"
 )
@@ -926,7 +926,7 @@ fun AdjustableRow(
                             String.format("%02d:%02d", minutes, seconds)
                         }
 
-                        unit == "kg" -> "$value kg"
+                        unit == "kg" -> stringResource(R.string.weight_unit_format, value)
 
                         else -> value.toString()
                     },
@@ -993,7 +993,7 @@ fun ExerciseSetCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "SERIA $setNumber",
+                    text = stringResource(R.string.set_number, setNumber),
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -1006,7 +1006,7 @@ fun ExerciseSetCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Usuń",
+                            contentDescription = stringResource(R.string.delete),
                             tint = Color.White,
                             modifier = Modifier.size(20.dp),
                         )
@@ -1016,7 +1016,7 @@ fun ExerciseSetCard(
 
 
             AdjustableRow(
-                label = "CIĘŻAR",
+                label = stringResource(R.string.weight_label),
                 value = weight,
                 onValueChange = onWeightChange,
                 step = 5,
@@ -1025,7 +1025,7 @@ fun ExerciseSetCard(
 
 
             AdjustableRow(
-                label = "POWTÓRZENIA",
+                label = stringResource(R.string.reps_label),
                 value = reps,
                 onValueChange = onRepsChange,
                 step = 1,
@@ -1035,7 +1035,7 @@ fun ExerciseSetCard(
 
 
             AdjustableRow(
-                label = "ODPOCZYNEK",
+                label = stringResource(R.string.rest_label),
                 value = rest,
                 onValueChange = onRestChange,
                 step = 10,
@@ -1134,10 +1134,10 @@ private fun PreviewMultipleSets() {
                 onDelete = {},
             )
 
-                    ActionButton(
-                        onClick = {},
-                        label = "DODAJ SERIĘ",
-                    )
+            ActionButton(
+                onClick = {},
+                label = "DODAJ SERIĘ",
+            )
             ActionButton(
                 onClick = {},
                 label = "ZAPISZ ĆWICZENIE",
@@ -1155,4 +1155,3 @@ fun resolveImageModel(context: Context, photoUrl: String?): Any? {
     val resId = context.resources.getIdentifier(photoUrl, "raw", context.packageName)
     return if (resId != 0) resId else null
 }
-

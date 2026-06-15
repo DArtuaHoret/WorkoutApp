@@ -1,9 +1,7 @@
 package com.example.workoutapp.ui.screens.section_1
 
-
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,6 +10,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,13 +19,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.workoutapp.drawableResIdByName
+import com.example.workoutapp.R
 import com.example.workoutapp.ui.reusableContents.Section_1.*
 import java.io.File
 
@@ -43,29 +41,26 @@ fun ExerciseDetailScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier,
-
 ) {
-    val exerciseName        by viewModel.exerciseName.collectAsState()
+    val exerciseName         by viewModel.exerciseName.collectAsState()
     val selectedMuscleGroups by viewModel.selectedMuscleGroups.collectAsState()
-    val sets                by viewModel.sets.collectAsState()
-    val muscleGroups by viewModel.muscleGroups.collectAsState()
-    val exerciseNote by viewModel.exerciseNote.collectAsState()
-    val photoUrl by viewModel.photoUrl.collectAsState()
+    val sets                 by viewModel.sets.collectAsState()
+    val muscleGroups         by viewModel.muscleGroups.collectAsState()
+    val exerciseNote         by viewModel.exerciseNote.collectAsState()
+    val photoUrl             by viewModel.photoUrl.collectAsState()
     val context = LocalContext.current
 
     val pickImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri -> uri?.let { viewModel.onImagePicked(context, it) } }
 
-
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Nagłówek
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -76,12 +71,12 @@ fun ExerciseDetailScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Wróć",
+                    contentDescription = stringResource(R.string.back),
                     tint = Color.White,
                 )
             }
             Text(
-                text = "Ćwiczenie",
+                text = stringResource(R.string.exercise_title),
                 color = Color.White,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
@@ -89,14 +84,11 @@ fun ExerciseDetailScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(vertical = 16.dp),
         ) {
-            // Exercise image
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -110,45 +102,45 @@ fun ExerciseDetailScreen(
                             .clickable { pickImage.launch("image/*") },
                         contentAlignment = Alignment.Center,
                     ) {
-                    val url = photoUrl
-                    val model: Any? = when {
-                        url.isNullOrBlank() -> null
-                        url.startsWith("/") -> File(url)
-                        else -> {
-                            val resId = remember(url) {
-                                context.resources.getIdentifier(url, "raw", context.packageName)
-                                    .takeIf { it != 0 }
+                        val url = photoUrl
+                        val model: Any? = when {
+                            url.isNullOrBlank() -> null
+                            url.startsWith("/") -> File(url)
+                            else -> {
+                                val resId = remember(url) {
+                                    context.resources.getIdentifier(url, "raw", context.packageName)
+                                        .takeIf { it != 0 }
+                                }
+                                resId
                             }
-                            resId
                         }
-                    }
 
-                    if (model != null) {
-                        AsyncImage(
-                            model = model,
-                            contentDescription = exerciseName,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop,
-                        )
-                    } else {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            ExerciseImagePlaceholder()
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                "Dotknij, aby dodać zdjęcie/gif",
-                                color = Color(0xFF888888),
-                                fontSize = 12.sp
+                        if (model != null) {
+                            AsyncImage(
+                                model = model,
+                                contentDescription = exerciseName,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
                             )
+                        } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                ExerciseImagePlaceholder()
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(R.string.exercise_photo_hint),
+                                    color = Color(0xFF888888),
+                                    fontSize = 12.sp,
+                                )
+                            }
                         }
                     }
-                } }
+                }
             }
 
-            // Exercise name
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text = "Nazwa ćwiczenia",
+                        text = stringResource(R.string.exercise_name_label),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
@@ -156,7 +148,7 @@ fun ExerciseDetailScreen(
                     WorkoutTextField(
                         value = exerciseName,
                         onValueChange = viewModel::onExerciseNameChange,
-                        placeholder = "np. Martwy ciąg",
+                        placeholder = stringResource(R.string.exercise_name_placeholder),
                     )
                 }
             }
@@ -164,7 +156,7 @@ fun ExerciseDetailScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text = "Opis / notatka",
+                        text = stringResource(R.string.exercise_note_label),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
@@ -172,12 +164,11 @@ fun ExerciseDetailScreen(
                     WorkoutTextField(
                         value = exerciseNote,
                         onValueChange = viewModel::onExerciseNoteChange,
-                        placeholder = "np. Trzymaj plecy proste...",
+                        placeholder = stringResource(R.string.exercise_note_placeholder),
                     )
                 }
             }
 
-            // Muscle groups
             item {
                 MuscleGroupSelector(
                     selectedGroups = selectedMuscleGroups,
@@ -186,10 +177,9 @@ fun ExerciseDetailScreen(
                 )
             }
 
-            // Sets header
             item {
                 Text(
-                    text = "Serie",
+                    text = stringResource(R.string.sets_title),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
@@ -197,7 +187,6 @@ fun ExerciseDetailScreen(
                 )
             }
 
-            // Set cards
             itemsIndexed(
                 items = sets,
                 key = { _, set -> set.id },
@@ -214,11 +203,10 @@ fun ExerciseDetailScreen(
                 )
             }
 
-            // Add set button
             item {
                 ActionButton(
                     onClick = viewModel::onAddSet,
-                    label = "DODAJ SERIĘ",
+                    label = stringResource(R.string.add_set),
                     style = ActionButtonStyle.DarkOutlined,
                 )
             }
@@ -227,11 +215,20 @@ fun ExerciseDetailScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         ActionButton(
+            onClick = { viewModel.deleteExercise { onBackClick() } },
+            label = stringResource(R.string.delete_exercise),
+            icon = Icons.Default.Delete,
+            style = ActionButtonStyle.DangerFilled,
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        ActionButton(
             onClick = {
                 viewModel.saveExercise()
                 onSaveClick()
             },
-            label = "ZAPISZ ĆWICZENIE",
+            label = stringResource(R.string.save_exercise),
             icon = null,
             style = ActionButtonStyle.LightFilled,
         )
@@ -239,4 +236,3 @@ fun ExerciseDetailScreen(
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
-

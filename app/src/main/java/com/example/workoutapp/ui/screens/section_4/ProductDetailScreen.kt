@@ -30,6 +30,7 @@ import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.example.workoutapp.ui.reusableContents.Section_4.*
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.ui.Alignment
 
 data class ProductDetailArgs(
@@ -64,7 +65,6 @@ fun ProductDetailScreen(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Nagłówek z przyciskiem wstecz
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -107,7 +107,6 @@ fun ProductDetailScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Treść
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -146,6 +145,13 @@ fun ProductDetailScreen(
                             Text("🌾", fontSize = 22.sp)
                         }
                     }
+
+                    ActionButton(
+                        onClick = { viewModel.deleteProduct { onBackClick() } },
+                        label = "USUŃ PRODUKT",
+                        icon = Icons.Default.Delete,
+                        style = ActionButtonStyle.DangerFilled,
+                    )
                 }
 
                 is ProductDetailUiState.Create -> {
@@ -210,7 +216,8 @@ fun ProductDetailScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
         }
     }
 }

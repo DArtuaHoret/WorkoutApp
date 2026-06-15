@@ -18,7 +18,6 @@ class Converters {
 
 @Database(
     entities = [
-        // Wszystkie encje muszą być tu wymienione
         Exercise::class,
         MuscleGroup::class,
         ExerciseMuscleGroup::class,
@@ -51,14 +50,12 @@ abstract class AppDatabase : RoomDatabase() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
 
-                // Grupy mięśniowe
                 db.execSQL("""
             INSERT INTO muscle_groups (id, name) VALUES
             (1,'Klatka'),(2,'Plecy'),(3,'Barki'),(4,'Biceps'),(5,'Triceps'),
             (6,'Brzuch'),(7,'Nogi'),(8,'Pośladki'),(9,'Łydki')
         """.trimIndent())
 
-                // Ćwiczenia
                 db.execSQL("""
             INSERT INTO exercises (id, name, isCustom, isActive, photoUrl) VALUES
             (1,'Wyciskanie sztangi na ławce poziomej',1,1,'exercise_0025'),
@@ -147,7 +144,6 @@ abstract class AppDatabase : RoomDatabase() {
             (89,'Allachy',1,1,'exercise_0175')
         """.trimIndent())
 
-                // Powiązania z grupami mięśniowymi
                 db.execSQL("""
             INSERT INTO exercise_muscle_groups (exerciseId, muscleGroupId) VALUES
             (1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1),(9,1),(10,1),(11,1),(12,1),(13,1),(14,1),(15,1),

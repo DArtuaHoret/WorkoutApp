@@ -1,0 +1,60 @@
+<resources>
+    <!-- Wspólne -->
+    <string name="app_name">WorkoutApp</string>
+    <string name="back">Back</string>
+
+    <!-- Common - reusable components -->
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="search">Search</string>
+    <string name="expand">Expand</string>
+    <string name="add_exercise_to">Add %s</string>
+    <string name="add_exercise_button">ADD EXERCISE</string>
+    <string name="main_muscles_label">Main Muscles:</string>
+    <string name="select_muscle_groups">Select muscle groups...</string>
+    <string name="set_number">SET %d</string>
+    <string name="weight_label">WEIGHT</string>
+    <string name="reps_label">REPS</string>
+    <string name="rest_label">REST</string>
+    <string name="weight_unit_format">%d kg</string>
+    <string name="sets_short_label">Sets</string>
+    <string name="weight_short_label">Weight</string>
+    <string name="rest_short_label">Rest</string>
+
+    <!-- ExerciseDetailScreen -->
+    <string name="exercise_title">Exercise</string>
+    <string name="exercise_photo_hint">Tap to add photo/gif</string>
+    <string name="exercise_name_label">Exercise name</string>
+    <string name="exercise_name_placeholder">e.g. Deadlift</string>
+    <string name="exercise_note_label">Description / note</string>
+    <string name="exercise_note_placeholder">e.g. Keep your back straight...</string>
+    <string name="sets_title">Sets</string>
+    <string name="add_set">ADD SET</string>
+    <string name="delete_exercise">DELETE EXERCISE</string>
+    <string name="save_exercise">SAVE EXERCISE</string>
+
+    <!-- ExerciseSearchScreen -->
+    <string name="exercise_search_title">Exercise search</string>
+    <string name="exercise_search_filter_custom">Custom</string>
+    <string name="exercise_search_placeholder">e.g. Squat, Bench press</string>
+    <string name="exercise_search_empty_custom">No custom exercises for \"%s\"</string>
+    <string name="exercise_search_empty">No results for \"%s\"</string>
+    <string name="exercise_search_custom_badge">CUSTOM</string>
+    <string name="add_custom_exercise">ADD CUSTOM EXERCISE</string>
+
+    <!-- TemplateDetailScreen -->
+    <string name="template_detail_title">Template overview</string>
+    <string name="template_name_label">Template name</string>
+    <string name="template_name_required">Name is required</string>
+    <string name="template_description_label">Template description</string>
+    <string name="template_description_placeholder">e.g. Mass plan, 3 days a week...</string>
+    <string name="exercises_title">Exercises</string>
+    <string name="delete_template">DELETE TEMPLATE</string>
+    <string name="save_template">SAVE TEMPLATE</string>
+
+    <!-- TemplateListScreen -->
+    <string name="templates_title">Templates</string>
+    <string name="templates_empty_title">No templates</string>
+    <string name="templates_empty_subtitle">Create your first workout plan.</string>
+    <string name="create_new">CREATE NEW</string>
+</resources>

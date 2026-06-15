@@ -46,7 +46,7 @@ class ProductDetailViewModel(
         }
     }
 
-    // ── View ────────────────────────────────────────────────────────────────
+
 
     fun onFavoriteClick() {
         val current = _uiState.value as? ProductDetailUiState.View ?: return
@@ -74,7 +74,7 @@ class ProductDetailViewModel(
         }
     }
 
-    // ── Create / Edit ────────────────────────────────────────────────────────
+
 
     fun onProductNameChange(value: String)        = updateCreate { copy(productName = value) }
     fun onProductDescriptionChange(value: String) = updateCreate { copy(productDescription = value) }
@@ -104,11 +104,20 @@ class ProductDetailViewModel(
         }
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
+
 
     private fun updateCreate(block: ProductDetailUiState.Create.() -> ProductDetailUiState.Create) {
         val current = _uiState.value as? ProductDetailUiState.Create ?: return
         _uiState.value = current.block()
+    }
+
+    fun deleteProduct(onDeleted: () -> Unit) {
+        val current = _uiState.value as? ProductDetailUiState.View ?: return
+        viewModelScope.launch {
+            val product = foodRepository.findActiveByName(current.args.name) ?: return@launch
+            foodRepository.deactivateProduct(product.id)
+            onDeleted()
+        }
     }
 
     private fun buildInitialState(): ProductDetailUiState {

@@ -1,7 +1,5 @@
 package com.example.workoutapp.ui.screens.section_1
 
-
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -16,12 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.workoutapp.R
 import com.example.workoutapp.ui.reusableContents.Section_1.*
-
 
 data class ExerciseOption(
     val id: String,
@@ -41,7 +39,7 @@ fun ExerciseSearchScreen(
 ) {
     val query             by viewModel.query.collectAsState()
     val filteredExercises by viewModel.filteredExercises.collectAsState()
-    val showOnlyCustom by viewModel.showOnlyCustom.collectAsState()
+    val showOnlyCustom    by viewModel.showOnlyCustom.collectAsState()
 
     val grouped = remember(filteredExercises) {
         filteredExercises.groupBy { it.muscleGroup }
@@ -52,7 +50,7 @@ fun ExerciseSearchScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp),
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -64,12 +62,12 @@ fun ExerciseSearchScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Wróć",
+                    contentDescription = stringResource(R.string.back),
                     tint = Color.White,
                 )
             }
             Text(
-                text = "Wyszukiwanie ćwiczeń",
+                text = stringResource(R.string.exercise_search_title),
                 color = Color.White,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
@@ -82,7 +80,7 @@ fun ExerciseSearchScreen(
                 onClick = viewModel::onToggleShowOnlyCustom,
                 label = {
                     Text(
-                        text = "Własne",
+                        text = stringResource(R.string.exercise_search_filter_custom),
                         fontSize = 13.sp,
                     )
                 },
@@ -101,9 +99,6 @@ fun ExerciseSearchScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Lista
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -113,12 +108,10 @@ fun ExerciseSearchScreen(
                 WorkoutTextField(
                     value = query,
                     onValueChange = viewModel::onQueryChange,
-                    placeholder = "np. Przysiad, Wyciskanie",
+                    placeholder = stringResource(R.string.exercise_search_placeholder),
                     showSearchIcon = true,
                 )
             }
-
-
 
             if (grouped.isEmpty()) {
                 item {
@@ -130,9 +123,9 @@ fun ExerciseSearchScreen(
                     ) {
                         Text(
                             text = if (showOnlyCustom) {
-                                "Brak własnych ćwiczeń dla \"$query\""
+                                stringResource(R.string.exercise_search_empty_custom, query)
                             } else {
-                                "Brak wyników dla \"$query\""
+                                stringResource(R.string.exercise_search_empty, query)
                             },
                             color = Color(0xFF888888),
                             fontSize = 15.sp,
@@ -178,7 +171,7 @@ fun ExerciseSearchScreen(
                                         .padding(horizontal = 6.dp, vertical = 2.dp),
                                 ) {
                                     Text(
-                                        text = "WŁASNE",
+                                        text = stringResource(R.string.exercise_search_custom_badge),
                                         color = Color(0xFFCCCCCC),
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold,
@@ -194,15 +187,13 @@ fun ExerciseSearchScreen(
             item { Spacer(modifier = Modifier.height(8.dp)) }
         }
 
-        // Przycisk na dole
         Spacer(modifier = Modifier.height(12.dp))
         ActionButton(
             onClick = onAddCustomExercise,
-            label = "DODAJ WŁASNE ĆWICZENIE",
+            label = stringResource(R.string.add_custom_exercise),
             icon = Icons.Default.Add,
             style = ActionButtonStyle.DarkOutlined,
         )
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
-

@@ -52,7 +52,6 @@ interface ExerciseDao {
     @Delete
     suspend fun deleteExerciseMuscleGroupCrossRef(crossRef: ExerciseMuscleGroup)
 
-    // join - cwiki dla podanej grupy mies
     @Query("""
     	SELECT e.* FROM exercises e
     	INNER JOIN exercise_muscle_groups emg ON e.id = emg.exerciseId
@@ -61,28 +60,28 @@ interface ExerciseDao {
     fun getExercisesForMuscleGroup(muscleGroupId: Long): Flow<List<Exercise>>
 
     @Query("""
-    SELECT 
-        e.id   AS exerciseId,
-        e.name AS exerciseName,
-        COALESCE(mg.name, 'Inne') AS muscleGroupName,
-        e.isCustom AS isCustom,
-        e.photoUrl AS photoUrl
-    FROM exercises e
-    LEFT JOIN exercise_muscle_groups emg ON emg.exerciseId = e.id
-    LEFT JOIN muscle_groups mg ON mg.id = emg.muscleGroupId
-    WHERE e.isActive = 1
-    GROUP BY e.id
-    ORDER BY mg.name ASC, e.name ASC
-""")
+        SELECT 
+            e.id   AS exerciseId,
+            e.name AS exerciseName,
+            COALESCE(mg.name, 'Inne') AS muscleGroupName,
+            e.isCustom AS isCustom,
+            e.photoUrl AS photoUrl
+        FROM exercises e
+        LEFT JOIN exercise_muscle_groups emg ON emg.exerciseId = e.id
+        LEFT JOIN muscle_groups mg ON mg.id = emg.muscleGroupId
+        WHERE e.isActive = 1
+        GROUP BY e.id
+        ORDER BY mg.name ASC, e.name ASC
+    """)
     fun getActiveExercisesWithMuscleGroup(): Flow<List<ExerciseWithMuscleGroup>>
 
     @Query("DELETE FROM exercise_muscle_groups WHERE exerciseId = :exerciseId")
     suspend fun deleteAllMuscleGroupsForExercise(exerciseId: Long)
 
     @Query("""
-    SELECT mg.* FROM muscle_groups mg
-    INNER JOIN exercise_muscle_groups emg ON mg.id = emg.muscleGroupId
-    WHERE emg.exerciseId = :exerciseId
-""")
+        SELECT mg.* FROM muscle_groups mg
+        INNER JOIN exercise_muscle_groups emg ON mg.id = emg.muscleGroupId
+        WHERE emg.exerciseId = :exerciseId
+    """)
     fun getMuscleGroupsForExercise(exerciseId: Long): Flow<List<MuscleGroup>>
 }

@@ -40,7 +40,7 @@ fun AddMealSearchScreen(
     onProductQuickAddClick: (ProductSearchItem) -> Unit,
     onScanBarcodeClick: () -> Unit,
     onAddCustomProductClick: () -> Unit,
-    onLibraryClick: () -> Unit,   // ← nowy
+    onLibraryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val query by viewModel.query.collectAsState()
@@ -101,7 +101,7 @@ fun AddMealSearchScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
-                        // TODO: zastąp swoim LoadingIndicator
+
                         Text(text = "Ładowanie...", color = Color(0xFF888888), fontSize = 14.sp)
                     }
                 }
@@ -140,15 +140,15 @@ fun AddMealSearchScreen(
                                 ProductCard(
                                     productName = product.name,
                                     productDescription = product.description,
-                                    onCardClick = { onProductCardClick(product) },        // klik w kartę → detal
-                                    onAddClick = { onProductQuickAddClick(product) },     // klik w + → szybki add
+                                    onCardClick = { onProductCardClick(product) },
+                                    onAddClick = { onProductQuickAddClick(product) },
                                 )
                             }
                         }
                     }
                 }
 
-                else -> Unit // Idle – nic nie pokazuj
+                else -> Unit
             }
         }
 
@@ -169,7 +169,7 @@ fun AddMealSearchScreen(
 private fun PreviewAddMealSearchEmpty() {
     MaterialTheme {
         AddMealSearchScreen(
-            onProductCardClick = {},     // ← nowy (przejście do detalu)
+            onProductCardClick = {},
             onProductQuickAddClick = {},
             onScanBarcodeClick = {},
             onAddCustomProductClick = {},

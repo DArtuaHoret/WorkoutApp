@@ -624,12 +624,12 @@ private fun PreviewWorkoutActionButtons() {
 
 @Composable
 fun DateSelectionDialog(
-    initialDate: LocalDate = LocalDate.now(), // DODANO
+    initialDate: LocalDate = LocalDate.now(),
     onDismissRequest: () -> Unit,
     onDateSelected: (LocalDate) -> Unit
 ) {
     var tempDate by remember { mutableStateOf(initialDate) }
-    val pickerStartDate = remember { initialDate } // ZAMROŻONY STAN
+    val pickerStartDate = remember { initialDate }
 
     Dialog(onDismissRequest = onDismissRequest) {
         Card(
@@ -656,7 +656,7 @@ fun DateSelectionDialog(
                 )
 
                 WheelDatePicker(
-                    startDate = pickerStartDate, // BEZPIECZNIE PRZEKAZANA DATA
+                    startDate = pickerStartDate,
                     textColor = Color.White,
                     selectorProperties = WheelPickerDefaults.selectorProperties(
                         color = Color(0xFFD7DAD7).copy(alpha = 0.2f),
@@ -799,14 +799,12 @@ private fun PreviewDateRangeEmpty() {
 
 @Composable
 fun CenteredDateSelectionDialog(
-    initialDate: LocalDate = LocalDate.now(), // 1. Przyjmujemy datę początkową
+    initialDate: LocalDate = LocalDate.now(),
     onVisibleChange: (Boolean) -> Unit,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    // 2. tempDate zaczyna od przekazanej daty początkowej
     var tempDate by remember { mutableStateOf(initialDate) }
 
-    // 3. Zamrażamy stan daty startowej dla samego pickera, aby chronić go przed rekompozycją podczas przewijania
     val pickerStartDate = remember { initialDate }
 
     Box(
@@ -846,7 +844,7 @@ fun CenteredDateSelectionDialog(
                 )
 
                 WheelDatePicker(
-                    startDate = pickerStartDate, // 4. Używamy bezpiecznej, zamrożonej daty
+                    startDate = pickerStartDate,
                     textColor = Color.White,
                     selectorProperties = WheelPickerDefaults.selectorProperties(
                         color = Color(0xFFD7DAD7).copy(alpha = 0.2f),
@@ -935,7 +933,6 @@ fun CenteredDateRangeSelector(
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
 
-                // Pole wyboru daty "OD"
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -949,7 +946,7 @@ fun CenteredDateRangeSelector(
 
                 Divider(color = Color(0xFF333333), thickness = 1.dp)
 
-                // Pole wyboru daty "DO"
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -972,10 +969,10 @@ fun CenteredDateRangeSelector(
         }
     }
 
-    // --- POD-DIALOGI ---
+
     if (showStartDialog) {
         CenteredDateSelectionDialog(
-            initialDate = startDate, // Przekazujemy obecną datę "od"
+            initialDate = startDate,
             onVisibleChange = { showStartDialog = it },
             onDateSelected = {
                 startDate = it
@@ -986,7 +983,7 @@ fun CenteredDateRangeSelector(
 
     if (showEndDialog) {
         CenteredDateSelectionDialog(
-            initialDate = endDate, // Przekazujemy obecną datę "do"
+            initialDate = endDate,
             onVisibleChange = { showEndDialog = it },
             onDateSelected = {
                 endDate = it
@@ -1010,7 +1007,6 @@ private fun PreviewCenteredDateRangeSelector() {
 }
 
 
-// Prosta klasa transferowa (DTO) reprezentująca pozycję na liście
 data class TemplateSelectionItem(
     val id: String,
     val name: String
@@ -1041,7 +1037,7 @@ fun CenteredTemplateSelectionDialog(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
-                ) {} // Zabezpieczenie przed zamknięciem po kliknięciu w tło karty
+                ) {}
                 .border(
                     width = 2.dp,
                     color = Color.White,
@@ -1064,7 +1060,7 @@ fun CenteredTemplateSelectionDialog(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                // Główna zawartość - lista szablonów lub informacja o ich braku
+
                 if (templates.isEmpty()) {
                     Box(
                         modifier = Modifier.weight(1f),

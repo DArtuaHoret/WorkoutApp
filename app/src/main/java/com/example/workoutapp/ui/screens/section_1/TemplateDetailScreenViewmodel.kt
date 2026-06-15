@@ -11,7 +11,7 @@ import com.example.workoutapp.database.WorkoutTemplateRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-// TemplateDetailViewModel.kt
+
 class TemplateDetailViewModel(
     savedStateHandle: SavedStateHandle,
     private val templateRepository: WorkoutTemplateRepository,
@@ -19,7 +19,7 @@ class TemplateDetailViewModel(
 
     private val args = savedStateHandle.toRoute<Destinations.TemplateDetail>()
 
-    // Jeden StateFlow dla ID — null oznacza "jeszcze nie zapisano"
+
     private val _dbId = MutableStateFlow<Long?>(args.id.toLongOrNull())
     val dbId: StateFlow<Long?> = _dbId.asStateFlow()
 
@@ -72,11 +72,20 @@ class TemplateDetailViewModel(
         }
     }
 
+    fun deleteTemplate(onDeleted: () -> Unit) {
+        val id = _dbId.value ?: return
+        viewModelScope.launch {
+            val template = templateRepository.getTemplateById(id) ?: return@launch
+            templateRepository.deleteTemplate(template)
+            onDeleted()
+        }
+    }
+
 
     fun onTemplateDescriptionChange(newDesc: String) { _templateDescription.value = newDesc }
 }
 
-// Mapper poza klasą — czytelniejszy
+
 private fun TemplateExerciseEntry.toExerciseEntry() = ExerciseEntry(
     id         = itemId.toString(),
     exerciseId = exerciseId.toString(),
@@ -87,7 +96,7 @@ private fun TemplateExerciseEntry.toExerciseEntry() = ExerciseEntry(
     restTime   = if (minRestTime == maxRestTime) formatTime(minRestTime)
     else "${formatTime(minRestTime)}–${formatTime(maxRestTime)}",
     note       = note ?: "",
-    photoUrl   = photoUrl ?: "", // ← dodaj, nazwa pola zależna od TemplateExerciseEntry
+    photoUrl   = photoUrl ?: "",
 )
 
 private fun formatTime(seconds: Int): String =

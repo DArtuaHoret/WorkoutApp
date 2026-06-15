@@ -1,27 +1,21 @@
 package com.example.workoutapp.ui.screens.section_1
 
-
-
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.workoutapp.R
 import com.example.workoutapp.ui.reusableContents.Section_1.*
-
 
 data class ExerciseEntry(
     val id: String,
@@ -31,10 +25,9 @@ data class ExerciseEntry(
     val weight: String,
     val restTime: String,
     val note: String = "",
-    val photoUrl: String = "", // ← nowe pole
+    val photoUrl: String = "",
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TemplateDetailScreen(
     viewModel: TemplateDetailViewModel,
@@ -43,20 +36,21 @@ fun TemplateDetailScreen(
     onEditExercise: (ExerciseEntry) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val templateName by viewModel.templateName.collectAsState()
-    val exercises    by viewModel.exercises.collectAsState()
+    val templateName        by viewModel.templateName.collectAsState()
+    val exercises           by viewModel.exercises.collectAsState()
     val templateDescription by viewModel.templateDescription.collectAsState()
     val canSave = templateName.isNotBlank()
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         ) {
             IconButton(
                 onClick = onBackClick,
@@ -64,12 +58,12 @@ fun TemplateDetailScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Wróć",
+                    contentDescription = stringResource(R.string.back),
                     tint = Color.White,
                 )
             }
             Text(
-                text = "Przegląd szablonu",
+                text = stringResource(R.string.template_detail_title),
                 color = Color.White,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
@@ -77,18 +71,15 @@ fun TemplateDetailScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
         LazyColumn(
-            modifier = Modifier.weight(1f), // ← zamiast fillMaxSize()
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(vertical = 16.dp),
         ) {
-            // Template name field
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text = "Nazwa szablonu",
+                        text = stringResource(R.string.template_name_label),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
@@ -99,20 +90,18 @@ fun TemplateDetailScreen(
                     )
                     if (templateName.isBlank()) {
                         Text(
-                            text = "Nazwa jest wymagana",
+                            text = stringResource(R.string.template_name_required),
                             color = Color.Red,
-                            fontSize = 12.sp
+                            fontSize = 12.sp,
                         )
                     }
                 }
             }
 
-
-
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text = "Opis szablonu",
+                        text = stringResource(R.string.template_description_label),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
@@ -120,15 +109,14 @@ fun TemplateDetailScreen(
                     WorkoutTextField(
                         value = templateDescription,
                         onValueChange = viewModel::onTemplateDescriptionChange,
-                        placeholder = "np. Plan na masę, 3 dni w tygodniu...",
+                        placeholder = stringResource(R.string.template_description_placeholder),
                     )
                 }
             }
 
-            // Exercises header
             item {
                 Text(
-                    text = "Ćwiczenia",
+                    text = stringResource(R.string.exercises_title),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
@@ -136,7 +124,6 @@ fun TemplateDetailScreen(
                 )
             }
 
-            // Exercise cards
             items(
                 items = exercises,
                 key = { it.id },
@@ -147,28 +134,33 @@ fun TemplateDetailScreen(
                     weight = exercise.weight,
                     restTime = exercise.restTime,
                     note = exercise.note,
-                    photoUrl = exercise.photoUrl, // ← przekazanie
+                    photoUrl = exercise.photoUrl,
                     onEditClick = { onEditExercise(exercise) },
                     onDeleteClick = { viewModel.deleteExercise(exercise) },
                 )
             }
 
-            // Add exercise card
             item {
                 AddExerciseCard(onAddClick = onAddExerciseClick)
             }
-
-
-
         }
+
+        ActionButton(
+            onClick = { viewModel.deleteTemplate { onBackClick() } },
+            label = stringResource(R.string.delete_template),
+            icon = Icons.Default.Delete,
+            style = ActionButtonStyle.DangerFilled,
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         ActionButton(
             onClick = {
-                if (!(templateName.isNotBlank())) return@ActionButton
-
+                if (!templateName.isNotBlank()) return@ActionButton
                 viewModel.saveTemplate()
                 onBackClick()
             },
-            label = "ZAPISZ SZABLON",
+            label = stringResource(R.string.save_template),
             enabled = canSave,
             style = ActionButtonStyle.LightFilled,
         )

@@ -2,18 +2,21 @@ package com.example.workoutapp
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
+import com.example.workoutapp.ui.screens.SettingsScreen
 import com.example.workoutapp.ui.screens.section_1.ExerciseDetailScreen
 import com.example.workoutapp.ui.screens.section_1.ExerciseSearchScreen
 import com.example.workoutapp.ui.screens.section_1.TemplateDetailScreen
@@ -36,6 +39,8 @@ import java.time.LocalDate
 
 // --- Type-safe destinations ---
 sealed interface Destinations {
+
+    @Serializable data object Settings : Destinations
 
     // ── Sekcja 1 – zagnieżdżony graf szablonów ───────────────────────────
     /** Korzeń zagnieżdżonego grafu szablonów – nie jest osobnym screenem. */
@@ -133,8 +138,9 @@ data class BottomNavItem(
 val bottomNavItems = listOf(
     BottomNavItem(Destinations.TemplatesGraph, "📋", "Szablony"),
     BottomNavItem(Destinations.Workout,        "🏋️", "Trening"),
-    BottomNavItem(Destinations.HistoryGraph,        "📅", "Historia"),
+    BottomNavItem(Destinations.HistoryGraph,   "📅", "Historia"),
     BottomNavItem(Destinations.DietGraph,      "🍎", "Dieta"),
+    BottomNavItem(Destinations.Settings,       "⚙️", "Ustawienia"),  // ← NOWE
 )
 
 @Composable
@@ -181,6 +187,13 @@ fun AppNavigation() {
             startDestination = Destinations.TemplatesGraph,
             modifier = Modifier.padding(innerPadding)
         ) {
+
+            composable<Destinations.Settings> {
+                SettingsScreen(
+                    viewModel = viewModel(factory = WorkoutAppViewModelProvider.Factory),
+                    onBackClick = { navController.popBackStack() },
+                )
+            }
 
             // ── Zagnieżdżony graf sekcji 1 ───────────────────────────────
             navigation<Destinations.TemplatesGraph>(
