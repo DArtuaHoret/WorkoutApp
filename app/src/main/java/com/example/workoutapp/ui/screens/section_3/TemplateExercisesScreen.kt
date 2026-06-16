@@ -37,7 +37,7 @@ fun TemplateExercisesScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val exerciseSets by viewModel.exerciseSets.collectAsState()
+    val exercises by viewModel.exercises.collectAsState()
 
     Scaffold(
         topBar = {
@@ -71,7 +71,7 @@ fun TemplateExercisesScreen(
                 .padding(horizontal = 16.dp)
                 .fillMaxSize()
         ) {
-            if (exerciseSets.isEmpty()) {
+            if (exercises.isEmpty()) {
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "Brak ćwiczeń w tym treningu",
@@ -87,25 +87,33 @@ fun TemplateExercisesScreen(
                     contentPadding = PaddingValues(vertical = 16.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(
-                        items = exerciseSets,
-                        key = { "${it.sessionItemId}_${it.setNumber}" }
-                    ) { set ->
+                    items(items = exercises, key = { it.sessionItemId }) { exercise ->
+                        // Podsumowanie serii jak w sekcji 1: zakres lub jedna wartość
+                        val setCount = exercise.sets.size.toString()
+                        val weights = exercise.sets.map { it.plannedWeight.toInt() }
+                        val weight = if (weights.isEmpty()) "0 kg"
+                        else if (weights.min() == weights.max()) "${weights.min()} kg"
+                        else "${weights.min()}–${weights.max()} kg"
+                        val rests = exercise.sets.map { it.plannedRestTime }
+                        val restTime = if (rests.isEmpty()) "00:00"
+                        else if (rests.min() == rests.max()) formatRestTime(rests.min())
+                        else "${formatRestTime(rests.min())}–${formatRestTime(rests.max())}"
+
                         ExerciseItemCard(
-                            exerciseName = "${set.exerciseName} — Seria ${set.setNumber}",
-                            series = "${set.plannedReps} powtórzeń",
-                            weight = "${set.plannedWeight.toInt()} kg",
-                            restTime = formatRestTime(set.plannedRestTime),  // ← rzeczywisty czas
-                            note = set.note ?: "",
+                            exerciseName = exercise.exerciseName,
+                            series = setCount,
+                            weight = weight,
+                            restTime = restTime,
+                            note = exercise.note ?: "",
                             onEditClick = {
                                 onEditExercise(
-                                    set.sessionItemId.toString(),
-                                    set.exerciseId.toString(),
-                                    set.exerciseName
+                                    exercise.sessionItemId.toString(),
+                                    exercise.exerciseId.toString(),
+                                    exercise.exerciseName
                                 )
                             },
                             onDeleteClick = {
-                                viewModel.deleteSessionItem(set.sessionItemId)
+                                viewModel.deleteSessionItem(exercise.sessionItemId)
                             }
                         )
                     }

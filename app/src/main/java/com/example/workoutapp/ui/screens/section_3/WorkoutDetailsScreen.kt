@@ -18,54 +18,44 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.example.workoutapp.ui.reusableContents.Section_3.CompletedWorkoutCard
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-
-data class WorkoutSessionData(
-    val id: String,
-    val workoutName: String,
-    val timeRange: String,
-    val icon: ImageVector,
-    val isCompleted: Boolean
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutDetailsScreen(
-    date: LocalDate,
-    workoutSessions: List<WorkoutSessionData>,
+    viewModel: WorkoutDetailsViewModel,
     onBackClick: () -> Unit,
-    onWorkoutClick: (String) -> Unit,         // pozostaje dla kompatybilności
-    onViewExercisesClick: (String) -> Unit,   // "ZOBACZYĆ SZCZEGÓŁY" → lista ćwiczeń
-    onStartWorkoutClick: (String) -> Unit,    // "ROZPOCZĄĆ TRENING" → timer
+    onViewExercisesClick: (String) -> Unit,
+    onStartWorkoutClick: (sessionId: String, templateId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val formattedDateHeader = remember(date) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    val formattedDateHeader = remember(uiState.date) {
         val localePl = Locale.forLanguageTag("pl-PL")
         val datePartFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", localePl)
-        val datePart = date.format(datePartFormatter).uppercase(localePl)
+        val datePart = uiState.date.format(datePartFormatter).uppercase(localePl)
         val dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", localePl)
-        val dayOfWeek = date.format(dayOfWeekFormatter).replaceFirstChar {
+        val dayOfWeek = uiState.date.format(dayOfWeekFormatter).replaceFirstChar {
             if (it.isLowerCase()) it.titlecase(localePl) else it.toString()
         }
         "$datePart ($dayOfWeek)"
     }
 
-    // ID aktualnie wybranej sesji (null = nic nie wybrano)
     var selectedSessionId by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
@@ -113,14 +103,13 @@ fun WorkoutDetailsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                workoutSessions.forEach { session ->
+                uiState.workoutSessions.forEach { session ->
                     CompletedWorkoutCard(
                         workoutName = session.workoutName,
                         timeRange = session.timeRange,
                         icon = session.icon,
                         isCompleted = session.isCompleted,
                         modifier = Modifier.clickable {
-                            // Zaznacz lub odznacz kartę
                             selectedSessionId = if (selectedSessionId == session.id) null else session.id
                         }
                     )
@@ -129,7 +118,6 @@ fun WorkoutDetailsScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Przyciski pojawiają się gdy jest wybrana sesja
             if (selectedSessionId != null) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -144,7 +132,10 @@ fun WorkoutDetailsScreen(
                         style = ActionButtonStyle.LightFilled
                     )
                     ActionButton(
-                        onClick = { onStartWorkoutClick(selectedSessionId!!) },
+                        onClick = {
+                            val templateId = uiState.sessionToTemplateId[selectedSessionId!!] ?: ""
+                            onStartWorkoutClick(selectedSessionId!!, templateId)
+                        },
                         label = "ROZPOCZĄĆ TRENING",
                         icon = null,
                         style = ActionButtonStyle.LightFilled

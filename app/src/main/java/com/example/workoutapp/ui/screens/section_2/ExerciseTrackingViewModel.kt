@@ -154,15 +154,6 @@ class ExerciseTrackingViewModel(
     fun onDoneClick() { _isResting.value = true }
 
     fun onTimerFinished() {
-        val completed = _restsCompleted.value + 1
-
-        if (completed < _reps.value) {
-            _restsCompleted.value = completed
-            _isResting.value = false
-            return
-        }
-
-        _restsCompleted.value = 0
         val currentEntry = exerciseList[currentIndex]
 
         if (_currentSet.value < currentEntry.setCount) {

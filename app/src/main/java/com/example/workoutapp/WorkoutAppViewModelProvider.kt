@@ -19,6 +19,7 @@ import com.example.workoutapp.ui.screens.section_4.AddMealSearchViewModel
 import com.example.workoutapp.ui.screens.section_4.BarcodeScannerViewModel
 import com.example.workoutapp.ui.screens.section_4.FavoriteProductsViewModel
 import com.example.workoutapp.ui.screens.section_4.ProductDetailViewModel
+import com.example.workoutapp.ui.screens.section_3.WorkoutDetailsViewModel
 
 object WorkoutAppViewModelProvider {
     val Factory = viewModelFactory {
@@ -115,6 +116,14 @@ object WorkoutAppViewModelProvider {
                 templateRepository = workoutApp().workoutTemplateRepository,
                 sessionRepository = workoutApp().workoutSessionRepository,
                 exerciseRepository = workoutApp().exerciseRepository
+            )
+        }
+
+        initializer<WorkoutDetailsViewModel> {
+            WorkoutDetailsViewModel(
+                savedStateHandle = this.createSavedStateHandle(),
+                sessionRepository = workoutApp().workoutSessionRepository,
+                templateRepository = workoutApp().workoutTemplateRepository
             )
         }
     }

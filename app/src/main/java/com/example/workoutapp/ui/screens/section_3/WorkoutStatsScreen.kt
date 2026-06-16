@@ -1,6 +1,5 @@
 package com.example.workoutapp.ui.screens.section_3
 
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -28,22 +29,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.workoutapp.ui.reusableContents.Section_3.AverageTimeCard
 import com.example.workoutapp.ui.reusableContents.Section_3.MuscleGroupDistributionCard
-import com.example.workoutapp.ui.reusableContents.Section_3.MuscleGroupShare
 import com.example.workoutapp.ui.reusableContents.Section_3.TrainingProgressCard
-import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutStatsScreen(
-    startDate: LocalDate,
-    endDate: LocalDate,
-    totalDays: Int,
-    completedWorkouts: Int,
-    muscleDistribution: List<MuscleGroupShare>,
-    averageTimeInSeconds: Int,
+    viewModel: WorkoutStatsViewModel,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
     val rangeFormatter = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
@@ -70,9 +65,8 @@ fun WorkoutStatsScreen(
                 .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Wyświetlenie wybranego zakresu dat pod TopAppBarem
             Text(
-                text = "Zakres: ${startDate.format(rangeFormatter)} — ${endDate.format(rangeFormatter)}",
+                text = "Zakres: ${uiState.startDate.format(rangeFormatter)} — ${uiState.endDate.format(rangeFormatter)}",
                 color = Color(0xFFAAAAAA),
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),
@@ -80,15 +74,39 @@ fun WorkoutStatsScreen(
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text("FREKWENCJA", color = Color(0xFFE5D5C5), fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-                TrainingProgressCard(totalDays = totalDays, completedWorkouts = completedWorkouts, modifier = Modifier.fillMaxWidth())
+                Text(
+                    "FREKWENCJA",
+                    color = Color(0xFFE5D5C5),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                TrainingProgressCard(
+                    totalDays = uiState.totalDays,
+                    completedWorkouts = uiState.completedWorkouts,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text("ROZKŁAD & CZAS", color = Color(0xFFE5D5C5), fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-                MuscleGroupDistributionCard(distribution = muscleDistribution, modifier = Modifier.fillMaxWidth())
+                Text(
+                    "ROZKŁAD & CZAS",
+                    color = Color(0xFFE5D5C5),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                MuscleGroupDistributionCard(
+                    distribution = uiState.muscleDistribution,
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.height(16.dp))
-                AverageTimeCard(averageTimeInSeconds = averageTimeInSeconds, modifier = Modifier.fillMaxWidth())
+                AverageTimeCard(
+                    averageTimeInSeconds = uiState.averageTimeInSeconds,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
             Spacer(modifier = Modifier.height(32.dp))
         }

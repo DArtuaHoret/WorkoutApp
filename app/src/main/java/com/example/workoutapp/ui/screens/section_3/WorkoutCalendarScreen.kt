@@ -7,28 +7,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import java.time.LocalDate
 
 import com.example.workoutapp.ui.calendar.WorkoutCalendar
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.example.workoutapp.ui.reusableContents.Section_3.CenteredDateRangeSelector
 import com.example.workoutapp.ui.reusableContents.Section_3.CenteredTemplateSelectionDialog
-import com.example.workoutapp.ui.reusableContents.Section_3.TemplateSelectionItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutHistoryScreen(
-    selectedDate: LocalDate?,
-    workoutDays: Set<LocalDate>,
-    availableTemplates: List<TemplateSelectionItem>,
-    onDateSelected: (LocalDate) -> Unit,
+    viewModel: WorkoutCalendarViewModel,
+    selectedDate: java.time.LocalDate?,
+    onDateSelected: (java.time.LocalDate) -> Unit,
     onBackClick: () -> Unit,
     onAssignWorkoutClick: (templateId: String) -> Unit,
-    onViewStatsClick: (LocalDate, LocalDate) -> Unit,
+    onViewStatsClick: (java.time.LocalDate, java.time.LocalDate) -> Unit,
     onViewWorkoutDetailsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val availableTemplates by viewModel.availableTemplates.collectAsState()
+    val workoutDays by viewModel.scheduledDates.collectAsState()
+
     var showStatsRangeSelector by remember { mutableStateOf(false) }
     var showTemplateSelectionDialog by remember { mutableStateOf(false) }
 

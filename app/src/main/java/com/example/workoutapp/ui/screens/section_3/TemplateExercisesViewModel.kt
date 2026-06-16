@@ -9,10 +9,22 @@ import com.example.workoutapp.database.ExerciseRepository
 import com.example.workoutapp.database.WorkoutSessionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
-// Pojedyncza seria ćwiczenia sesji z pełnymi danymi
+// Ćwiczenie z pogrupowanymi seriami — do wyświetlenia na liście
+data class SessionExerciseEntry(
+    val sessionItemId: Long,
+    val exerciseId: Long,
+    val exerciseName: String,
+    val note: String?,
+    val sets: List<SessionExerciseSetEntry>  // wszystkie serie razem
+)
+
+// Pojedyncza seria — do wyświetlenia w ekranie edycji
 data class SessionExerciseSetEntry(
     val sessionItemId: Long,
     val sessionSetId: Long,
@@ -21,7 +33,7 @@ data class SessionExerciseSetEntry(
     val setNumber: Int,
     val plannedReps: Int,
     val plannedWeight: Double,
-    val plannedRestTime: Int,   // NOWE
+    val plannedRestTime: Int,
     val note: String?
 )
 
@@ -32,66 +44,93 @@ class TemplateExercisesViewModel(
 ) : ViewModel() {
 
     private val args = savedStateHandle.toRoute<Destinations.TemplateExercises>()
-    val sessionId = args.templateId.toLongOrNull() ?: 0L  // templateId reużywamy jako sessionId
+    val sessionId = args.templateId.toLongOrNull() ?: 0L
     val sessionName = args.templateName
 
-    private val _exerciseSets = MutableStateFlow<List<SessionExerciseSetEntry>>(emptyList())
-    val exerciseSets: StateFlow<List<SessionExerciseSetEntry>> = _exerciseSets
+    // Pogrupowane ćwiczenia — każde ćwiczenie zawiera listę swoich serii
+    private val _exercises = MutableStateFlow<List<SessionExerciseEntry>>(emptyList())
+    val exercises: StateFlow<List<SessionExerciseEntry>> = _exercises
 
     init {
-        loadExerciseSets()
+        observeExercises()
     }
 
-    private fun loadExerciseSets() {
+    private fun observeExercises() {
         viewModelScope.launch {
+            // Obserwuj items sesji — gdy coś się zmieni (np. po edycji), odświeży listę
             sessionRepository.getItemsForSession(sessionId).collect { items ->
-                val allSets = mutableListOf<SessionExerciseSetEntry>()
-                items.forEach { item ->
-                    // Pobierz nazwę ćwiczenia
+                val exerciseEntries = items.map { item ->
                     val exerciseName = runCatching {
                         exerciseRepository.getExerciseById(item.exerciseId)
                             .first().firstOrNull()?.name ?: "Ćwiczenie"
                     }.getOrElse { "Ćwiczenie" }
 
-                    val sets = sessionRepository.getSetsForSessionItemOnce(item.id)
-                    if (sets.isEmpty()) {
-                        allSets.add(
+                    // Dla każdego itemu obserwuj jego serie reaktywnie
+                    val sets = sessionRepository.getSetsForSessionItem(item.id).first()
+                        .map { set ->
                             SessionExerciseSetEntry(
                                 sessionItemId = item.id,
-                                sessionSetId = 0L,
+                                sessionSetId = set.id,
                                 exerciseId = item.exerciseId,
                                 exerciseName = exerciseName,
-                                setNumber = 1,
-                                plannedReps = 0,
-                                plannedWeight = 0.0,
-                                plannedRestTime = 60,
+                                setNumber = set.setNumber,
+                                plannedReps = set.plannedReps,
+                                plannedWeight = set.plannedWeight,
+                                plannedRestTime = set.plannedRestTime,
                                 note = item.note
                             )
-                        )
-                    } else {
-                        sets.forEach { set ->
-                            allSets.add(
-                                SessionExerciseSetEntry(
-                                    sessionItemId = item.id,
-                                    sessionSetId = set.id,
-                                    exerciseId = item.exerciseId,
-                                    exerciseName = exerciseName,
-                                    setNumber = set.setNumber,
-                                    plannedReps = set.plannedReps,
-                                    plannedWeight = set.plannedWeight,
-                                    plannedRestTime = set.plannedRestTime,  // NOWE
-                                    note = item.note
-                                )
-                            )
                         }
-                    }
+
+                    SessionExerciseEntry(
+                        sessionItemId = item.id,
+                        exerciseId = item.exerciseId,
+                        exerciseName = exerciseName,
+                        note = item.note,
+                        sets = sets
+                    )
                 }
-                _exerciseSets.value = allSets
+                _exercises.value = exerciseEntries
             }
         }
     }
 
-    // Usuwa ćwiczenie (item) i wszystkie jego serie z sesji
+    // Odśwież dane — wywołaj po powrocie z ekranu edycji
+    fun refresh() {
+        viewModelScope.launch {
+            val items = sessionRepository.getItemsForSessionOnce(sessionId)
+            val exerciseEntries = items.map { item ->
+                val exerciseName = runCatching {
+                    exerciseRepository.getExerciseById(item.exerciseId)
+                        .first().firstOrNull()?.name ?: "Ćwiczenie"
+                }.getOrElse { "Ćwiczenie" }
+
+                val sets = sessionRepository.getSetsForSessionItemOnce(item.id)
+                    .map { set ->
+                        SessionExerciseSetEntry(
+                            sessionItemId = item.id,
+                            sessionSetId = set.id,
+                            exerciseId = item.exerciseId,
+                            exerciseName = exerciseName,
+                            setNumber = set.setNumber,
+                            plannedReps = set.plannedReps,
+                            plannedWeight = set.plannedWeight,
+                            plannedRestTime = set.plannedRestTime,
+                            note = item.note
+                        )
+                    }
+
+                SessionExerciseEntry(
+                    sessionItemId = item.id,
+                    exerciseId = item.exerciseId,
+                    exerciseName = exerciseName,
+                    note = item.note,
+                    sets = sets
+                )
+            }
+            _exercises.value = exerciseEntries
+        }
+    }
+
     fun deleteSessionItem(sessionItemId: Long) {
         viewModelScope.launch {
             sessionRepository.deleteSetsForSessionItem(sessionItemId)

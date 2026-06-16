@@ -1,4 +1,4 @@
-package com.example.workoutapp.ui.screens.section_3
+/*package com.example.workoutapp.ui.screens.section_3
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -152,4 +152,4 @@ private fun PreviewHistoryWithRangeActive() {
             )
         }
     }
-}
+}*/

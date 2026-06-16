@@ -13,9 +13,10 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-// Reprezentacja stanu interfejsu (co ekran ma wyświetlić)
 data class WorkoutStatsUiState(
     val isLoading: Boolean = true,
+    val startDate: LocalDate = LocalDate.now(),
+    val endDate: LocalDate = LocalDate.now(),
     val totalDays: Int = 0,
     val completedWorkouts: Int = 0,
     val muscleDistribution: List<MuscleGroupShare> = emptyList(),
@@ -26,7 +27,6 @@ class WorkoutStatsViewModel(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    // 1. BEZPIECZNE POBIERANIE ARGUMENTÓW (Zgodnie z architekturą Twojej aplikacji)
     private val args = savedStateHandle.toRoute<Destinations.HistoryStats>()
 
     private val startDate = LocalDate.parse(args.startDateIso)
@@ -41,36 +41,24 @@ class WorkoutStatsViewModel(
 
     private fun loadAndCalculateStats() {
         viewModelScope.launch {
-            // 1. Obliczenie całkowitej liczby dni (plus 1, aby zakres był włączny)
             val daysBetween = ChronoUnit.DAYS.between(startDate, endDate).toInt() + 1
 
-            // 2. Symulacja zapytania do bazy danych.
-            // Na razie wymuszamy pustą listę, co odpowiada rzeczywistości (brak treningów).
-            // W przyszłości zamienisz to na: val workoutLogs = historyRepository.getWorkoutsBetweenDates(startDate, endDate)
-            val workoutLogs = emptyList<Any>() // Typ Any użyty tymczasowo jako placeholder
+            val workoutLogs = emptyList<Any>()
 
-            // 3. Dynamiczne obliczenia na podstawie pobranej listy
-            val calculatedCompletedWorkouts = workoutLogs.size // Zwróci 0
+            val calculatedCompletedWorkouts = workoutLogs.size
 
-            // Bezpieczne liczenie średniej (chroni przed błędem dzielenia przez zero)
-            val calculatedAvgTime = if (calculatedCompletedWorkouts > 0) {
-                // Docelowo: workoutLogs.sumOf { it.durationInSeconds } / calculatedCompletedWorkouts
-                0
-            } else {
-                0
-            }
+            val calculatedAvgTime = if (calculatedCompletedWorkouts > 0) 0 else 0
 
-            // Bezpieczne liczenie rozkładu mięśni
             val calculatedDistribution = if (workoutLogs.isEmpty()) {
-                emptyList<MuscleGroupShare>() // Pusta lista wyczyści wykresy
+                emptyList<MuscleGroupShare>()
             } else {
-                // Docelowo: logika grupowania partii mięśniowych
                 emptyList<MuscleGroupShare>()
             }
 
-            // 4. Aktualizacja stanu interfejsu rzeczywistymi obliczeniami
             _uiState.value = WorkoutStatsUiState(
                 isLoading = false,
+                startDate = startDate,
+                endDate = endDate,
                 totalDays = daysBetween,
                 completedWorkouts = calculatedCompletedWorkouts,
                 muscleDistribution = calculatedDistribution,

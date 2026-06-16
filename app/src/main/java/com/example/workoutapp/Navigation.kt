@@ -38,7 +38,6 @@ import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
 import com.example.workoutapp.ui.screens.section_3.WorkoutDetailsScreen
-import com.example.workoutapp.ui.screens.section_3.WorkoutSessionData
 
 import com.example.workoutapp.ui.screens.section_3.TemplateExercisesScreen
 import com.example.workoutapp.ui.screens.section_3.TemplateExercisesViewModel
@@ -46,7 +45,14 @@ import com.example.workoutapp.ui.screens.section_3.SessionExerciseEditScreen
 import com.example.workoutapp.ui.screens.section_3.SessionExerciseEditViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+<<<<<<< Updated upstream
 import androidx.compose.ui.res.stringResource
+=======
+
+import com.example.workoutapp.ui.screens.section_3.WorkoutDetailsViewModel
+
+
+>>>>>>> Stashed changes
 
 
 // --- Type-safe destinations ---
@@ -374,29 +380,29 @@ fun AppNavigation() {
                     val viewModel: WorkoutCalendarViewModel = viewModel(
                         viewModelStoreOwner = backStackEntry, factory = WorkoutAppViewModelProvider.Factory
                     )
-                    val templates by viewModel.availableTemplates.collectAsState()
-                    val scheduledDates by viewModel.scheduledDates.collectAsState()
 
-                    // Ładuj sesje dla wybranego dnia przy każdej zmianie daty
                     LaunchedEffect(selectedDate) {
                         selectedDate?.let { viewModel.loadSessionsForDate(it) }
                     }
 
                     WorkoutHistoryScreen(
+                        viewModel = viewModel,
                         selectedDate = selectedDate,
-                        workoutDays = scheduledDates,
-                        availableTemplates = templates,
                         onDateSelected = { selectedDate = it },
                         onBackClick = {},
                         onAssignWorkoutClick = { templateId ->
                             selectedDate?.let { date ->
-                                // Zapisz przypisanie i przejdź do listy szczegółów
                                 viewModel.assignTemplateToDate(templateId, date)
                                 navController.navigate(Destinations.HistoryDetails(dateIsoString = date.toString()))
                             }
                         },
                         onViewStatsClick = { startDate, endDate ->
-                            navController.navigate(Destinations.HistoryStats(startDateIso = startDate.toString(), endDateIso = endDate.toString()))
+                            navController.navigate(
+                                Destinations.HistoryStats(
+                                    startDateIso = startDate.toString(),
+                                    endDateIso = endDate.toString()
+                                )
+                            )
                         },
                         onViewWorkoutDetailsClick = {
                             selectedDate?.let { date ->
@@ -407,41 +413,17 @@ fun AppNavigation() {
                 }
 
                 composable<Destinations.HistoryDetails> { backStackEntry ->
-                    val args = backStackEntry.toRoute<Destinations.HistoryDetails>()
-                    val date = LocalDate.parse(args.dateIsoString)
-
-                    val calendarEntry = remember(backStackEntry) {
-                        navController.getBackStackEntry(Destinations.HistoryCalendar)
-                    }
-                    val calendarViewModel: WorkoutCalendarViewModel = viewModel(
-                        viewModelStoreOwner = calendarEntry, factory = WorkoutAppViewModelProvider.Factory
+                    val viewModel: WorkoutDetailsViewModel = viewModel(
+                        viewModelStoreOwner = backStackEntry, factory = WorkoutAppViewModelProvider.Factory
                     )
-                    val sessions by calendarViewModel.sessionsForSelectedDate.collectAsState()
-
-                    // id = session.id — potrzebne do nawigacji do listy ćwiczeń
-                    val sessionData = sessions.map { sessionWithName ->
-                        WorkoutSessionData(
-                            id = sessionWithName.session.id.toString(),
-                            workoutName = sessionWithName.templateName,
-                            timeRange = date.toString(),
-                            icon = androidx.compose.material.icons.Icons.Filled.FitnessCenter,
-                            isCompleted = sessionWithName.session.status == "DONE"
-                        )
-                    }
-
-                    // Mapa sessionId → templateId (potrzebna do timera)
-                    val sessionToTemplateId = sessions.associate {
-                        it.session.id.toString() to (it.session.workoutTemplateId?.toString() ?: "")
-                    }
 
                     WorkoutDetailsScreen(
-                        date = date,
-                        workoutSessions = sessionData,
+                        viewModel = viewModel,
                         onBackClick = { navController.popBackStack() },
-                        onWorkoutClick = {},
                         onViewExercisesClick = { sessionId ->
                             if (sessionId.isNotEmpty()) {
-                                val sessionName = sessionData
+                                val uiState = viewModel.uiState.value
+                                val sessionName = uiState.workoutSessions
                                     .find { it.id == sessionId }?.workoutName ?: ""
                                 navController.navigate(
                                     Destinations.TemplateExercises(
@@ -451,13 +433,12 @@ fun AppNavigation() {
                                 )
                             }
                         },
-                        onStartWorkoutClick = { sessionId ->
-                            val templateId = sessionToTemplateId[sessionId] ?: ""
+                        onStartWorkoutClick = { sessionId, templateId ->
                             if (templateId.isNotEmpty()) {
                                 navController.navigate(
                                     Destinations.ActiveWorkout(
                                         templateId = templateId,
-                                        dateIso = date.toString(),
+                                        dateIso = viewModel.date.toString(),
                                         sessionId = sessionId
                                     )
                                 ) {
@@ -508,15 +489,9 @@ fun AppNavigation() {
                     val viewModel: WorkoutStatsViewModel = viewModel(
                         viewModelStoreOwner = backStackEntry, factory = WorkoutAppViewModelProvider.Factory
                     )
-                    val uiState by viewModel.uiState.collectAsState()
-                    val args = backStackEntry.toRoute<Destinations.HistoryStats>()
-                    val startDate = java.time.LocalDate.parse(args.startDateIso)
-                    val endDate = java.time.LocalDate.parse(args.endDateIso)
 
-                    com.example.workoutapp.ui.screens.section_3.WorkoutStatsScreen(
-                        startDate = startDate, endDate = endDate, totalDays = uiState.totalDays,
-                        completedWorkouts = uiState.completedWorkouts, muscleDistribution = uiState.muscleDistribution,
-                        averageTimeInSeconds = uiState.averageTimeInSeconds,
+                    WorkoutStatsScreen(
+                        viewModel = viewModel,
                         onBackClick = { navController.popBackStack() }
                     )
                 }
