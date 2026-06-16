@@ -694,65 +694,7 @@ private fun PreviewDateSelectionDialog() {
 
 
 
-@Composable
-fun DateRangeSelector(
-    initialStartDate: LocalDate? = LocalDate.now().minusWeeks(1),
-    initialEndDate: LocalDate? = LocalDate.now(),
-    onDateRangeConfirmed: (LocalDate, LocalDate) -> Unit
-) {
-    var startDate by remember { mutableStateOf(initialStartDate) }
-    var endDate by remember { mutableStateOf(initialEndDate) }
 
-    var showStartDialog by remember { mutableStateOf(false) }
-    var showEndDialog by remember { mutableStateOf(false) }
-
-    if (showStartDialog) {
-        CenteredDateSelectionDialog(
-            onVisibleChange = { showStartDialog = it },
-            onDateSelected = { startDate = it; showStartDialog = false }
-        )
-    }
-    if (showEndDialog) {
-        DateSelectionDialog(onDismissRequest = { showEndDialog = false }, onDateSelected = { endDate = it; showEndDialog = false })
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .background(color = Color(0xFF1A1A1A), shape = RoundedCornerShape(14.dp))
-            .border(
-                width = 2.dp,
-                color = Color.White,
-                shape = RoundedCornerShape(14.dp)
-            )
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = "Wybierz interesujący przedział dat",
-            color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            DateBox(label = "Od", date = startDate, onClick = { showStartDialog = true }, modifier = Modifier.weight(1f))
-            DateBox(label = "Do", date = endDate, onClick = { showEndDialog = true }, modifier = Modifier.weight(1f))
-        }
-
-        ActionButton(
-            onClick = {
-                if (startDate != null && endDate != null) {
-                    onDateRangeConfirmed(startDate!!, endDate!!)
-                }
-            },
-            label = "ZATWIERDŹ ZAKRES",
-            icon = null,
-            style = ActionButtonStyle.LightFilled
-        )
-    }
-}
 
 @Composable
 fun DateBox(label: String, date: LocalDate?, onClick: () -> Unit, modifier: Modifier = Modifier) {
@@ -771,25 +713,7 @@ fun DateBox(label: String, date: LocalDate?, onClick: () -> Unit, modifier: Modi
     }
 }
 
-@Preview(name = "Wypełnione Daty", showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-fun PreviewDateRangeSelector() {
-    MaterialTheme {
-        DateRangeSelector(onDateRangeConfirmed = { _, _ -> })
-    }
-}
 
-@Preview(name = "Puste Daty", showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun PreviewDateRangeEmpty() {
-    MaterialTheme {
-        DateRangeSelector(
-            initialStartDate = null,
-            initialEndDate = null,
-            onDateRangeConfirmed = { _, _ -> }
-        )
-    }
-}
 
 
 
@@ -963,6 +887,7 @@ fun CenteredDateRangeSelector(
                 ActionButton(
                     onClick = { onDateRangeConfirmed(startDate, endDate) },
                     label = "ZATWIERDŹ ZAKRES",
+                    icon = null,
                     style = ActionButtonStyle.LightFilled
                 )
             }

@@ -20,10 +20,14 @@ import androidx.compose.runtime.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.ui.graphics.drawscope.Stroke
+import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
+import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import kotlinx.coroutines.delay
 
 
@@ -129,7 +133,7 @@ fun ExerciseSetCardDetailed(
                 ) {
                     AdjustableRow(label = "CIĘŻAR:", value = weight, onValueChange = onWeightChange, step = 5, unit = "kg")
                     AdjustableRow(label = "POWTÓRZENIA:", value = reps, onValueChange = onRepsChange, step = 1, minValue = 1)
-                    AdjustableRow(label = "CZAS:", value = rest, onValueChange = onRestChange, step = 15, unit = "s")
+                    AdjustableRow(label = "ODPOCZYNEK:", value = rest, onValueChange = onRestChange, step = 15, unit = "s")
                 }
 
                 Spacer(modifier = Modifier.width(24.dp))
@@ -429,13 +433,16 @@ private fun PreviewEditingContentWrapper(
 @Composable
 fun ExerciseTimer(
     title: String,
+    resetKey: Any = Unit,
     initialSeconds: Int = 59,
-    initialIsRunning: Boolean = true,
+    initialIsRunning: Boolean = false,
+    isExercisePhase: Boolean = false, // true = faza ćwiczenia (od razu "Skończono"), false = faza odpoczynku (timer)
     onTimerFinished: () -> Unit = {},
     onFinishClick: () -> Unit = {}
 ) {
-    var timeLeft by remember { mutableIntStateOf(initialSeconds) }
-    var isRunning by remember { mutableStateOf(initialIsRunning) }
+    var timeLeft by remember(resetKey) { mutableIntStateOf(initialSeconds) }
+    var isRunning by remember(resetKey) { mutableStateOf(initialIsRunning) }
+    var finishClickHandled by remember(resetKey) { mutableStateOf(false) }
 
     LaunchedEffect(key1 = timeLeft, key2 = isRunning) {
         if (isRunning && timeLeft > 0) {
@@ -449,9 +456,8 @@ fun ExerciseTimer(
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .padding(32.dp),
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -469,10 +475,12 @@ fun ExerciseTimer(
             modifier = Modifier
                 .size(300.dp)
                 .clickable(
-                    enabled = timeLeft <= 0,
+                    // Klikalne gdy: faza ćwiczenia (zawsze) LUB faza odpoczynku gdy timer doszedł do zera
+                    enabled = isExercisePhase || (timeLeft <= 0 && !finishClickHandled),
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
+                    finishClickHandled = true
                     onFinishClick()
                 },
             contentAlignment = Alignment.Center
@@ -484,14 +492,24 @@ fun ExerciseTimer(
                 )
             }
 
-            if (timeLeft > 0) {
+            if (isExercisePhase) {
+                // Faza ćwiczenia — zawsze pokazuj "Skończono"
+                Text(
+                    text = "Skończono",
+                    color = Color.White,
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            } else if (timeLeft > 0) {
+                // Faza odpoczynku — odliczanie
                 Text(
                     text = timeLeft.toString(),
                     color = Color.White,
-                    fontSize = 120.sp,
+                    fontSize = 100.sp,
                     fontWeight = FontWeight.Bold
                 )
             } else {
+                // Faza odpoczynku — timer doszedł do zera
                 Text(
                     text = "Skończono",
                     color = Color.White,
@@ -503,7 +521,8 @@ fun ExerciseTimer(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        if (timeLeft > 0) {
+        // Przyciski +/- i play/pause tylko w fazie odpoczynku gdy timer jeszcze biegnie
+        if (!isExercisePhase && timeLeft > 0) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -511,21 +530,40 @@ fun ExerciseTimer(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = { if (timeLeft > 0) timeLeft-- }) {
-                    Text("−", color = Color.White, fontSize = 60.sp)
+                IconButton(
+                    onClick = { timeLeft = maxOf(0, timeLeft - 5) },
+                    modifier = Modifier.size(64.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = "Minus",
+                        tint = Color.White,
+                        modifier = Modifier.size(48.dp)
+                    )
                 }
 
-                TextButton(onClick = { isRunning = !isRunning }) {
+                IconButton(
+                    onClick = { isRunning = !isRunning },
+                    modifier = Modifier.size(64.dp)
+                ) {
                     Icon(
                         imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
                         contentDescription = if (isRunning) "Pauza" else "Start",
                         tint = Color.White,
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(48.dp)
                     )
                 }
 
-                TextButton(onClick = { timeLeft++ }) {
-                    Text("+", color = Color.White, fontSize = 60.sp)
+                IconButton(
+                    onClick = { timeLeft += 5 },
+                    modifier = Modifier.size(64.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Plus",
+                        tint = Color.White,
+                        modifier = Modifier.size(48.dp)
+                    )
                 }
             }
         } else {
@@ -534,8 +572,267 @@ fun ExerciseTimer(
     }
 }
 
-@Preview(showBackground = true)
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewRestTimer() {
-    ExerciseTimer(title = "ODPOCZYNEK", initialSeconds = 59)
+    // Dodajemy Box z czarnym tłem, aby zasymulować środowisko z ExerciseTrackingScreen
+    Box(modifier = Modifier.background(Color.Black).padding(16.dp)) {
+        ExerciseTimer(
+            title = "ODPOCZYNEK",
+            initialSeconds = 59,
+            initialIsRunning = true,
+            onTimerFinished = {},
+            onFinishClick = {}
+        )
+    }
+}
+
+// 1. KARTA KOMUNIKATU (Sama zawartość wizualna)
+@Composable
+fun ExitConfirmationDialog(
+    title: String = "Przerwać trening?",
+    message: String = "Jeśli wyjdziesz, postęp obecnego treningu zostanie utracony. Czy na pewno chcesz opuścić ten ekran?",
+    confirmText: String = "ZAKOŃCZ TRENING",
+    dismissText: String = "ZOSTAŃ",
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .background(Color(0xFF1A1A1A), RoundedCornerShape(28.dp))
+            .border(BorderStroke(2.dp, Color.White), RoundedCornerShape(28.dp))
+            .padding(24.dp)
+    ) {
+        Text(
+            text = title,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            color = Color.White
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = message,
+            fontSize = 16.sp,
+            color = Color.LightGray
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ActionButton(
+                onClick = onConfirm,
+                label = confirmText,
+                icon = null,
+                style = ActionButtonStyle.LightFilled
+            )
+
+            ActionButton(
+                onClick = onDismiss,
+                label = dismissText,
+                icon = null,
+                style = ActionButtonStyle.LightFilled
+            )
+        }
+    }
+}
+
+// PODGLĄD DLA KARTY KOMUNIKATU
+@Preview(showBackground = true, backgroundColor = 0xFF000000, name = "1. Exit Confirmation Card")
+@Composable
+private fun PreviewExitConfirmationDialog() {
+    MaterialTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            ExitConfirmationDialog(
+                onConfirm = {},
+                onDismiss = {}
+            )
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+
+// 2. PEŁNOEKRANOWY KONTENER (Zaciemnione tło + wycentrowana karta)
+@Composable
+fun CenteredExitConfirmationDialog(
+    title: String = "Przerwać trening?",
+    message: String = "Jeśli wyjdziesz, postęp obecnego treningu zostanie utracony. Czy na pewno chcesz opuścić ten ekran?",
+    confirmText: String = "ZAKOŃCZ TRENING",
+    dismissText: String = "ZOSTAŃ",
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.6f))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                // Zamknięcie po kliknięciu poza obszarem karty
+                onDismiss()
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        ExitConfirmationDialog(
+            title = title,
+            message = message,
+            confirmText = confirmText,
+            dismissText = dismissText,
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
+            modifier = Modifier
+                .fillMaxWidth(0.85f)
+                .wrapContentHeight()
+                .clickable(
+                    // Blokada propagacji kliknięć w obrębie karty
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {}
+        )
+    }
+}
+
+// PODGLĄD DLA PEŁNOEKRANOWEGO KONTENERA
+@Preview(showBackground = true, name = "2. Centered Exit Dialog Overlay")
+@Composable
+private fun PreviewCenteredExitConfirmationDialog() {
+    MaterialTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White) // Użycie bieli wizualizuje przezroczystość nakładki
+        ) {
+            CenteredExitConfirmationDialog(
+                onConfirm = {},
+                onDismiss = {}
+            )
+        }
+    }
+}
+
+@Composable
+fun WorkoutSuccessDialog(
+    title: String = "Trening zakończony",
+    message: String = "Twój trening zakończył się sukcesem i został pomyślnie zapisany w kalendarzu.",
+    confirmText: String = "OK",
+    onConfirm: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .background(Color(0xFF1A1A1A), RoundedCornerShape(28.dp))
+            .border(BorderStroke(2.dp, Color.White), RoundedCornerShape(28.dp))
+            .padding(24.dp)
+    ) {
+        Text(
+            text = title,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            color = Color.White
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = message,
+            fontSize = 16.sp,
+            color = Color.LightGray
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Pojedynczy przycisk zatwierdzający
+        ActionButton(
+            onClick = onConfirm,
+            label = confirmText,
+            icon = null,
+            style = ActionButtonStyle.LightFilled
+        )
+    }
+}
+
+// PODGLĄD DLA KARTY KOMUNIKATU O SUKCESIE
+@Preview(showBackground = true, backgroundColor = 0xFF000000, name = "3. Workout Success Card")
+@Composable
+private fun PreviewWorkoutSuccessDialog() {
+    MaterialTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            WorkoutSuccessDialog(
+                onConfirm = {}
+            )
+        }
+    }
+}
+
+@Composable
+fun CenteredWorkoutSuccessDialog(
+    title: String = "Trening zakończony!",
+    message: String = "Twój trening zakończył się sukcesem i został pomyślnie zapisany w kalendarzu.",
+    confirmText: String = "OK",
+    onConfirm: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.6f))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                // Zamknięcie po kliknięciu poza obszarem karty traktujemy jako zatwierdzenie (OK)
+                onConfirm()
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        WorkoutSuccessDialog(
+            title = title,
+            message = message,
+            confirmText = confirmText,
+            onConfirm = onConfirm,
+            modifier = Modifier
+                .fillMaxWidth(0.85f)
+                .wrapContentHeight()
+                .clickable(
+                    // Blokada propagacji kliknięć w obrębie karty, aby kliknięcie w tekst nie zamykało okna
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {}
+        )
+    }
+}
+
+
+@Preview(showBackground = true, name = "4. Centered Success Dialog Overlay")
+@Composable
+private fun PreviewCenteredWorkoutSuccessDialog() {
+    MaterialTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White) // Użycie bieli wizualizuje przezroczystość nakładki
+        ) {
+            CenteredWorkoutSuccessDialog(
+                onConfirm = {}
+            )
+        }
+    }
 }

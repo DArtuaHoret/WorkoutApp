@@ -34,7 +34,9 @@ private fun PreviewWorkoutDetailsScreen() {
             date = LocalDate.of(2026, 10, 12),
             workoutSessions = mockSessions,
             onBackClick = {},
-            onWorkoutClick = {}
+            onWorkoutClick = {},
+            onViewExercisesClick = {},
+            onStartWorkoutClick = {}
         )
     }
 }

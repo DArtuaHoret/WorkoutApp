@@ -36,9 +36,11 @@ data class WorkoutSessionSet(
     var actualReps: Int = 0,
     var plannedWeight: Double,
     var actualWeight: Double = 0.0,
+    var plannedRestTime: Int = 60,  // NOWE: czas odpoczynku skopiowany z WorkoutTemplateSet
     var isDone: Boolean = false,
     var note: String? = null,
     var workoutSessionItemId: Long,
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0
 )
+

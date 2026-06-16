@@ -9,10 +9,22 @@ import coil.decode.ImageDecoderDecoder
 import com.example.workoutapp.database.AppDatabase
 import com.example.workoutapp.database.ExerciseRepositoryImpl
 import com.example.workoutapp.database.FoodRepositoryImpl
+<<<<<<< Updated upstream
 import com.example.workoutapp.database.SettingsRepository
 import com.example.workoutapp.database.WorkoutTemplateRepositoryImpl
 
 class WorkoutApp : Application(), ImageLoaderFactory {
+=======
+import com.example.workoutapp.database.WorkoutSessionRepositoryImpl
+import com.example.workoutapp.database.WorkoutTemplateRepositoryImpl
+
+class WorkoutApp : Application() {
+
+    val workoutSessionRepository by lazy {
+        WorkoutSessionRepositoryImpl(AppDatabase.getDatabase(this).workoutSessionDao())
+    }
+
+>>>>>>> Stashed changes
     val exerciseRepository by lazy {
         ExerciseRepositoryImpl(AppDatabase.getDatabase(this).exerciseDao())
     }
@@ -25,6 +37,7 @@ class WorkoutApp : Application(), ImageLoaderFactory {
         FoodRepositoryImpl(AppDatabase.getDatabase(this).foodDao())
     }
 
+<<<<<<< Updated upstream
     val settingsRepository: SettingsRepository by lazy {
         SettingsRepository(this)
     }
@@ -44,4 +57,9 @@ class WorkoutApp : Application(), ImageLoaderFactory {
             }
             .build()
     }
+=======
+    override fun onCreate() {
+        super.onCreate()
+    }
+>>>>>>> Stashed changes
 }

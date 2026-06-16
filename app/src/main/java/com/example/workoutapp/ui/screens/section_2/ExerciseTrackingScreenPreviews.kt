@@ -4,7 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 
-@Preview(name = "ExerciseTrackingScreen - Stoper działa w trakcie odpoczynku", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "ExerciseTrackingScreen - Faza ćwiczenia", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewActiveWorkoutResting() {
     MaterialTheme {
@@ -15,20 +15,21 @@ private fun PreviewActiveWorkoutResting() {
             reps = 12,
             weight = 60,
             restTime = 59,
-            isResting = true,
-            isTimerRunning = true,
+            isResting = false,
+            restsCompleted = 0,
+            isWorkoutFinished = false,
             onBackClick = {},
             onRepsChange = {},
             onWeightChange = {},
             onRestTimeChange = {},
+            onDoneClick = {},
             onTimerFinished = {},
             onSaveDescription = {},
-            onDoneClick = {}
         )
     }
 }
 
-@Preview(name = "ExerciseTrackingScreen - Stoper działa w trakcie wykonania", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "ExerciseTrackingScreen - Faza odpoczynku", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewActiveWorkoutExecution() {
     MaterialTheme {
@@ -39,15 +40,16 @@ private fun PreviewActiveWorkoutExecution() {
             reps = 12,
             weight = 60,
             restTime = 30,
-            isResting = false,
-            isTimerRunning = true,
+            isResting = true,
+            restsCompleted = 0,
+            isWorkoutFinished = false,
             onBackClick = {},
             onRepsChange = {},
             onWeightChange = {},
             onRestTimeChange = {},
+            onDoneClick = {},
             onTimerFinished = {},
-            onSaveDescription = {},
-            onDoneClick = {}
+            onSaveDescription = {}
         )
     }
 }
@@ -64,14 +66,15 @@ private fun PreviewActiveWorkoutPaused() {
             weight = 60,
             restTime = 15,
             isResting = true,
-            isTimerRunning = false,
+            restsCompleted = 0,
+            isWorkoutFinished = false,
             onBackClick = {},
             onRepsChange = {},
             onWeightChange = {},
             onRestTimeChange = {},
+            onDoneClick = {},
             onTimerFinished = {},
-            onSaveDescription = {},
-            onDoneClick = {}
+            onSaveDescription = {}
         )
     }
 }
@@ -88,14 +91,15 @@ private fun PreviewActiveWorkoutFinished() {
             weight = 60,
             restTime = 0,
             isResting = true,
-            isTimerRunning = false,
+            restsCompleted = 0,
+            isWorkoutFinished = false,
             onBackClick = {},
             onRepsChange = {},
             onWeightChange = {},
             onRestTimeChange = {},
+            onDoneClick = {},
             onTimerFinished = {},
-            onSaveDescription = {},
-            onDoneClick = {}
+            onSaveDescription = {}
         )
     }
 }
@@ -111,15 +115,68 @@ private fun PreviewActiveWorkoutDescriptionDialog() {
             reps = 12,
             weight = 60,
             restTime = 59,
-            isResting = true,
-            isTimerRunning = false,
+            isResting = false,
+            restsCompleted = 0,
+            isWorkoutFinished = false,
             initialShowDescription = true,
             onBackClick = {},
             onRepsChange = {},
             onWeightChange = {},
             onRestTimeChange = {},
-            onTimerFinished = {},
             onDoneClick = {},
+            onTimerFinished = {},
+            onSaveDescription = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Active Workout - W trakcie wyjścia")
+@Composable
+private fun PreviewActiveWorkoutScreenWithExitDialog() {
+    MaterialTheme {
+        ActiveWorkoutScreen(
+            exerciseName = "Martwy ciąg",
+            exerciseDescription = "Pamiętaj o prostych plecach i napiętym brzuchu.",
+            currentSet = 3,
+            reps = 8,
+            weight = 100,
+            restTime = 60,
+            isResting = false,
+            restsCompleted = 0,
+            isWorkoutFinished = false,
+            initialShowDescription = false,
+            initialShowExitDialog = true,
+            onBackClick = {},
+            onRepsChange = {},
+            onWeightChange = {},
+            onRestTimeChange = {},
+            onDoneClick = {},
+            onTimerFinished = {},
+            onSaveDescription = {}
+        )
+    }
+}
+
+@Preview(name = "ExerciseTrackingScreen - Dialog sukcesu", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewActiveWorkoutSuccess() {
+    MaterialTheme {
+        ActiveWorkoutScreen(
+            exerciseName = "Martwy ciąg",
+            exerciseDescription = "Pamiętaj o prostych plecach.",
+            currentSet = 3,
+            reps = 8,
+            weight = 100,
+            restTime = 60,
+            isResting = false,
+            restsCompleted = 0,
+            isWorkoutFinished = true,
+            onBackClick = {},
+            onRepsChange = {},
+            onWeightChange = {},
+            onRestTimeChange = {},
+            onDoneClick = {},
+            onTimerFinished = {},
             onSaveDescription = {}
         )
     }

@@ -3,12 +3,10 @@ package com.example.workoutapp.ui.screens.section_3
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 
 import com.example.workoutapp.ui.calendar.WorkoutCalendar
@@ -26,8 +24,8 @@ fun WorkoutHistoryScreen(
     availableTemplates: List<TemplateSelectionItem>,
     onDateSelected: (LocalDate) -> Unit,
     onBackClick: () -> Unit,
-    onAssignWorkoutClick: (String) -> Unit,
-    onViewStatsClick: (LocalDate, LocalDate) -> Unit, // Zmieniona sygnatura
+    onAssignWorkoutClick: (templateId: String) -> Unit,
+    onViewStatsClick: (LocalDate, LocalDate) -> Unit,
     onViewWorkoutDetailsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -69,6 +67,7 @@ fun WorkoutHistoryScreen(
                         ActionButton(
                             onClick = onViewWorkoutDetailsClick,
                             label = "ZOBACZ SZCZEGÓŁY TRENINGU",
+                            icon = null,
                             style = ActionButtonStyle.LightFilled
                         )
                     }
@@ -80,8 +79,9 @@ fun WorkoutHistoryScreen(
                     )
 
                     ActionButton(
-                        onClick = { showStatsRangeSelector = true }, // Otwiera wybór zakresu
+                        onClick = { showStatsRangeSelector = true },
                         label = "OBEJRZYJ STATYSTYKI",
+                        icon = null,
                         style = ActionButtonStyle.LightFilled
                     )
                 }
@@ -94,17 +94,18 @@ fun WorkoutHistoryScreen(
                 onVisibleChange = { showStatsRangeSelector = it },
                 onDateRangeConfirmed = { start, end ->
                     showStatsRangeSelector = false
-                    onViewStatsClick(start, end) // Przekazuje wybrane daty do nawigacji
+                    onViewStatsClick(start, end)
                 }
             )
         }
 
         if (showTemplateSelectionDialog) {
             CenteredTemplateSelectionDialog(
-                templates = availableTemplates, // <--- TUTAJ używamy przekazanej listy
+                templates = availableTemplates,
                 onVisibleChange = { showTemplateSelectionDialog = it },
                 onTemplateSelected = { selectedTemplateId ->
-                    onAssignWorkoutClick(selectedTemplateId) // Przekazujemy ID wyżej
+                    showTemplateSelectionDialog = false
+                    onAssignWorkoutClick(selectedTemplateId)
                 }
             )
         }
