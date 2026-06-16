@@ -45,14 +45,13 @@ import com.example.workoutapp.ui.screens.section_3.SessionExerciseEditScreen
 import com.example.workoutapp.ui.screens.section_3.SessionExerciseEditViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-<<<<<<< Updated upstream
+
 import androidx.compose.ui.res.stringResource
-=======
+
 
 import com.example.workoutapp.ui.screens.section_3.WorkoutDetailsViewModel
 
 
->>>>>>> Stashed changes
 
 
 // --- Type-safe destinations ---
