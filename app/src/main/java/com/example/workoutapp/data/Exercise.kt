@@ -16,6 +16,7 @@ import androidx.room.PrimaryKey
  */
 data class Exercise(
     var name: String,
+    var nameEn: String = "",     // ← NOWE
     var isCustom: Boolean = false,
     var isActive: Boolean = true,
     var photoUrl: String? = null,

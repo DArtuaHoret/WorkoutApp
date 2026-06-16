@@ -32,7 +32,9 @@ class SessionExerciseEditViewModel(
     val sessionItemId: Long = args.sessionItemId.toLongOrNull() ?: 0L
     val exerciseId: Long = args.exerciseId.toLongOrNull() ?: 0L
 
-    private val _exerciseName = MutableStateFlow(args.exerciseName)
+    private var lang: String = "pl"
+
+    private val _exerciseName = MutableStateFlow("")
     val exerciseName: StateFlow<String> = _exerciseName.asStateFlow()
 
     private val _sets = MutableStateFlow<List<SessionSetState>>(emptyList())
@@ -40,6 +42,20 @@ class SessionExerciseEditViewModel(
 
     init {
         loadSets()
+        loadExerciseName()
+    }
+
+    fun setLang(lang: String) {
+        this.lang = lang
+        loadExerciseName()
+    }
+
+    private fun loadExerciseName() {
+        viewModelScope.launch {
+            val exercise = exerciseRepository.getExerciseById(exerciseId).first().firstOrNull() ?: return@launch
+            _exerciseName.value = if (lang == "en" && exercise.nameEn.isNotBlank())
+                exercise.nameEn else exercise.name
+        }
     }
 
     private fun loadSets() {
@@ -52,11 +68,10 @@ class SessionExerciseEditViewModel(
                         setNumber = set.setNumber,
                         reps = set.plannedReps,
                         weight = set.plannedWeight.toInt(),
-                        restTime = set.plannedRestTime  // NOWE
+                        restTime = set.plannedRestTime
                     )
                 }
             } else {
-                // Brak serii — zacznij od jednej pustej
                 _sets.value = listOf(SessionSetState(setNumber = 1))
             }
         }
@@ -72,11 +87,10 @@ class SessionExerciseEditViewModel(
     }
 
     fun onDeleteSet(index: Int) {
-        if (_sets.value.size <= 1) return  // zawsze zostaw co najmniej 1 serię
+        if (_sets.value.size <= 1) return
         _sets.value = _sets.value.toMutableList().also { it.removeAt(index) }
     }
 
-    // Usuń całe ćwiczenie (item + wszystkie serie) z sesji
     fun deleteExercise(onDone: () -> Unit) {
         viewModelScope.launch {
             sessionRepository.deleteSetsForSessionItem(sessionItemId)
@@ -85,10 +99,8 @@ class SessionExerciseEditViewModel(
         }
     }
 
-    // Zapisz zmiany — nadpisz serie w bazie
     fun save(onDone: () -> Unit) {
         viewModelScope.launch {
-            // Usuń stare serie i wstaw nowe
             sessionRepository.deleteSetsForSessionItem(sessionItemId)
             _sets.value.forEachIndexed { index, setState ->
                 sessionRepository.saveSessionSet(
@@ -97,7 +109,7 @@ class SessionExerciseEditViewModel(
                         setNumber = index + 1,
                         plannedReps = setState.reps,
                         plannedWeight = setState.weight.toDouble(),
-                        plannedRestTime = setState.restTime  // NOWE
+                        plannedRestTime = setState.restTime
                     )
                 )
             }

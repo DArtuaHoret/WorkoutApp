@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +48,10 @@ fun ActiveWorkoutScreen(
     var showDescription by remember(initialShowDescription) { mutableStateOf(initialShowDescription) }
     var showExitDialog by remember(initialShowExitDialog) { mutableStateOf(initialShowExitDialog) }
 
+
+    //val lang = LocalConfiguration.current.locales[0].language
+    //LaunchedEffect(Unit) { viewModel.setLang(lang) }
+
     BackHandler(enabled = !isWorkoutFinished) {
         showExitDialog = true
     }
@@ -54,36 +59,40 @@ fun ActiveWorkoutScreen(
     Box(modifier = modifier.fillMaxSize()) {
 
         // WARSTWA 1: Interfejs treningowy
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text("Aktywny trening", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { showExitDialog = true }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Wróć", tint = Color.White)
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { showDescription = true }) {
-                            Icon(Icons.Default.Info, "Informacje o ćwiczeniu", tint = Color.White)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
-                )
-            },
-            containerColor = Color.Black,
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                IconButton(
+                    onClick = { showExitDialog = true },
+                    modifier = Modifier.offset(x = (-12).dp)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Wróć", tint = Color.White)
+                }
+                Text(
+                    text = "Aktywny trening",
+                    color = Color.White,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.offset(x = (-16).dp)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = { showDescription = true }) {
+                    Icon(Icons.Default.Info, "Informacje o ćwiczeniu", tint = Color.White)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
 
                 ExerciseSetCardDetailed(
                     exerciseName = exerciseName,
@@ -150,4 +159,3 @@ fun ActiveWorkoutScreen(
             )
         }
     }
-}

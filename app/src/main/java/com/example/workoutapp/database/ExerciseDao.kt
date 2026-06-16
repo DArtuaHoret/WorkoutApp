@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 data class ExerciseWithMuscleGroup(
     val exerciseId: Long,
     val exerciseName: String,
+    val exerciseNameEn: String,
     val muscleGroupName: String,
     val isCustom: Boolean,
     val photoUrl: String?,
@@ -61,8 +62,9 @@ interface ExerciseDao {
 
     @Query("""
         SELECT 
-            e.id   AS exerciseId,
-            e.name AS exerciseName,
+            e.id     AS exerciseId,
+            e.name   AS exerciseName,
+            e.nameEn AS exerciseNameEn,
             COALESCE(mg.name, 'Inne') AS muscleGroupName,
             e.isCustom AS isCustom,
             e.photoUrl AS photoUrl

@@ -169,11 +169,18 @@ class ExerciseDetailViewModel(
         }
     }
 
+    private var lang: String = "pl"
+
+    fun setLang(lang: String) {
+        this.lang = lang
+    }
+
     private fun loadExercise(exerciseId: String) {
         viewModelScope.launch {
             val id = exerciseId.toLongOrNull() ?: return@launch
             exerciseRepository.getExerciseById(id).first().firstOrNull()?.let { exercise ->
-                _exerciseName.value = exercise.name
+                _exerciseName.value = if (lang == "en" && exercise.nameEn.isNotBlank())
+                    exercise.nameEn else exercise.name
                 _photoUrl.value = exercise.photoUrl
             }
             exerciseRepository.getMuscleGroupsForExercise(id)

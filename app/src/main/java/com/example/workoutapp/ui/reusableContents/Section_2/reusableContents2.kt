@@ -114,7 +114,11 @@ fun ExerciseSetCardDetailed(
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.ExtraBold,
+                    //maxLines = 2,
+                    //overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "SERIA $setNumber",
                     color = Color.White,

@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +50,9 @@ fun ExerciseDetailScreen(
     val exerciseNote         by viewModel.exerciseNote.collectAsState()
     val photoUrl             by viewModel.photoUrl.collectAsState()
     val context = LocalContext.current
+
+    val lang = LocalConfiguration.current.locales[0].language
+    LaunchedEffect(Unit) { viewModel.setLang(lang) }
 
     val pickImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()

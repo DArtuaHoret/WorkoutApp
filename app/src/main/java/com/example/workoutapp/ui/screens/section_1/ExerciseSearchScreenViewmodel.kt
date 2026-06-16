@@ -15,17 +15,23 @@ class ExerciseSearchViewModel(
     private val _showOnlyCustom = MutableStateFlow(false)
     val showOnlyCustom: StateFlow<Boolean> = _showOnlyCustom.asStateFlow()
 
+    private val _lang = MutableStateFlow("pl") // ← NOWE
+
+    fun setLang(lang: String) { _lang.value = lang } // ← NOWE
+
     val filteredExercises: StateFlow<List<ExerciseOption>> =
         combine(
             exerciseRepository.getActiveExercisesWithMuscleGroup(),
             _query,
             _showOnlyCustom,
-        ) { exercises, query, onlyCustom ->
+            _lang,
+        ) { exercises, query, onlyCustom, lang ->
             exercises
                 .map {
                     ExerciseOption(
                         id = it.exerciseId.toString(),
-                        name = it.exerciseName,
+                        name = if (lang == "en" && it.exerciseNameEn.isNotBlank()) // ← NOWE
+                            it.exerciseNameEn else it.exerciseName,
                         muscleGroup = it.muscleGroupName,
                         isCustom = it.isCustom,
                         photoUrl = it.photoUrl,

@@ -29,12 +29,19 @@ class TemplateDetailViewModel(
     private val _templateDescription = MutableStateFlow(args.description ?: "")
     val templateDescription: StateFlow<String> = _templateDescription.asStateFlow()
 
-    val exercises: StateFlow<List<ExerciseEntry>> = _dbId
-        .flatMapLatest { id ->
+    private val _lang = MutableStateFlow("pl")
+
+    fun setLang(lang: String) { _lang.value = lang }
+
+    val exercises: StateFlow<List<ExerciseEntry>> = combine(
+        _dbId.flatMapLatest { id ->
             if (id == null) flowOf(emptyList())
             else templateRepository.getExerciseEntriesForTemplate(id)
-                .map { list -> list.map { it.toExerciseEntry() } }
-        }
+        },
+        _lang,
+    ) { list, lang ->
+        list.map { it.toExerciseEntry(lang) }
+    }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
@@ -86,10 +93,10 @@ class TemplateDetailViewModel(
 }
 
 
-private fun TemplateExerciseEntry.toExerciseEntry() = ExerciseEntry(
+private fun TemplateExerciseEntry.toExerciseEntry(lang: String) = ExerciseEntry(
     id         = itemId.toString(),
     exerciseId = exerciseId.toString(),
-    name       = exerciseName,
+    name       = if (lang == "en" && exerciseNameEn.isNotBlank()) exerciseNameEn else exerciseName,
     series     = setCount.toString(),
     weight     = if (minWeight == maxWeight) "${minWeight.toInt()} kg"
     else "${minWeight.toInt()}–${maxWeight.toInt()} kg",

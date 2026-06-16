@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,9 @@ fun TemplateDetailScreen(
     val exercises           by viewModel.exercises.collectAsState()
     val templateDescription by viewModel.templateDescription.collectAsState()
     val canSave = templateName.isNotBlank()
+
+    val lang = LocalConfiguration.current.locales[0].language
+    LaunchedEffect(Unit) { viewModel.setLang(lang) }
 
     Column(
         modifier = modifier

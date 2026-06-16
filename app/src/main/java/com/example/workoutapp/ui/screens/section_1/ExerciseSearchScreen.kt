@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,8 @@ fun ExerciseSearchScreen(
     val query             by viewModel.query.collectAsState()
     val filteredExercises by viewModel.filteredExercises.collectAsState()
     val showOnlyCustom    by viewModel.showOnlyCustom.collectAsState()
+    val lang = LocalConfiguration.current.locales[0].language
+    LaunchedEffect(Unit) { viewModel.setLang(lang) }
 
     val grouped = remember(filteredExercises) {
         filteredExercises.groupBy { it.muscleGroup }

@@ -77,6 +77,14 @@ class ExerciseTrackingViewModel(
 
     private var currentExerciseSets: List<UnifiedSet> = emptyList()
 
+    private var lang: String = "pl"
+
+    fun setLang(lang: String) {
+        this.lang = lang
+        if (sessionId != null) loadFromSession(sessionId)
+        else loadFromTemplate(templateId)
+    }
+
     init {
         if (sessionId != null) {
             loadFromSession(sessionId)
@@ -110,8 +118,10 @@ class ExerciseTrackingViewModel(
             val items = sessionRepository.getItemsForSessionOnce(sessionId)
             exerciseList = items.map { item ->
                 val exerciseName = runCatching {
-                    exerciseRepository.getExerciseById(item.exerciseId)
-                        .first().firstOrNull()?.name ?: "Ćwiczenie"
+                    val exercise = exerciseRepository.getExerciseById(item.exerciseId)
+                        .first().firstOrNull()
+                    if (lang == "en" && exercise?.nameEn?.isNotBlank() == true)
+                        exercise.nameEn else exercise?.name ?: "Ćwiczenie"
                 }.getOrElse { "Ćwiczenie" }
 
                 val sets = sessionRepository.getSetsForSessionItemOnce(item.id)

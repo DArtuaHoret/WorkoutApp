@@ -2,6 +2,7 @@
     <!-- Wspólne -->
     <string name="app_name">WorkoutApp</string>
     <string name="back">Back</string>
+    <string name="save_changes">SAVE CHANGES</string>
 
     <!-- Common - reusable components -->
     <string name="edit">Edit</string>
