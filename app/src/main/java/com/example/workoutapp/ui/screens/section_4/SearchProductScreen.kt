@@ -12,12 +12,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.workoutapp.R
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.example.workoutapp.ui.reusableContents.Section_1.WorkoutTextField
@@ -56,10 +58,10 @@ fun AddMealSearchScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp),
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Dieta",
+            text = stringResource(R.string.diet_title),
             color = Color.White,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
@@ -69,7 +71,7 @@ fun AddMealSearchScreen(
         WorkoutTextField(
             value = query,
             onValueChange = viewModel::onQueryChange,
-            placeholder = "Wyszukaj produkt (np. jabłko)...",
+            placeholder = stringResource(R.string.diet_search_placeholder),
             showSearchIcon = true,
             imeAction = ImeAction.Search,
         )
@@ -78,7 +80,7 @@ fun AddMealSearchScreen(
 
         ActionButton(
             onClick = onScanBarcodeClick,
-            label = "SKANUJ KOD KRESKOWY",
+            label = stringResource(R.string.diet_scan_barcode),
             icon = Icons.Default.QrCodeScanner,
             style = ActionButtonStyle.DarkOutlined,
         )
@@ -87,7 +89,7 @@ fun AddMealSearchScreen(
 
         ActionButton(
             onClick = onLibraryClick,
-            label = "BIBLIOTEKA",
+            label = stringResource(R.string.diet_library),
             icon = Icons.Default.Bookmarks,
             style = ActionButtonStyle.DarkOutlined,
         )
@@ -101,8 +103,11 @@ fun AddMealSearchScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
-
-                        Text(text = "Ładowanie...", color = Color(0xFF888888), fontSize = 14.sp)
+                        Text(
+                            text = stringResource(R.string.diet_loading),
+                            color = Color(0xFF888888),
+                            fontSize = 14.sp,
+                        )
                     }
                 }
 
@@ -126,8 +131,8 @@ fun AddMealSearchScreen(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = "Brak wyników dla ",
-                                        color = Color(0xFF888888),
+                                text = stringResource(R.string.diet_no_results),
+                                color = Color(0xFF888888),
                                 fontSize = 14.sp,
                             )
                         }
@@ -156,7 +161,7 @@ fun AddMealSearchScreen(
 
         ActionButton(
             onClick = onAddCustomProductClick,
-            label = "DODAJ SWÓJ PRODUKT",
+            label = stringResource(R.string.diet_add_custom),
             style = ActionButtonStyle.LightFilled,
         )
 

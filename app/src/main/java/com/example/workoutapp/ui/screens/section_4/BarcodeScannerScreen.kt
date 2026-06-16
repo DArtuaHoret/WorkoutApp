@@ -25,12 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.workoutapp.R
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -64,11 +66,11 @@ fun BarcodeScannerScreen(
     LaunchedEffect(Unit) {
         permissionLauncher.launch(Manifest.permission.CAMERA)
     }
+
     BackHandler {
         isCameraVisible = false
         onBackClick()
     }
-
 
     LaunchedEffect(uiState) {
         when (val state = uiState) {
@@ -83,7 +85,7 @@ fun BarcodeScannerScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp),
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -98,12 +100,12 @@ fun BarcodeScannerScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Wróć",
+                    contentDescription = stringResource(R.string.back),
                     tint = Color.White,
                 )
             }
             Text(
-                text = "Skaner",
+                text = stringResource(R.string.scanner_title),
                 color = Color.White,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
@@ -112,7 +114,6 @@ fun BarcodeScannerScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
 
         if (hasCameraPermission && isCameraVisible) {
             CameraPreview(
@@ -135,7 +136,7 @@ fun BarcodeScannerScreen(
             ) {
                 when {
                     !hasCameraPermission -> Text(
-                        "Brak uprawnień do kamery",
+                        text = stringResource(R.string.scanner_no_permission),
                         color = Color(0xFF888888),
                         fontSize = 14.sp,
                     )
@@ -156,13 +157,13 @@ fun BarcodeScannerScreen(
             is BarcodeScannerUiState.Error -> {
                 ActionButton(
                     onClick = viewModel::onReset,
-                    label = "SPRÓBUJ PONOWNIE",
+                    label = stringResource(R.string.scanner_retry),
                     style = ActionButtonStyle.DarkOutlined,
                 )
             }
             else -> {
                 Text(
-                    text = "Skieruj kamerę na kod kreskowy",
+                    text = stringResource(R.string.scanner_hint),
                     color = Color(0xFF888888),
                     fontSize = 14.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally),

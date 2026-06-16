@@ -6,32 +6,25 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.workoutapp.R
 import com.example.workoutapp.WorkoutAppViewModelProvider
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.example.workoutapp.ui.reusableContents.Section_4.*
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.ui.Alignment
 
 data class ProductDetailArgs(
     val id: String,
@@ -63,30 +56,32 @@ fun ProductDetailScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp),
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconButton(onClick = onBackClick,  modifier = Modifier.offset(x = (-12).dp),) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.offset(x = (-12).dp),
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Wróć",
+                    contentDescription = stringResource(R.string.back),
                     tint = Color.White,
                 )
             }
 
             Text(
                 text = when (uiState) {
-                    is ProductDetailUiState.Create -> "Dodaj produkt"
-                    is ProductDetailUiState.View   -> "Szczegóły produktu"
+                    is ProductDetailUiState.Create -> stringResource(R.string.product_detail_title_create)
+                    is ProductDetailUiState.View   -> stringResource(R.string.product_detail_title_view)
                 },
-
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.offset(x = (-16).dp)
+                modifier = Modifier.offset(x = (-16).dp),
             )
 
             if (uiState is ProductDetailUiState.View) {
@@ -98,7 +93,7 @@ fun ProductDetailScreen(
                             Icons.Default.Favorite
                         else
                             Icons.Default.FavoriteBorder,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.product_detail_favorite),
                         tint = if (viewState.isFavorite) Color(0xFFFF4D4D) else Color.White,
                     )
                 }
@@ -126,10 +121,18 @@ fun ProductDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        NutrientCard(label = "ENERGIA", value = "${args.kcal} KCAL", modifier = Modifier.weight(1f)) {
+                        NutrientCard(
+                            label = stringResource(R.string.nutrient_energy),
+                            value = "${args.kcal} KCAL",
+                            modifier = Modifier.weight(1f),
+                        ) {
                             Text("⚡", fontSize = 22.sp)
                         }
-                        NutrientCard(label = "BIAŁKO", value = "${args.protein} g", modifier = Modifier.weight(1f)) {
+                        NutrientCard(
+                            label = stringResource(R.string.nutrient_protein),
+                            value = "${args.protein} g",
+                            modifier = Modifier.weight(1f),
+                        ) {
                             Text("💪", fontSize = 22.sp)
                         }
                     }
@@ -138,20 +141,30 @@ fun ProductDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        NutrientCard(label = "TŁUSZCZE", value = "${args.fat} g", modifier = Modifier.weight(1f)) {
+                        NutrientCard(
+                            label = stringResource(R.string.nutrient_fat),
+                            value = "${args.fat} g",
+                            modifier = Modifier.weight(1f),
+                        ) {
                             Text("🫙", fontSize = 22.sp)
                         }
-                        NutrientCard(label = "WĘGLOWODANY", value = "${args.carbs} g", modifier = Modifier.weight(1f)) {
+                        NutrientCard(
+                            label = stringResource(R.string.nutrient_carbs),
+                            value = "${args.carbs} g",
+                            modifier = Modifier.weight(1f),
+                        ) {
                             Text("🌾", fontSize = 22.sp)
                         }
                     }
 
-                    ActionButton(
-                        onClick = { viewModel.deleteProduct { onBackClick() } },
-                        label = "USUŃ PRODUKT",
-                        icon = Icons.Default.Delete,
-                        style = ActionButtonStyle.DangerFilled,
-                    )
+                    if (state.canDelete) {
+                        ActionButton(
+                            onClick = { viewModel.deleteProduct { onBackClick() } },
+                            label = stringResource(R.string.product_detail_delete),
+                            icon = Icons.Default.Delete,
+                            style = ActionButtonStyle.DangerFilled,
+                        )
+                    }
                 }
 
                 is ProductDetailUiState.Create -> {
@@ -166,11 +179,21 @@ fun ProductDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        EditableNutrientCard(label = "ENERGIA", value = state.kcal, onValueChange = viewModel::onKcalChange, modifier = Modifier.weight(1f)) {
-                            Text("⚡", fontSize = 22.sp)
+                        EditableNutrientCard(
+                            label = stringResource(R.string.nutrient_energy),
+                            value = state.kcal,
+                            onValueChange = viewModel::onKcalChange,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(stringResource(R.string.nutrient_icon_energy), fontSize = 22.sp)
                         }
-                        EditableNutrientCard(label = "BIAŁKO", value = state.protein, onValueChange = viewModel::onProteinChange, modifier = Modifier.weight(1f)) {
-                            Text("💪", fontSize = 22.sp)
+                        EditableNutrientCard(
+                            label = stringResource(R.string.nutrient_protein),
+                            value = state.protein,
+                            onValueChange = viewModel::onProteinChange,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(stringResource(R.string.nutrient_icon_protein), fontSize = 22.sp)
                         }
                     }
 
@@ -178,11 +201,21 @@ fun ProductDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        EditableNutrientCard(label = "TŁUSZCZE", value = state.fat, onValueChange = viewModel::onFatChange, modifier = Modifier.weight(1f)) {
-                            Text("🫙", fontSize = 22.sp)
+                        EditableNutrientCard(
+                            label = stringResource(R.string.nutrient_fat),
+                            value = state.fat,
+                            onValueChange = viewModel::onFatChange,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(stringResource(R.string.nutrient_icon_fat), fontSize = 22.sp)
                         }
-                        EditableNutrientCard(label = "WĘGLOWODANY", value = state.carbs, onValueChange = viewModel::onCarbsChange, modifier = Modifier.weight(1f)) {
-                            Text("🌾", fontSize = 22.sp)
+                        EditableNutrientCard(
+                            label = stringResource(R.string.nutrient_carbs),
+                            value = state.carbs,
+                            onValueChange = viewModel::onCarbsChange,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(stringResource(R.string.nutrient_icon_carbs), fontSize = 22.sp)
                         }
                     }
 
@@ -196,7 +229,7 @@ fun ProductDetailScreen(
                                 viewModel.onSaveProductClick()
                                 onSaveProductClick()
                             },
-                            label = "ZAPISZ PRODUKT",
+                            label = stringResource(R.string.product_detail_save),
                             style = ActionButtonStyle.LightFilled,
                             modifier = Modifier.weight(1f),
                         )
@@ -207,8 +240,11 @@ fun ProductDetailScreen(
                                 .border(2.dp, Color.White, RoundedCornerShape(14.dp)),
                         ) {
                             Icon(
-                                imageVector = if (state.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = "Ulubione",
+                                imageVector = if (state.isFavorite)
+                                    Icons.Default.Favorite
+                                else
+                                    Icons.Default.FavoriteBorder,
+                                contentDescription = stringResource(R.string.product_detail_favorite),
                                 tint = if (state.isFavorite) Color(0xFFFF4D4D) else Color.White,
                             )
                         }
@@ -217,7 +253,6 @@ fun ProductDetailScreen(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-
         }
     }
 }

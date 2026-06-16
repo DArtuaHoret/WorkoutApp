@@ -14,6 +14,7 @@ sealed interface ProductDetailUiState {
     data class View(
         val args: ProductDetailArgs,
         val isFavorite: Boolean = false,
+        val canDelete: Boolean = false,
     ) : ProductDetailUiState
 
     data class Create(
@@ -130,6 +131,7 @@ class ProductDetailViewModel(
         val carbs       = savedStateHandle.get<String>("carbs")       ?: ""
         val isEditMode  = savedStateHandle.get<Boolean>("isEditMode") ?: false
         val isFavorite  = savedStateHandle.get<Boolean>("isFavorite") ?: false
+        val canDelete = savedStateHandle.get<Boolean>("canDelete") ?: false
 
         return when {
             isEditMode -> ProductDetailUiState.Create(
@@ -143,7 +145,9 @@ class ProductDetailViewModel(
                 isFavorite         = isFavorite,
             )
             id.isNotEmpty() -> ProductDetailUiState.View(
-                args = ProductDetailArgs(id, name, description, kcal, protein, fat, carbs)
+                args = ProductDetailArgs(id, name, description, kcal, protein, fat, carbs),
+                canDelete = canDelete,
+
             )
             else -> ProductDetailUiState.Create()
         }

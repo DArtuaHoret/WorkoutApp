@@ -10,10 +10,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.workoutapp.R
 import com.example.workoutapp.WorkoutAppViewModelProvider
 import com.example.workoutapp.ui.reusableContents.Section_4.FavoriteProductItemCard
 import com.example.workoutapp.ui.reusableContents.Section_4.LibraryTabButton
@@ -45,7 +47,7 @@ fun FavoriteProductsScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp),
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -57,12 +59,12 @@ fun FavoriteProductsScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Wróć",
+                    contentDescription = stringResource(R.string.back),
                     tint = Color.White,
                 )
             }
             Text(
-                text = "Biblioteka",
+                text = stringResource(R.string.library_title),
                 color = Color.White,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
@@ -77,13 +79,13 @@ fun FavoriteProductsScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             LibraryTabButton(
-                label = "Ulubione",
+                label = stringResource(R.string.library_tab_favorites),
                 selected = uiState is FavoriteProductsUiState.Favorites,
                 onClick = { viewModel.onShowFavorites() },
                 modifier = Modifier.weight(1f),
             )
             LibraryTabButton(
-                label = "Moje produkty",
+                label = stringResource(R.string.library_tab_my_products),
                 selected = uiState is FavoriteProductsUiState.MyProducts,
                 onClick = { viewModel.onShowMyProducts() },
                 modifier = Modifier.weight(1f),
@@ -107,14 +109,17 @@ fun FavoriteProductsScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = if (uiState is FavoriteProductsUiState.Favorites) "🤍" else "📦",
+                        text = if (uiState is FavoriteProductsUiState.Favorites)
+                            stringResource(R.string.library_empty_favorites_emoji)
+                        else
+                            stringResource(R.string.library_empty_my_products_emoji),
                         fontSize = 48.sp,
                     )
                     Text(
                         text = if (uiState is FavoriteProductsUiState.Favorites)
-                            "Brak ulubionych produktów"
+                            stringResource(R.string.library_empty_favorites)
                         else
-                            "Brak własnych produktów",
+                            stringResource(R.string.library_empty_my_products),
                         color = Color(0xFF888888),
                         fontSize = 16.sp,
                     )

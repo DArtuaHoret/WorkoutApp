@@ -1,11 +1,8 @@
 package com.example.workoutapp.ui.screens
 
-
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -13,9 +10,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.workoutapp.R
 
 @Composable
 fun SettingsScreen(
@@ -36,20 +35,18 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-
             Text(
-                text = "Ustawienia",
+                text = stringResource(R.string.settings_title),
                 color = Color.White,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                //modifier = Modifier.offset(x = (-16).dp),
             )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Język aplikacji",
+            text = stringResource(R.string.settings_language_label),
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
@@ -62,13 +59,13 @@ fun SettingsScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             LanguageButton(
-                label = "🇵🇱  Polski",
+                label = stringResource(R.string.settings_language_pl),
                 selected = language == "pl",
                 onClick = { viewModel.onLanguageChange("pl") },
                 modifier = Modifier.weight(1f),
             )
             LanguageButton(
-                label = "🇬🇧  English",
+                label = stringResource(R.string.settings_language_en),
                 selected = language == "en",
                 onClick = { viewModel.onLanguageChange("en") },
                 modifier = Modifier.weight(1f),

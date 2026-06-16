@@ -46,7 +46,7 @@ import com.example.workoutapp.ui.screens.section_3.SessionExerciseEditScreen
 import com.example.workoutapp.ui.screens.section_3.SessionExerciseEditViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-
+import androidx.compose.ui.res.stringResource
 
 
 // --- Type-safe destinations ---
@@ -127,6 +127,7 @@ sealed interface Destinations {
         val protein: String,
         val fat: String,
         val carbs: String,
+        val canDelete: Boolean = false, // ← NOWE
     ) : Destinations
 
     /** Tworzenie nowego produktu. */
@@ -153,19 +154,19 @@ data class BottomNavItem(
     val label: String,
 )
 
-val bottomNavItems = listOf(
-    BottomNavItem(Destinations.TemplatesGraph, "📋", "Szablony"),
-    BottomNavItem(Destinations.Workout,        "🏋️", "Trening"),
-    BottomNavItem(Destinations.HistoryGraph,   "📅", "Historia"),
-    BottomNavItem(Destinations.DietGraph,      "🍎", "Dieta"),
-    BottomNavItem(Destinations.Settings,       "⚙️", "Ustawienia"),  // ← NOWE
-)
-
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    val bottomNavItems = listOf(
+        BottomNavItem(Destinations.TemplatesGraph, stringResource(R.string.nav_templates_icon), stringResource(R.string.nav_templates_label)),
+        BottomNavItem(Destinations.Workout,        stringResource(R.string.nav_workout_icon),   stringResource(R.string.nav_workout_label)),
+        BottomNavItem(Destinations.HistoryGraph,   stringResource(R.string.nav_history_icon),   stringResource(R.string.nav_history_label)),
+        BottomNavItem(Destinations.DietGraph,      stringResource(R.string.nav_diet_icon),      stringResource(R.string.nav_diet_label)),
+        BottomNavItem(Destinations.Settings,       stringResource(R.string.nav_settings_icon),  stringResource(R.string.nav_settings_label)),
+    )
 
     Scaffold(
         containerColor = Color.Black,
@@ -541,6 +542,7 @@ fun AppNavigation() {
                                     protein     = product.protein,
                                     fat         = product.fat,
                                     carbs       = product.carbs,
+                                    canDelete   = false,
                                 )
                             )
                         },
@@ -610,6 +612,7 @@ fun AppNavigation() {
                                     protein     = product.protein,
                                     fat         = product.fat,
                                     carbs       = product.carbs,
+                                    canDelete   = true, // ← z biblioteki można usuwać
                                 )
                             )
                         },

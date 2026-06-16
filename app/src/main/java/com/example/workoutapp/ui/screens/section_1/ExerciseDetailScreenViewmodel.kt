@@ -90,6 +90,11 @@ class ExerciseDetailViewModel(
                     )
                 )
 
+                val existingItem = templateRepository.getItemById(itemId) ?: return@launch
+                templateRepository.updateTemplateItem(
+                    existingItem.copy(note = _exerciseNote.value.ifBlank { null })
+                )
+
                 exerciseRepository.unlinkAllMuscleGroupsForExercise(exerciseId)
                 val allGroups = exerciseRepository.getAllMuscleGroups().first()
                 _selectedMuscleGroups.value.forEach { groupName ->

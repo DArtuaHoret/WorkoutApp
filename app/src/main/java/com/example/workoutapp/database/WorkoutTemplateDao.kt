@@ -44,6 +44,9 @@ interface WorkoutTemplateDao {
     @Query("SELECT * FROM workout_templates WHERE isActive = 1 AND name != '' ORDER BY createdAt DESC")
     fun getActiveTemplates(): Flow<List<WorkoutTemplate>>
 
+    @Query("SELECT * FROM workout_template_items WHERE id = :itemId")
+    suspend fun getItemById(itemId: Long): WorkoutTemplateItem?
+
     // ── Template Items ────────────────────────────────────────────────────────
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -78,7 +78,7 @@ fun ExerciseDetailScreen(
             Text(
                 text = stringResource(R.string.exercise_title),
                 color = Color.White,
-                fontSize = 26.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.offset(x = (-16).dp),
             )

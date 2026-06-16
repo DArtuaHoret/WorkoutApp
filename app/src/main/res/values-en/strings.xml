@@ -57,4 +57,63 @@
     <string name="templates_empty_title">No templates</string>
     <string name="templates_empty_subtitle">Create your first workout plan.</string>
     <string name="create_new">CREATE NEW</string>
+
+    <!-- SettingsScreen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_language_label">App language</string>
+    <string name="settings_language_pl">🇵🇱  Polish</string>
+    <string name="settings_language_en">🇬🇧  English</string>
+
+    <!-- BarcodeScannerScreen -->
+    <string name="scanner_title">Scanner</string>
+    <string name="scanner_no_permission">Camera permission denied</string>
+    <string name="scanner_hint">Point the camera at a barcode</string>
+    <string name="scanner_retry">TRY AGAIN</string>
+
+    <!-- FavoriteProductsScreen -->
+    <string name="library_title">Library</string>
+    <string name="library_tab_favorites">Favorites</string>
+    <string name="library_tab_my_products">My products</string>
+    <string name="library_empty_favorites_emoji">🤍</string>
+    <string name="library_empty_my_products_emoji">📦</string>
+    <string name="library_empty_favorites">No favorite products</string>
+    <string name="library_empty_my_products">No custom products</string>
+
+    <!-- ProductDetailScreen -->
+    <string name="product_detail_title_view">Product details</string>
+    <string name="product_detail_title_create">Add product</string>
+    <string name="product_detail_delete">DELETE PRODUCT</string>
+    <string name="product_detail_save">SAVE PRODUCT</string>
+    <string name="product_detail_favorite">Favorite</string>
+    <string name="nutrient_energy">ENERGY</string>
+    <string name="nutrient_protein">PROTEIN</string>
+    <string name="nutrient_fat">FAT</string>
+    <string name="nutrient_carbs">CARBOHYDRATES</string>
+
+    <!-- ProductDetailScreen – nutrient icons -->
+    <string name="nutrient_icon_energy">⚡</string>
+    <string name="nutrient_icon_protein">💪</string>
+    <string name="nutrient_icon_fat">🫙</string>
+    <string name="nutrient_icon_carbs">🌾</string>
+
+    <!-- AddMealSearchScreen -->
+    <string name="diet_title">Diet</string>
+    <string name="diet_search_placeholder">Search for a product (e.g. apple)…</string>
+    <string name="diet_scan_barcode">SCAN BARCODE</string>
+    <string name="diet_library">LIBRARY</string>
+    <string name="diet_loading">Loading…</string>
+    <string name="diet_no_results">No results for </string>
+    <string name="diet_add_custom">ADD YOUR PRODUCT</string>
+
+    <!-- BottomNav -->
+    <string name="nav_templates_icon">📋</string>
+    <string name="nav_templates_label">Templates</string>
+    <string name="nav_workout_icon">🏋️</string>
+    <string name="nav_workout_label">Workout</string>
+    <string name="nav_history_icon">📅</string>
+    <string name="nav_history_label">History</string>
+    <string name="nav_diet_icon">🍎</string>
+    <string name="nav_diet_label">Diet</string>
+    <string name="nav_settings_icon">⚙️</string>
+    <string name="nav_settings_label">Settings</string>
 </resources>

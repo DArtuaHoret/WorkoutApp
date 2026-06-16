@@ -11,6 +11,8 @@ interface WorkoutTemplateRepository {
     fun getSetsForItem(itemId: Long): Flow<List<WorkoutTemplateSet>>
     fun getExerciseEntriesForTemplate(templateId: Long): Flow<List<TemplateExerciseEntry>>
     suspend fun saveTemplate(template: WorkoutTemplate): Long
+
+    suspend fun getItemById(itemId: Long): WorkoutTemplateItem?
     suspend fun updateTemplate(template: WorkoutTemplate)
     suspend fun deleteTemplate(template: WorkoutTemplate)
     suspend fun saveTemplateItem(item: WorkoutTemplateItem): Long
@@ -56,6 +58,11 @@ class WorkoutTemplateRepositoryImpl(
     override suspend fun saveTemplateItem(item: WorkoutTemplateItem): Long =
         withContext(Dispatchers.IO) {
             templateDao.insertWorkoutTemplateItem(item)
+        }
+
+    override suspend fun getItemById(itemId: Long): WorkoutTemplateItem? =
+        withContext(Dispatchers.IO) {
+            templateDao.getItemById(itemId)
         }
 
     override suspend fun getTemplateById(id: Long): WorkoutTemplate? =
