@@ -43,7 +43,7 @@ fun WorkoutHistoryScreen(
     var showStatsRangeSelector by remember { mutableStateOf(false) }
     var showTemplateSelectionDialog by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier.fillMaxSize()) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -96,27 +96,28 @@ fun WorkoutHistoryScreen(
             }
 
             Spacer(modifier = Modifier.weight(1f))
+
+            if (showStatsRangeSelector) {
+                CenteredDateRangeSelector(
+                    onVisibleChange = { showStatsRangeSelector = it },
+                    onDateRangeConfirmed = { start, end ->
+                        showStatsRangeSelector = false
+                        onViewStatsClick(start, end)
+                    }
+                )
+            }
+
+            if (showTemplateSelectionDialog) {
+                CenteredTemplateSelectionDialog(
+                    templates = availableTemplates,
+                    onVisibleChange = { showTemplateSelectionDialog = it },
+                    onTemplateSelected = { selectedTemplateId ->
+                        showTemplateSelectionDialog = false
+                        onAssignWorkoutClick(selectedTemplateId)
+                    }
+                )
+            }
         }
 
-        if (showStatsRangeSelector) {
-            CenteredDateRangeSelector(
-                onVisibleChange = { showStatsRangeSelector = it },
-                onDateRangeConfirmed = { start, end ->
-                    showStatsRangeSelector = false
-                    onViewStatsClick(start, end)
-                }
-            )
-        }
 
-        if (showTemplateSelectionDialog) {
-            CenteredTemplateSelectionDialog(
-                templates = availableTemplates,
-                onVisibleChange = { showTemplateSelectionDialog = it },
-                onTemplateSelected = { selectedTemplateId ->
-                    showTemplateSelectionDialog = false
-                    onAssignWorkoutClick(selectedTemplateId)
-                }
-            )
-        }
-    }
 }

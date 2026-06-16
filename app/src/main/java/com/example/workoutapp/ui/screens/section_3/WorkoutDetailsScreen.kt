@@ -78,9 +78,9 @@ fun WorkoutDetailsScreen(
                 )
             }
             Text(
-                text = "SZCZEGÓŁY TRENINGÓW DNIA",
+                text = "Szczegóły dnia",
                 color = Color.White,
-                fontSize = 18.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.offset(x = (-16).dp)
             )

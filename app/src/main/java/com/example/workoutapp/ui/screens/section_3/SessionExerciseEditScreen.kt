@@ -54,6 +54,8 @@ fun SessionExerciseEditScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
+
+        Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -69,9 +71,9 @@ fun SessionExerciseEditScreen(
                 )
             }
             Text(
-                text = exerciseName.uppercase(),
+                text = exerciseName,
                 color = Color.White,
-                fontSize = 18.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .weight(1f)

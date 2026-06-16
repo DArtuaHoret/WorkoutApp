@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,6 +48,8 @@ fun TemplateExercisesScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
+
+        Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -62,9 +65,9 @@ fun TemplateExercisesScreen(
                 )
             }
             Text(
-                text = viewModel.sessionName.uppercase(),
+                text = viewModel.sessionName,
                 color = Color.White,
-                fontSize = 18.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.offset(x = (-16).dp)
             )
