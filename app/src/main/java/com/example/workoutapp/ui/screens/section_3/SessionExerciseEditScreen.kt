@@ -1,5 +1,6 @@
 package com.example.workoutapp.ui.screens.section_3
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,31 +11,33 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.workoutapp.R
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.example.workoutapp.ui.reusableContents.Section_1.ExerciseSetCard
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionExerciseEditScreen(
     viewModel: SessionExerciseEditViewModel,
@@ -46,27 +49,25 @@ fun SessionExerciseEditScreen(
     val exerciseName by viewModel.exerciseName.collectAsState()
     val sets by viewModel.sets.collectAsState()
 
-    val lang = LocalConfiguration.current.locales[0].language
-    LaunchedEffect(Unit) { viewModel.setLang(lang) }
-
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .background(Color.Black)
+            .padding(horizontal = 16.dp),
     ) {
-
         Spacer(modifier = Modifier.height(16.dp))
+
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(
                 onClick = onBackClick,
-                modifier = Modifier.offset(x = (-12).dp)
+                modifier = Modifier.offset(x = (-12).dp),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
+                    contentDescription = "Powrót",
                     tint = Color.White
                 )
             }
@@ -75,17 +76,16 @@ fun SessionExerciseEditScreen(
                 color = Color.White,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .weight(1f)
-                    .offset(x = (-16).dp)
+                modifier = Modifier.offset(x = (-16).dp).weight(1f)
             )
             IconButton(onClick = {
                 viewModel.deleteExercise { onDeleteExerciseClick() }
             }) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.delete_exercise),
-                    tint = Color.White
+                    contentDescription = "Usuń ćwiczenie",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
@@ -97,7 +97,7 @@ fun SessionExerciseEditScreen(
         ) {
             item {
                 Text(
-                    text = stringResource(R.string.sets_title),
+                    text = "Serie",
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -111,11 +111,17 @@ fun SessionExerciseEditScreen(
                 ExerciseSetCard(
                     setNumber = index + 1,
                     weight = set.weight,
-                    onWeightChange = { viewModel.onSetChange(index, set.copy(weight = it)) },
+                    onWeightChange = {
+                        viewModel.onSetChange(index, set.copy(weight = it))
+                    },
                     reps = set.reps,
-                    onRepsChange = { viewModel.onSetChange(index, set.copy(reps = it)) },
+                    onRepsChange = {
+                        viewModel.onSetChange(index, set.copy(reps = it))
+                    },
                     rest = set.restTime,
-                    onRestChange = { viewModel.onSetChange(index, set.copy(restTime = it)) },
+                    onRestChange = {
+                        viewModel.onSetChange(index, set.copy(restTime = it))
+                    },
                     onDelete = if (sets.size > 1) ({ viewModel.onDeleteSet(index) }) else null
                 )
             }
@@ -123,7 +129,7 @@ fun SessionExerciseEditScreen(
             item {
                 ActionButton(
                     onClick = { viewModel.onAddSet() },
-                    label = stringResource(R.string.add_set),
+                    label = "DODAJ SERIĘ",
                     style = ActionButtonStyle.DarkOutlined
                 )
             }
@@ -133,7 +139,7 @@ fun SessionExerciseEditScreen(
 
         ActionButton(
             onClick = { viewModel.save { onSaveClick() } },
-            label = stringResource(R.string.save_changes),
+            label = "ZAPISZ ZMIANY",
             icon = null,
             style = ActionButtonStyle.LightFilled
         )

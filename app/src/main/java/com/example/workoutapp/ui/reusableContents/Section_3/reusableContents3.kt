@@ -56,13 +56,13 @@ import java.time.format.DateTimeFormatter
 // -----------------Anzh-----------
 @Composable
 fun TrainingProgressCard(
-    totalDays: Int,
+    totalSessions: Int,
     completedWorkouts: Int,
     modifier: Modifier = Modifier,
 ) {
 
-    val percentage = if (totalDays > 0) {
-        (completedWorkouts.toFloat() / totalDays.toFloat()) * 100f
+    val percentage = if (totalSessions > 0) {
+        (completedWorkouts.toFloat() / totalSessions.toFloat()) * 100f
     } else {
         0f
     }
@@ -152,7 +152,7 @@ fun TrainingProgressCard(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Całkowita liczba dni: $totalDays",
+                text = "Wszystkich treningów: $totalSessions",
                 color = Color(0xFFCCCCCC),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
@@ -182,7 +182,7 @@ private fun PreviewTrainingProgressCard() {
                 .width(320.dp)
         ) {
             TrainingProgressCard(
-                totalDays = 168,
+                totalSessions = 168,
                 completedWorkouts = 115
             )
         }

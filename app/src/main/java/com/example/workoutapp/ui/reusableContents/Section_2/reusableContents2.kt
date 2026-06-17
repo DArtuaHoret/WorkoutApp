@@ -40,6 +40,7 @@ fun AdjustableRow(
     step: Int = 1,
     unit: String = "",
     minValue: Int = 0,
+    enabled: Boolean = true
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -50,12 +51,16 @@ fun AdjustableRow(
 
         Row(
             modifier = Modifier
-                .border(2.dp, Color.White, RoundedCornerShape(50))
+                .border(2.dp, if (enabled) Color.White else Color(0xFF555555), RoundedCornerShape(50))
                 .padding(horizontal = 6.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconButton(onClick = { if (value > minValue) onValueChange(value - step) }, modifier = Modifier.size(28.dp)) {
-                Text(text = "−", color = Color.White, fontSize = 22.sp)
+            IconButton(
+                onClick = { if (value > minValue) onValueChange(value - step) },
+                modifier = Modifier.size(28.dp),
+                enabled = enabled
+            ) {
+                Text(text = "−", color = if (enabled) Color.White else Color(0xFF555555), fontSize = 22.sp)
             }
 
             Box(
@@ -73,8 +78,12 @@ fun AdjustableRow(
                     fontWeight = FontWeight.SemiBold
                 )
             }
-            IconButton(onClick = { onValueChange(value + step) }, modifier = Modifier.size(28.dp)) {
-                Text(text = "+", color = Color.White, fontSize = 22.sp)
+            IconButton(
+                onClick = { onValueChange(value + step) },
+                modifier = Modifier.size(28.dp),
+                enabled = enabled
+            ) {
+                Text(text = "+", color = if (enabled) Color.White else Color(0xFF555555), fontSize = 22.sp)
             }
         }
     }
@@ -89,6 +98,7 @@ fun ExerciseSetCardDetailed(
     onRepsChange: (Int) -> Unit,
     rest: Int,
     onRestChange: (Int) -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -135,9 +145,9 @@ fun ExerciseSetCardDetailed(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    AdjustableRow(label = "CIĘŻAR:", value = weight, onValueChange = onWeightChange, step = 5, unit = "kg")
-                    AdjustableRow(label = "POWTÓRZENIA:", value = reps, onValueChange = onRepsChange, step = 1, minValue = 1)
-                    AdjustableRow(label = "ODPOCZYNEK:", value = rest, onValueChange = onRestChange, step = 15, unit = "s")
+                    AdjustableRow(label = "CIĘŻAR:", value = weight, onValueChange = onWeightChange, step = 5, unit = "kg", enabled = enabled)
+                    AdjustableRow(label = "POWTÓRZENIA:", value = reps, onValueChange = onRepsChange, step = 1, minValue = 1, enabled = enabled)
+                    AdjustableRow(label = "ODPOCZYNEK:", value = rest, onValueChange = onRestChange, step = 10, unit = "s", enabled = enabled)
                 }
 
                 Spacer(modifier = Modifier.width(24.dp))

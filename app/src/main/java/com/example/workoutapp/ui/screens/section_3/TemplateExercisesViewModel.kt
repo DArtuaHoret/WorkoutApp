@@ -9,7 +9,10 @@ import com.example.workoutapp.database.ExerciseRepository
 import com.example.workoutapp.database.WorkoutSessionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 // Ćwiczenie z pogrupowanymi seriami — do wyświetlenia na liście
@@ -17,8 +20,8 @@ data class SessionExerciseEntry(
     val sessionItemId: Long,
     val exerciseId: Long,
     val exerciseName: String,
-    val note: String?,
     val photoUrl: String?,
+    val note: String?,
     val sets: List<SessionExerciseSetEntry>
 )
 
@@ -32,8 +35,7 @@ data class SessionExerciseSetEntry(
     val plannedReps: Int,
     val plannedWeight: Double,
     val plannedRestTime: Int,
-    val note: String?,
-    val photoUrl: String?,
+    val note: String?
 )
 
 class TemplateExercisesViewModel(
@@ -46,13 +48,7 @@ class TemplateExercisesViewModel(
     val sessionId = args.templateId.toLongOrNull() ?: 0L
     val sessionName = args.templateName
 
-    private var lang: String = "pl"
-
-    fun setLang(lang: String) {
-        this.lang = lang
-        observeExercises()
-    }
-
+    // Pogrupowane ćwiczenia — każde ćwiczenie zawiera listę swoich serii
     private val _exercises = MutableStateFlow<List<SessionExerciseEntry>>(emptyList())
     val exercises: StateFlow<List<SessionExerciseEntry>> = _exercises
 
@@ -62,16 +58,16 @@ class TemplateExercisesViewModel(
 
     private fun observeExercises() {
         viewModelScope.launch {
+            // Obserwuj items sesji — gdy coś się zmieni (np. po edycji), odświeży listę
             sessionRepository.getItemsForSession(sessionId).collect { items ->
                 val exerciseEntries = items.map { item ->
                     val exercise = runCatching {
-                        exerciseRepository.getExerciseById(item.exerciseId)
-                            .first().firstOrNull()
+                        exerciseRepository.getExerciseById(item.exerciseId).first().firstOrNull()
                     }.getOrNull()
+                    val exerciseName = exercise?.name ?: "Ćwiczenie"
+                    val exercisePhotoUrl = exercise?.photoUrl
 
-                    val exerciseName = if (lang == "en" && exercise?.nameEn?.isNotBlank() == true)
-                        exercise.nameEn else exercise?.name ?: "Ćwiczenie"
-
+                    // Dla każdego itemu obserwuj jego serie reaktywnie
                     val sets = sessionRepository.getSetsForSessionItem(item.id).first()
                         .map { set ->
                             SessionExerciseSetEntry(
@@ -83,8 +79,7 @@ class TemplateExercisesViewModel(
                                 plannedReps = set.plannedReps,
                                 plannedWeight = set.plannedWeight,
                                 plannedRestTime = set.plannedRestTime,
-                                note = item.note,
-                                photoUrl = exercise?.photoUrl
+                                note = item.note
                             )
                         }
 
@@ -92,8 +87,8 @@ class TemplateExercisesViewModel(
                         sessionItemId = item.id,
                         exerciseId = item.exerciseId,
                         exerciseName = exerciseName,
+                        photoUrl = exercisePhotoUrl,
                         note = item.note,
-                        photoUrl = exercise?.photoUrl,
                         sets = sets
                     )
                 }
@@ -102,17 +97,16 @@ class TemplateExercisesViewModel(
         }
     }
 
+    // Odśwież dane — wywołaj po powrocie z ekranu edycji
     fun refresh() {
         viewModelScope.launch {
             val items = sessionRepository.getItemsForSessionOnce(sessionId)
             val exerciseEntries = items.map { item ->
                 val exercise = runCatching {
-                    exerciseRepository.getExerciseById(item.exerciseId)
-                        .first().firstOrNull()
+                    exerciseRepository.getExerciseById(item.exerciseId).first().firstOrNull()
                 }.getOrNull()
-
-                val exerciseName = if (lang == "en" && exercise?.nameEn?.isNotBlank() == true)
-                    exercise.nameEn else exercise?.name ?: "Ćwiczenie"
+                val exerciseName = exercise?.name ?: "Ćwiczenie"
+                val exercisePhotoUrl = exercise?.photoUrl
 
                 val sets = sessionRepository.getSetsForSessionItemOnce(item.id)
                     .map { set ->
@@ -125,8 +119,7 @@ class TemplateExercisesViewModel(
                             plannedReps = set.plannedReps,
                             plannedWeight = set.plannedWeight,
                             plannedRestTime = set.plannedRestTime,
-                            note = item.note,
-                            photoUrl = exercise?.photoUrl
+                            note = item.note
                         )
                     }
 
@@ -134,8 +127,8 @@ class TemplateExercisesViewModel(
                     sessionItemId = item.id,
                     exerciseId = item.exerciseId,
                     exerciseName = exerciseName,
+                    photoUrl = exercisePhotoUrl,
                     note = item.note,
-                    photoUrl = exercise?.photoUrl,
                     sets = sets
                 )
             }

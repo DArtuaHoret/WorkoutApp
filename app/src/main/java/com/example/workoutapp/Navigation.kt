@@ -36,22 +36,16 @@ import com.example.workoutapp.ui.screens.section_2.ExerciseTrackingViewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
-
 import com.example.workoutapp.ui.screens.section_3.WorkoutDetailsScreen
-
 import com.example.workoutapp.ui.screens.section_3.TemplateExercisesScreen
 import com.example.workoutapp.ui.screens.section_3.TemplateExercisesViewModel
 import com.example.workoutapp.ui.screens.section_3.SessionExerciseEditScreen
 import com.example.workoutapp.ui.screens.section_3.SessionExerciseEditViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-
 import androidx.compose.ui.res.stringResource
-
-
+import com.example.workoutapp.ui.reusableContents.Section_2.CenteredExitConfirmationDialog
 import com.example.workoutapp.ui.screens.section_3.WorkoutDetailsViewModel
-
-
 
 
 // --- Type-safe destinations ---
@@ -59,16 +53,10 @@ sealed interface Destinations {
 
     @Serializable data object Settings : Destinations
 
-    // ── Sekcja 1 – zagnieżdżony graf szablonów ───────────────────────────
-    /** Korzeń zagnieżdżonego grafu szablonów – nie jest osobnym screenem. */
     @Serializable data object TemplatesGraph : Destinations
-
-    /** Lista szablonów – startDestination grafu szablonów. */
     @Serializable data object Templates : Destinations
-
-    /** Podgląd / edycja pojedynczego szablonu. */
     @Serializable data class TemplateDetail(
-        val id: String,          // pusty string oznacza nowy szablon
+        val id: String,
         val name: String,
         val description: String = "",
     ) : Destinations
@@ -85,18 +73,14 @@ sealed interface Destinations {
         val note: String = "",
     ) : Destinations
 
-
-    // ── Sekcja 2 ─────────────────────────────────────────────────────────
-    @Serializable data object WorkoutGraph : Destinations // NOWY GRAF
-    @Serializable data object Workout : Destinations // Placeholder
+    @Serializable data object WorkoutGraph : Destinations
+    @Serializable data object Workout : Destinations
     @Serializable data class ActiveWorkout(
         val templateId: String,
         val dateIso: String,
         val sessionId: String? = null
     ) : Destinations
 
-    /** Korzeń grafu historii */
-    // ── Sekcja 3 – zagnieżdżony graf historii ────────────────────────────
     @Serializable data object HistoryGraph : Destinations
     @Serializable data object HistoryCalendar : Destinations
     @Serializable data class HistoryStats(
@@ -115,15 +99,10 @@ sealed interface Destinations {
         val exerciseId: String,
         val exerciseName: String
     ) : Destinations
-    /** Korzeń zagnieżdżonego grafu diety – nie jest osobnym screenem. */
-    // ── Sekcja 4 – zagnieżdżony graf diety ───────────────────────────────
+
     @Serializable data object DietGraph : Destinations
-
-    /** Lista produktów – startDestination grafu diety. */
     @Serializable data class Diet(val initialQuery: String = "") : Destinations
-
     @Serializable data object BarcodeScanner : Destinations
-    /** Podgląd istniejącego produktu. */
     @Serializable data class ProductDetail(
         val id: String,
         val name: String,
@@ -132,10 +111,9 @@ sealed interface Destinations {
         val protein: String,
         val fat: String,
         val carbs: String,
-        val canDelete: Boolean = false, // ← NOWE
+        val canDelete: Boolean = false,
     ) : Destinations
 
-    /** Tworzenie nowego produktu. */
     @Serializable data class ProductCreate(
         val id: String = "",
         val name: String = "",
@@ -144,8 +122,8 @@ sealed interface Destinations {
         val protein: String = "",
         val fat: String = "",
         val carbs: String = "",
-        val isEditMode: Boolean = false,    // ← NOWE
-        val isFavorite: Boolean = false,    // ← NOWE
+        val isEditMode: Boolean = false,
+        val isFavorite: Boolean = false,
     ) : Destinations
 
     @Serializable data object Library : Destinations
@@ -165,6 +143,10 @@ fun AppNavigation() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    // ── Stan dialogu ochrony aktywnego treningu ───────────────────────────
+    var showExitWorkoutDialog by remember { mutableStateOf(false) }
+    var pendingNavDestination by remember { mutableStateOf<Destinations?>(null) }
+
     val bottomNavItems = listOf(
         BottomNavItem(Destinations.TemplatesGraph, stringResource(R.string.nav_templates_icon), stringResource(R.string.nav_templates_label)),
         BottomNavItem(Destinations.Workout,        stringResource(R.string.nav_workout_icon),   stringResource(R.string.nav_workout_label)),
@@ -182,12 +164,19 @@ fun AppNavigation() {
                     NavigationBarItem(
                         selected = selected,
                         onClick = {
-                            navController.navigate(item.destination) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                            val isOnActiveWorkout =
+                                currentDestination?.hasRoute(Destinations.ActiveWorkout::class) == true
+                            if (isOnActiveWorkout) {
+                                pendingNavDestination = item.destination
+                                showExitWorkoutDialog = true
+                            } else {
+                                navController.navigate(item.destination) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
                             }
                         },
                         icon = { Text(text = item.icon, fontSize = 20.sp) },
@@ -202,6 +191,7 @@ fun AppNavigation() {
             }
         }
     ) { innerPadding ->
+
 
         var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
         var workoutDays  by remember { mutableStateOf(setOf<LocalDate>()) }
@@ -245,7 +235,6 @@ fun AppNavigation() {
                     )
                 }
 
-
                 composable<Destinations.TemplateDetail> { backStackEntry ->
                     val templateDetailViewModel: TemplateDetailViewModel = viewModel(
                         viewModelStoreOwner = backStackEntry,
@@ -267,7 +256,7 @@ fun AppNavigation() {
                                     templateId   = dbId.toString(),
                                     exerciseId   = exercise.exerciseId,
                                     exerciseName = exercise.name,
-                                    itemId       = exercise.id, // ← dodaj
+                                    itemId       = exercise.id,
                                     note         = exercise.note,
                                 )
                             )
@@ -297,14 +286,13 @@ fun AppNavigation() {
                             navController.navigate(
                                 Destinations.ExerciseDetail(
                                     templateId   = templateId,
-                                    exerciseId   = "",        // pusty = nowe ćwiczenie
+                                    exerciseId   = "",
                                     exerciseName = "",
                                 )
                             )
                         },
                     )
                 }
-
 
                 composable<Destinations.ExerciseDetail> { backStackEntry ->
                     ExerciseDetailScreen(
@@ -318,8 +306,6 @@ fun AppNavigation() {
                         },
                     )
                 }
-
-
             }
 
             // ── Sekcja 2 ─────────────────────────────────────────────────
@@ -340,39 +326,14 @@ fun AppNavigation() {
                         factory = WorkoutAppViewModelProvider.Factory
                     )
 
-                    val exerciseName by viewModel.exerciseName.collectAsState()
-                    val exerciseDescription: String by viewModel.exerciseDescription.collectAsState()
-                    val currentSet by viewModel.currentSet.collectAsState()
-                    val reps by viewModel.reps.collectAsState()
-                    val weight by viewModel.weight.collectAsState()
-                    val restTime by viewModel.restTime.collectAsState()
-                    val isResting by viewModel.isResting.collectAsState()
-                    val restsCompleted by viewModel.restsCompleted.collectAsState()
-                    val isWorkoutFinished by viewModel.isWorkoutFinished.collectAsState()
-
                     com.example.workoutapp.ui.screens.active_workout.ActiveWorkoutScreen(
-                        exerciseName = exerciseName,
-                        exerciseDescription = exerciseDescription,
-                        currentSet = currentSet,
-                        reps = reps,
-                        weight = weight,
-                        restTime = restTime,
-                        isResting = isResting,
-                        restsCompleted = restsCompleted,
-                        isWorkoutFinished = isWorkoutFinished,
-                        onBackClick = { navController.popBackStack() },
-                        onRepsChange = viewModel::updateReps,
-                        onWeightChange = viewModel::updateWeight,
-                        onRestTimeChange = viewModel::updateRestTime,
-                        onDoneClick = viewModel::onDoneClick,
-                        onTimerFinished = viewModel::onTimerFinished,
-                        onSaveDescription = viewModel::updateDescription
+                        viewModel = viewModel,
+                        onBackClick = { navController.popBackStack() }
                     )
                 }
             }
 
-
-            // ── Zagnieżdżony graf sekcji 3 (HISTORIA) ──────────────────
+            // ── Zagnieżdżony graf sekcji 3 (HISTORIA) ───────────────────
             navigation<Destinations.HistoryGraph>(startDestination = Destinations.HistoryCalendar) {
 
                 composable<Destinations.HistoryCalendar> { backStackEntry ->
@@ -522,7 +483,7 @@ fun AppNavigation() {
                         },
                         onProductQuickAddClick = { /* TODO */ },
                         onAddCustomProductClick = {
-                            navController.navigate(Destinations.ProductCreate())  // ← poprawne
+                            navController.navigate(Destinations.ProductCreate())
                         },
                         onLibraryClick = {
                             navController.navigate(Destinations.Library)
@@ -586,7 +547,7 @@ fun AppNavigation() {
                                     protein     = product.protein,
                                     fat         = product.fat,
                                     carbs       = product.carbs,
-                                    canDelete   = true, // ← z biblioteki można usuwać
+                                    canDelete   = true,
                                 )
                             )
                         },
@@ -600,8 +561,8 @@ fun AppNavigation() {
                                     protein     = product.protein,
                                     fat         = product.fat,
                                     carbs       = product.carbs,
-                                    isEditMode  = true,                 // ← NOWE
-                                    isFavorite  = product.isFavorite,   // ← NOWE
+                                    isEditMode  = true,
+                                    isFavorite  = product.isFavorite,
                                 )
                             )
                         },
@@ -609,5 +570,27 @@ fun AppNavigation() {
                 }
             }
         }
+    }
+    // ── Dialog potwierdzenia wyjścia z aktywnego treningu ─────────────
+    if (showExitWorkoutDialog) {
+        CenteredExitConfirmationDialog(
+            onConfirm = {
+                showExitWorkoutDialog = false
+                pendingNavDestination?.let { dest ->
+                    navController.navigate(dest) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+                pendingNavDestination = null
+            },
+            onDismiss = {
+                showExitWorkoutDialog = false
+                pendingNavDestination = null
+            }
+        )
     }
 }

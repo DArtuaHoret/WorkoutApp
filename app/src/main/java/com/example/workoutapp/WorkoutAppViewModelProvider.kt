@@ -81,11 +81,6 @@ object WorkoutAppViewModelProvider {
             BarcodeScannerViewModel()
         }
 
-        initializer<WorkoutStatsViewModel> {
-            WorkoutStatsViewModel(
-                savedStateHandle = this.createSavedStateHandle()
-            )
-        }
 
         initializer<WorkoutCalendarViewModel> {
             WorkoutCalendarViewModel(
@@ -124,6 +119,14 @@ object WorkoutAppViewModelProvider {
                 savedStateHandle = this.createSavedStateHandle(),
                 sessionRepository = workoutApp().workoutSessionRepository,
                 templateRepository = workoutApp().workoutTemplateRepository
+            )
+        }
+
+        initializer<WorkoutStatsViewModel> {
+            WorkoutStatsViewModel(
+                savedStateHandle = this.createSavedStateHandle(),
+                sessionRepository = workoutApp().workoutSessionRepository,
+                exerciseRepository = workoutApp().exerciseRepository
             )
         }
     }

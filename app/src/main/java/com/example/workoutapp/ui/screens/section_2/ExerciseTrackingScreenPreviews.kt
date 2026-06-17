@@ -1,4 +1,4 @@
-package com.example.workoutapp.ui.screens.active_workout
+/*package com.example.workoutapp.ui.screens.active_workout
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -180,4 +180,4 @@ private fun PreviewActiveWorkoutSuccess() {
             onSaveDescription = {}
         )
     }
-}
+}*/

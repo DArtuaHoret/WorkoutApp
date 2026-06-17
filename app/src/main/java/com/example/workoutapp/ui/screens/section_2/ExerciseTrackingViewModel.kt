@@ -12,10 +12,14 @@ import com.example.workoutapp.database.WorkoutSessionRepository
 import com.example.workoutapp.database.WorkoutTemplateRepository
 import com.example.workoutapp.database.ExerciseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Date
 
 // Ujednolicona reprezentacja serii — niezależnie od źródła (Template lub Session)
 private data class UnifiedSet(
@@ -48,6 +52,8 @@ class ExerciseTrackingViewModel(
     private var exerciseList: List<UnifiedExercise> = emptyList()
     private var currentIndex = 0
 
+    private val modifiedSets = mutableMapOf<Pair<Int, Int>, UnifiedSet>()
+
     private val _exerciseName = MutableStateFlow("Ładowanie...")
     val exerciseName: StateFlow<String> = _exerciseName.asStateFlow()
 
@@ -77,13 +83,8 @@ class ExerciseTrackingViewModel(
 
     private var currentExerciseSets: List<UnifiedSet> = emptyList()
 
-    private var lang: String = "pl"
-
-    fun setLang(lang: String) {
-        this.lang = lang
-        if (sessionId != null) loadFromSession(sessionId)
-        else loadFromTemplate(templateId)
-    }
+    val isWorkoutActive: StateFlow<Boolean> get() = // trening aktywny gdy nie skończony
+        _isWorkoutFinished.map { !it }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 
     init {
         if (sessionId != null) {
@@ -115,13 +116,16 @@ class ExerciseTrackingViewModel(
 
     private fun loadFromSession(sessionId: Long) {
         viewModelScope.launch {
+            val session = sessionRepository.getSessionByIdOnce(sessionId)
+            if (session != null && session.startedAt == null) {
+                sessionRepository.updateSession(session.copy(startedAt = Date()))
+            }
+
             val items = sessionRepository.getItemsForSessionOnce(sessionId)
             exerciseList = items.map { item ->
                 val exerciseName = runCatching {
-                    val exercise = exerciseRepository.getExerciseById(item.exerciseId)
-                        .first().firstOrNull()
-                    if (lang == "en" && exercise?.nameEn?.isNotBlank() == true)
-                        exercise.nameEn else exercise?.name ?: "Ćwiczenie"
+                    exerciseRepository.getExerciseById(item.exerciseId)
+                        .first().firstOrNull()?.name ?: "Ćwiczenie"
                 }.getOrElse { "Ćwiczenie" }
 
                 val sets = sessionRepository.getSetsForSessionItemOnce(item.id)
@@ -161,7 +165,35 @@ class ExerciseTrackingViewModel(
         _isResting.value = false
     }
 
+    private fun saveModificationsToSession() {
+        val id = sessionId ?: return // zapisujemy tylko dla sesji, nie szablonu
+        viewModelScope.launch {
+            modifiedSets.forEach { (key, modifiedSet) ->
+                val (exerciseIdx, setNumber) = key
+                val item = sessionRepository.getItemsForSessionOnce(id)
+                    .getOrNull(exerciseIdx) ?: return@forEach
+                val sets = sessionRepository.getSetsForSessionItemOnce(item.id)
+                val existingSet = sets.find { it.setNumber == setNumber } ?: return@forEach
+                sessionRepository.saveSessionSet(
+                    existingSet.copy(
+                        plannedReps = modifiedSet.reps,
+                        plannedWeight = modifiedSet.weight.toDouble(),
+                        plannedRestTime = modifiedSet.restTime
+                    )
+                )
+            }
+        }
+    }
+
     fun onDoneClick() { _isResting.value = true }
+
+    private fun markSessionAsDone() {
+        val id = sessionId ?: return
+        viewModelScope.launch {
+            val session = sessionRepository.getSessionByIdOnce(id) ?: return@launch
+            sessionRepository.updateSession(session.copy(status = "DONE", finishedAt = Date()))
+        }
+    }
 
     fun onTimerFinished() {
         val currentEntry = exerciseList[currentIndex]
@@ -174,13 +206,36 @@ class ExerciseTrackingViewModel(
                 applyExerciseToUi(currentIndex + 1)
             } else {
                 _isWorkoutFinished.value = true
+                saveModificationsToSession()
+                markSessionAsDone()
             }
         }
     }
 
-    fun updateReps(newReps: Int) { _reps.value = newReps }
-    fun updateWeight(newWeight: Int) { _weight.value = newWeight }
-    fun updateRestTime(newRest: Int) { _restTime.value = newRest }
+    fun updateReps(newReps: Int) {
+        _reps.value = newReps
+        recordModification()
+    }
+
+    fun updateWeight(newWeight: Int) {
+        _weight.value = newWeight
+        recordModification()
+    }
+
+    fun updateRestTime(newRest: Int) {
+        _restTime.value = newRest
+        recordModification()
+    }
+
+    private fun recordModification() {
+        val key = Pair(currentIndex, _currentSet.value)
+        modifiedSets[key] = UnifiedSet(
+            setNumber = _currentSet.value,
+            reps = _reps.value,
+            weight = _weight.value,
+            restTime = _restTime.value
+        )
+    }
     fun updateDescription(newDesc: String) { _exerciseDescription.value = newDesc }
 }
 
@@ -199,3 +254,4 @@ private fun WorkoutSessionSet.toUnified() = UnifiedSet(
     weight = plannedWeight.toInt(),
     restTime = plannedRestTime  // teraz czytamy rzeczywisty czas odpoczynku
 )
+

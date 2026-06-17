@@ -1,5 +1,6 @@
 package com.example.workoutapp.ui.screens.section_3
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,9 +13,14 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,6 +39,7 @@ import com.example.workoutapp.ui.reusableContents.Section_3.CompletedWorkoutCard
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutDetailsScreen(
     viewModel: WorkoutDetailsViewModel,
@@ -59,17 +66,18 @@ fun WorkoutDetailsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .background(Color.Black)
+            .padding(horizontal = 16.dp),
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(
                 onClick = onBackClick,
-                modifier = Modifier.offset(x = (-12).dp)
+                modifier = Modifier.offset(x = (-12).dp),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -85,6 +93,8 @@ fun WorkoutDetailsScreen(
                 modifier = Modifier.offset(x = (-16).dp)
             )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = formattedDateHeader,
@@ -113,6 +123,8 @@ fun WorkoutDetailsScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         if (selectedSessionId != null) {
+            val selectedSession = uiState.workoutSessions.find { it.id == selectedSessionId }
+
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
@@ -120,30 +132,34 @@ fun WorkoutDetailsScreen(
                     .padding(bottom = 32.dp)
             ) {
                 ActionButton(
+                    onClick = {
+                        viewModel.deleteSession(selectedSessionId!!) {
+                            selectedSessionId = null
+                        }
+                    },
+                    label = "USUŃ TRENING",
+                    icon = Icons.Default.Delete,
+                    style = ActionButtonStyle.DangerFilled
+                )
+                ActionButton(
                     onClick = { onViewExercisesClick(selectedSessionId!!) },
                     label = "ZOBACZYĆ SZCZEGÓŁY",
                     icon = null,
                     style = ActionButtonStyle.LightFilled
                 )
-                ActionButton(
-                    onClick = {
-                        val templateId = uiState.sessionToTemplateId[selectedSessionId!!] ?: ""
-                        onStartWorkoutClick(selectedSessionId!!, templateId)
-                    },
-                    label = "ROZPOCZĄĆ TRENING",
-                    icon = null,
-                    style = ActionButtonStyle.LightFilled
-                )
+
+                if (selectedSession?.isCompleted != true) {
+                    ActionButton(
+                        onClick = {
+                            val templateId = uiState.sessionToTemplateId[selectedSessionId!!] ?: ""
+                            onStartWorkoutClick(selectedSessionId!!, templateId)
+                        },
+                        label = "ROZPOCZĄĆ TRENING",
+                        icon = null,
+                        style = ActionButtonStyle.LightFilled
+                    )
+                }
             }
-        } else {
-            Text(
-                text = "Naciśnij na zestaw, aby zobaczyć opcje",
-                color = Color(0xFFAAAAAA),
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp)
-            )
         }
     }
 }

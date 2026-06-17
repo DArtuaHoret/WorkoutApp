@@ -78,4 +78,17 @@ class WorkoutDetailsViewModel(
             }
         }
     }
+
+    fun deleteSession(sessionId: String, onDeleted: () -> Unit) {
+        val id = sessionId.toLongOrNull() ?: return
+        viewModelScope.launch {
+            val items = sessionRepository.getItemsForSessionOnce(id)
+            items.forEach { item ->
+                sessionRepository.deleteSetsForSessionItem(item.id)
+                sessionRepository.deleteSessionItem(item.id)
+            }
+            sessionRepository.deleteSession(id)
+            onDeleted()
+        }
+    }
 }

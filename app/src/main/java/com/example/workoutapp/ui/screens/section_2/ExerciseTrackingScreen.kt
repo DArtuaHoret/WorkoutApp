@@ -12,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,36 +20,27 @@ import com.example.workoutapp.ui.reusableContents.Section_2.CenteredExitConfirma
 import com.example.workoutapp.ui.reusableContents.Section_2.CenteredWorkoutSuccessDialog
 import com.example.workoutapp.ui.reusableContents.Section_2.ExerciseSetCardDetailed
 import com.example.workoutapp.ui.reusableContents.Section_2.ExerciseTimer
+import com.example.workoutapp.ui.screens.section_2.ExerciseTrackingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActiveWorkoutScreen(
-    exerciseName: String,
-    exerciseDescription: String,
-    currentSet: Int,
-    reps: Int,
-    weight: Int,
-    restTime: Int,
-    isResting: Boolean,
-    restsCompleted: Int,
-    isWorkoutFinished: Boolean,
-    initialShowDescription: Boolean = false,
-    initialShowExitDialog: Boolean = false,
+    viewModel: ExerciseTrackingViewModel,
     onBackClick: () -> Unit,
-    onRepsChange: (Int) -> Unit,
-    onWeightChange: (Int) -> Unit,
-    onRestTimeChange: (Int) -> Unit,
-    onDoneClick: () -> Unit,
-    onTimerFinished: () -> Unit,
-    onSaveDescription: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showDescription by remember(initialShowDescription) { mutableStateOf(initialShowDescription) }
-    var showExitDialog by remember(initialShowExitDialog) { mutableStateOf(initialShowExitDialog) }
+    val exerciseName by viewModel.exerciseName.collectAsState()
+    val exerciseDescription by viewModel.exerciseDescription.collectAsState()
+    val currentSet by viewModel.currentSet.collectAsState()
+    val reps by viewModel.reps.collectAsState()
+    val weight by viewModel.weight.collectAsState()
+    val restTime by viewModel.restTime.collectAsState()
+    val isResting by viewModel.isResting.collectAsState()
+    val restsCompleted by viewModel.restsCompleted.collectAsState()
+    val isWorkoutFinished by viewModel.isWorkoutFinished.collectAsState()
 
-
-    //val lang = LocalConfiguration.current.locales[0].language
-    //LaunchedEffect(Unit) { viewModel.setLang(lang) }
+    var showDescription by remember { mutableStateOf(false) }
+    var showExitDialog by remember { mutableStateOf(false) }
 
     BackHandler(enabled = !isWorkoutFinished) {
         showExitDialog = true
@@ -58,69 +48,71 @@ fun ActiveWorkoutScreen(
 
     Box(modifier = modifier.fillMaxSize()) {
 
-        // WARSTWA 1: Interfejs treningowy
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(
                     onClick = { showExitDialog = true },
-                    modifier = Modifier.offset(x = (-12).dp)
+                    modifier = Modifier.offset(x = (-12).dp),
                 ) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Wróć", tint = Color.White)
                 }
                 Text(
-                    text = "Aktywny trening",
+                    "Aktywny trening",
                     color = Color.White,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.offset(x = (-16).dp)
+                    modifier = Modifier.offset(x = (-16).dp).weight(1f),
                 )
-                Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = { showDescription = true }) {
                     Icon(Icons.Default.Info, "Informacje o ćwiczeniu", tint = Color.White)
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
 
                 ExerciseSetCardDetailed(
                     exerciseName = exerciseName,
                     setNumber = currentSet,
                     weight = weight,
-                    onWeightChange = onWeightChange,
+                    onWeightChange = viewModel::updateWeight,
                     reps = reps,
-                    onRepsChange = onRepsChange,
+                    onRepsChange = viewModel::updateReps,
                     rest = restTime,
-                    onRestChange = onRestTimeChange
+                    onRestChange = viewModel::updateRestTime,
+                    enabled = !isResting
                 )
 
                 Spacer(modifier = Modifier.height(48.dp))
 
-                // resetKey zmienia się przy każdej zmianie fazy lub powtórzenia → timer się resetuje
                 key(currentSet, exerciseName, isResting, restsCompleted) {
                     ExerciseTimer(
                         title = if (isResting) "ODPOCZYNEK" else "WYKONANIE ĆWICZENIA",
                         resetKey = Triple(currentSet, isResting, restsCompleted),
                         initialSeconds = restTime,
-                        initialIsRunning = isResting, // odpoczynek startuje automatycznie
+                        initialIsRunning = isResting,
                         isExercisePhase = !isResting,
                         onTimerFinished = {},
                         onFinishClick = {
                             if (isResting) {
-                                onTimerFinished()
+                                viewModel.onTimerFinished()
                             } else {
-                                onDoneClick()
+                                viewModel.onDoneClick()
                             }
                         }
                     )
@@ -130,16 +122,14 @@ fun ActiveWorkoutScreen(
             }
         }
 
-        // WARSTWA 2: Opis ćwiczenia
         if (showDescription) {
             CenteredDescriptionDialog(
                 initialDescription = exerciseDescription,
                 onVisibleChange = { showDescription = it },
-                onSave = { updatedText -> onSaveDescription(updatedText) }
+                onSave = { updatedText -> viewModel.updateDescription(updatedText) }
             )
         }
 
-        // WARSTWA 3: Potwierdzenie wyjścia
         if (showExitDialog) {
             CenteredExitConfirmationDialog(
                 onConfirm = {
@@ -152,10 +142,10 @@ fun ActiveWorkoutScreen(
             )
         }
 
-        // WARSTWA 4: Sukces — trening zakończony
         if (isWorkoutFinished) {
             CenteredWorkoutSuccessDialog(
                 onConfirm = { onBackClick() }
             )
         }
     }
+}

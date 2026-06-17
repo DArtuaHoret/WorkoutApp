@@ -22,12 +22,16 @@ interface WorkoutSessionRepository {
     suspend fun updateSession(session: WorkoutSession)
     suspend fun saveSessionItem(item: WorkoutSessionItem): Long  // zwraca id
     suspend fun updateSessionItem(item: WorkoutSessionItem)
+
+    suspend fun deleteSession(sessionId: Long)
     suspend fun deleteSessionItem(itemId: Long)
     suspend fun deleteSetsForSessionItem(itemId: Long)
     suspend fun saveSessionSet(set: WorkoutSessionSet)
     suspend fun updateSessionSet(set: WorkoutSessionSet)
     fun getSessionsForDate(date: LocalDate): Flow<List<WorkoutSession>>
     fun getAllScheduledDates(): Flow<Set<LocalDate>>
+
+    fun getSessionsBetweenDates(startDate: LocalDate, endDate: LocalDate): Flow<List<WorkoutSession>>
 }
 
 class WorkoutSessionRepositoryImpl(private val sessionDao: WorkoutSessionDao) : WorkoutSessionRepository {
@@ -65,6 +69,9 @@ class WorkoutSessionRepositoryImpl(private val sessionDao: WorkoutSessionDao) : 
     override suspend fun updateSessionItem(item: WorkoutSessionItem) =
         withContext(Dispatchers.IO) { sessionDao.updateWorkoutSessionItem(item) }
 
+    override suspend fun deleteSession(sessionId: Long) =
+        withContext(Dispatchers.IO) { sessionDao.deleteSession(sessionId) }
+
     override suspend fun deleteSessionItem(itemId: Long) =
         withContext(Dispatchers.IO) { sessionDao.deleteSessionItem(itemId) }
 
@@ -93,5 +100,12 @@ class WorkoutSessionRepositoryImpl(private val sessionDao: WorkoutSessionDao) : 
                 }.getOrNull()
             }.toSet()
         }
+    }
+
+    override fun getSessionsBetweenDates(startDate: LocalDate, endDate: LocalDate): Flow<List<WorkoutSession>> {
+        val zone = ZoneId.systemDefault()
+        val rangeStart = startDate.atStartOfDay(zone).toInstant().toEpochMilli()
+        val rangeEnd = endDate.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
+        return sessionDao.getSessionsForDate(rangeStart, rangeEnd)
     }
 }

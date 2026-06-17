@@ -52,6 +52,9 @@ interface WorkoutSessionDao {
     @Query("SELECT * FROM workout_session_items WHERE workoutSessionId = :sessionId ORDER BY orderIndex")
     suspend fun getItemsForSessionOnce(sessionId: Long): List<WorkoutSessionItem>
 
+    @Query("DELETE FROM workout_sessions WHERE id = :sessionId")
+    suspend fun deleteSession(sessionId: Long)
+
     @Query("DELETE FROM workout_session_items WHERE id = :itemId")
     suspend fun deleteSessionItem(itemId: Long)
 
