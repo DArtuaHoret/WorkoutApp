@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.res.stringResource
+import com.example.workoutapp.R
+
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -23,11 +26,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,6 +48,10 @@ fun TemplateExercisesScreen(
     modifier: Modifier = Modifier
 ) {
     val exercises by viewModel.exercises.collectAsState()
+
+    val lang = LocalConfiguration.current.locales[0].language
+    LaunchedEffect(Unit) { viewModel.setLang(lang) }
+
 
     Column(
         modifier = modifier
@@ -62,7 +71,7 @@ fun TemplateExercisesScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Powrót",
+                    contentDescription = stringResource(R.string.close_description),
                     tint = Color.White
                 )
             }
@@ -78,7 +87,7 @@ fun TemplateExercisesScreen(
         if (exercises.isEmpty()) {
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "Brak ćwiczeń w tym treningu",
+                text = stringResource(R.string.template_exercises_empty),
                 color = Color(0xFFAAAAAA),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,

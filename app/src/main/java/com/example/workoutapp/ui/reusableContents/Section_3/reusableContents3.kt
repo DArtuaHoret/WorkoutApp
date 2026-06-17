@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.res.stringResource
+import com.example.workoutapp.R
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -145,7 +147,7 @@ fun TrainingProgressCard(
                     Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
-                        text = "ZREALIZOWANO TRENINGÓW",
+                        text = stringResource(R.string.completed_workouts_title),
                         color = Color.White,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
@@ -159,7 +161,10 @@ fun TrainingProgressCard(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Wszystkich treningów: $totalSessions",
+                text = stringResource(
+                    R.string.all_workouts_count,
+                    totalSessions
+                ),
                 color = Color(0xFFCCCCCC),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
@@ -169,7 +174,10 @@ fun TrainingProgressCard(
             Spacer(modifier = Modifier.height(2.dp))
 
             Text(
-                text = "Zrealizowano treningów: $completedWorkouts",
+                text = stringResource(
+                    R.string.completed_workouts_count,
+                    completedWorkouts
+                ),
                 color = Color(0xFFCCCCCC),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
@@ -206,7 +214,7 @@ data class MuscleGroupShare(
 fun MuscleGroupDistributionCard(
     distribution: List<MuscleGroupShare>,
     modifier: Modifier = Modifier,
-    title: String = "ROZKŁAD GRUP MIĘŚNIOWYCH"
+    title: String = stringResource(R.string.muscle_group_distribution),
 ) {
     val maxPercentage = distribution.maxOfOrNull { it.percentage }?.toFloat() ?: 100f
 
@@ -345,7 +353,7 @@ private fun PreviewMuscleGroupDistributionCard() {
 fun AverageTimeCard(
     averageTimeInSeconds: Int,
     modifier: Modifier = Modifier,
-    title: String = "ŚREDNI CZAS PROWADZENIA TRENINGU"
+    title: String = stringResource(R.string.average_training_time),
 ) {
     val minutes = averageTimeInSeconds / 60
     val seconds = averageTimeInSeconds % 60
@@ -389,7 +397,7 @@ fun AverageTimeCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Timer,
-                    contentDescription = "Stoper",
+                    contentDescription = stringResource(R.string.timer_icon_description),
                     tint = Color(0xFF5E9C52),
                     modifier = Modifier
                         .size(36.dp)
@@ -409,7 +417,7 @@ fun AverageTimeCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "min",
+                        text = stringResource(R.string.minutes_short),
                         color = Color(0xFFCCCCCC),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
@@ -428,7 +436,7 @@ fun AverageTimeCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "s",
+                        text = stringResource(R.string.seconds_short),
                         color = Color(0xFFCCCCCC),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
@@ -501,7 +509,10 @@ fun CompletedWorkoutCard(
             ) {
 
                 Text(
-                    text = "Zestaw: $workoutName",
+                    text = stringResource(
+                        R.string.workout_set,
+                        workoutName
+                    ),
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
@@ -518,9 +529,16 @@ fun CompletedWorkoutCard(
 
                 val timeText = when {
                     startedAtFormatted != null && finishedAtFormatted != null ->
-                        "Czas: $startedAtFormatted – $finishedAtFormatted"
+                        stringResource(
+                            R.string.workout_time,
+                            startedAtFormatted,
+                            finishedAtFormatted
+                        )
                     startedAtFormatted != null ->
-                        "Rozpoczęto: $startedAtFormatted"
+                        stringResource(
+                            R.string.workout_started,
+                            startedAtFormatted
+                        )
                     else -> null
                 }
 
@@ -544,7 +562,12 @@ fun CompletedWorkoutCard(
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = if (isCompleted) "ZREALIZOWANO" else "NIEZREALIZOWANO",
+                        text = stringResource(
+                            if (isCompleted)
+                                R.string.workout_completed
+                            else
+                                R.string.workout_not_completed
+                        ),
                         color = Color.White,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.ExtraBold
@@ -684,7 +707,7 @@ fun DateSelectionDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Wybierz datę",
+                    text = stringResource(R.string.choose_date),
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -707,7 +730,7 @@ fun DateSelectionDialog(
 
                 ActionButton(
                     onClick = { onDateSelected(tempDate) },
-                    label = "ZATWIERDŹ",
+                    label = stringResource(R.string.confirm),
                     icon = null,
                     style = ActionButtonStyle.LightFilled
                 )
@@ -741,7 +764,9 @@ fun DateBox(label: String, date: LocalDate?, onClick: () -> Unit, modifier: Modi
     ) {
         Text(text = label, color = Color(0xFFAAAAAA), fontSize = 12.sp)
         Text(
-            text = date?.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) ?: "Wybierz",
+            text =
+                date?.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                    ?: stringResource(R.string.choose),
             color = if (date == null) Color.Gray else Color.White,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold
@@ -796,7 +821,7 @@ fun CenteredDateSelectionDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Wybierz datę",
+                    text = stringResource(R.string.choose_date),
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -822,7 +847,7 @@ fun CenteredDateSelectionDialog(
                         onDateSelected(tempDate)
                         onVisibleChange(false)
                     },
-                    label = "ZATWIERDŹ",
+                    label = stringResource(R.string.confirm),
                     icon = null,
                     style = ActionButtonStyle.LightFilled
                 )
@@ -886,7 +911,7 @@ fun CenteredDateRangeSelector(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "WYBIERZ ZAKRES REPREZENTACJI DANYCH",
+                    text = stringResource(R.string.choose_data_range),
                     color = Color.White,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
@@ -900,7 +925,7 @@ fun CenteredDateRangeSelector(
                         .padding(vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Data od:", color = Color.Gray, fontSize = 16.sp)
+                    Text(stringResource(R.string.date_from), color = Color.Gray, fontSize = 16.sp)
                     Text(startDate.toString(), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
 
@@ -922,7 +947,7 @@ fun CenteredDateRangeSelector(
 
                 ActionButton(
                     onClick = { onDateRangeConfirmed(startDate, endDate) },
-                    label = "ZATWIERDŹ ZAKRES",
+                    label = stringResource(R.string.confirm_range),
                     icon = null,
                     style = ActionButtonStyle.LightFilled
                 )
@@ -1014,7 +1039,7 @@ fun CenteredTemplateSelectionDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Wybierz szablon",
+                    text = stringResource(R.string.choose_template),
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -1028,7 +1053,7 @@ fun CenteredTemplateSelectionDialog(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Brak dostępnych szablonów.\nUtwórz je w sekcji Szablony.",
+                            text = stringResource(R.string.no_templates_available),
                             color = Color(0xFF888888),
                             fontSize = 14.sp,
                             textAlign = TextAlign.Center
@@ -1067,7 +1092,7 @@ fun CenteredTemplateSelectionDialog(
 
                 ActionButton(
                     onClick = { onVisibleChange(false) },
-                    label = "ANULUJ",
+                    label = stringResource(R.string.cancel),
                     icon = null,
                     style = ActionButtonStyle.LightFilled
                 )
@@ -1242,7 +1267,7 @@ fun LoggedProductItemCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Usuń",
+                    contentDescription = stringResource(R.string.delete),
                     tint = Color(0xFFFF4D4D),
                     modifier = Modifier.size(20.dp),
                 )
@@ -1256,10 +1281,22 @@ fun LoggedProductItemCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            NutrientChip(label = "Kcal",     value = kcal)
-            NutrientChip(label = "Białko",   value = "${protein}g")
-            NutrientChip(label = "Tłuszcze", value = "${fat}g")
-            NutrientChip(label = "Węgl.",    value = "${carbs}g")
+            NutrientChip(
+                label = stringResource(R.string.kcal),
+                value = kcal
+            )
+            NutrientChip(
+                label = stringResource(R.string.protein),
+                value = "${protein}g"
+            )
+            NutrientChip(
+                label = stringResource(R.string.fat),
+                value = "${fat}g"
+            )
+            NutrientChip(
+                label = stringResource(R.string.carbohydrates_short),
+                value = "${carbs}g"
+            )
         }
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -1274,14 +1311,14 @@ fun LoggedProductItemCard(
                 onValueChange = { onGramsChange(it) },
                 label = {
                     Text(
-                        text = "Gramy",
+                        text = stringResource(R.string.grams),
                         color = Color(0xFF888888),
                         fontSize = 12.sp,
                     )
                 },
                 suffix = {
                     Text(
-                        text = "g",
+                        text = stringResource(R.string.grams_unit),
                         color = Color(0xFF888888),
                         fontSize = 14.sp,
                     )

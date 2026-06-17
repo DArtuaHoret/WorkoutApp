@@ -148,7 +148,10 @@ fun AddMealSearchScreen(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = stringResource(R.string.diet_no_results),
+                                text = stringResource(
+                                    R.string.diet_no_results_for,
+                                    query
+                                ),
                                 color = Color(0xFF888888),
                                 fontSize = 14.sp,
                             )

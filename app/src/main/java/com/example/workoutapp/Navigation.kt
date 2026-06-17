@@ -514,7 +514,7 @@ fun AppNavigation() {
                                     protein     = product.protein,
                                     fat         = product.fat,
                                     carbs       = product.carbs,
-                                    canDelete   = false,
+                                    canDelete   = true,
                                 )
                             )
                         },

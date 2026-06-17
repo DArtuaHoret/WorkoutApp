@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.res.stringResource
+import com.example.workoutapp.R
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -72,12 +74,12 @@ fun WorkoutDetailsScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Powrót",
+                        contentDescription = stringResource(R.string.close_description),
                         tint = Color.White
                     )
                 }
                 Text(
-                    text = "Szczegóły dnia",
+                    text = stringResource(R.string.workout_details_title),
                     color = Color.White,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
@@ -150,13 +152,13 @@ fun WorkoutDetailsScreen(
                             selectedSessionId = null
                         }
                     },
-                    label = "USUŃ TRENING",
+                    label = stringResource(R.string.delete_workout_button),
                     icon = Icons.Default.Delete,
                     style = ActionButtonStyle.DangerFilled
                 )
                 ActionButton(
                     onClick = { onViewExercisesClick(selectedSessionId!!) },
-                    label = "ZOBACZYĆ SZCZEGÓŁY",
+                    label = stringResource(R.string.view_details_button),
                     icon = null,
                     style = ActionButtonStyle.LightFilled
                 )
@@ -170,13 +172,13 @@ fun WorkoutDetailsScreen(
                                 uiState.sessionToTemplateId[selectedSessionId!!] ?: ""
                             onStartWorkoutClick(selectedSessionId!!, templateId)
                         },
-                        label = "ROZPOCZĄĆ TRENING",
+                        label = stringResource(R.string.start_workout_button),
                         icon = null,
                         style = ActionButtonStyle.LightFilled
                     )
                 } else if (selectedSession?.isCompleted != true && !isToday) {
                     Text(
-                        text = "Trening można rozpocząć tylko w dniu, na który jest zaplanowany",
+                        text = stringResource(R.string.workout_start_date_restriction),
                         color = Color(0xFFAAAAAA),
                         fontSize = 13.sp,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -188,10 +190,34 @@ fun WorkoutDetailsScreen(
 
         // ── PROGRESS BARY — zawsze na samym dole ────────────────
         NutritionProgressBarRow(
-            kcal = NutritionItem("Kcal", uiState.currentKcal, uiState.totalKcal, "kcal", Color(0xFFE040FB)),
-            protein = NutritionItem("Prot.", uiState.currentProtein, uiState.totalProtein, "g", Color(0xFF40C4FF)),
-            fats = NutritionItem("Fats", uiState.currentFats, uiState.totalFats, "g", Color(0xFFFFD740)),
-            carbs = NutritionItem("Carbs", uiState.currentCarbs, uiState.totalCarbs, "g", Color(0xFFB388FF))
+            kcal = NutritionItem(
+                stringResource(R.string.nutrient_label_kcal),
+                uiState.currentKcal,
+                uiState.totalKcal,
+                stringResource(R.string.unit_kcal),
+                Color(0xFFE040FB)
+            ),
+            protein = NutritionItem(
+                stringResource(R.string.nutrient_label_protein),
+                uiState.currentProtein,
+                uiState.totalProtein,
+                stringResource(R.string.unit_grams),
+                Color(0xFF40C4FF)
+            ),
+            fats = NutritionItem(
+                stringResource(R.string.nutrient_label_fat),
+                uiState.currentFats,
+                uiState.totalFats,
+                stringResource(R.string.unit_grams),
+                Color(0xFFFFD740)
+            ),
+            carbs = NutritionItem(
+                stringResource(R.string.nutrient_label_carbs),
+                uiState.currentCarbs,
+                uiState.totalCarbs,
+                stringResource(R.string.unit_grams),
+                Color(0xFFB388FF)
+            )
         )
     }
 }

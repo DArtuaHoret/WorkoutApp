@@ -7,6 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.ui.res.stringResource
+import com.example.workoutapp.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -138,7 +140,10 @@ fun ProductCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Dodaj $productName",
+                    contentDescription = stringResource(
+                        R.string.add_product_description,
+                        productName
+                    ),
                     tint = Color.White,
                     modifier = Modifier.size(18.dp),
                 )
@@ -201,7 +206,7 @@ private fun PreviewProductCardList() {
             WorkoutTextField(
                 value = query,
                 onValueChange = { query = it },
-                placeholder = "Wyszukaj produkt (np. jabłko)...",
+                placeholder = stringResource(R.string.product_name_placeholder),
                 showSearchIcon = true,
                 imeAction = ImeAction.Search,
             )
@@ -458,12 +463,12 @@ fun EditableProductDetailHeaderCard(
             WorkoutTextField(
                 value = productName,
                 onValueChange = onProductNameChange,
-                placeholder = "Nazwa produktu (np. Jabłko)",
+                placeholder = stringResource(R.string.product_name_placeholder),
             )
             WorkoutTextField(
                 value = productDescription,
                 onValueChange = onProductDescriptionChange,
-                placeholder = "Krótki opis (np. Bogate w błonnik...)",
+                placeholder = stringResource(R.string.product_description_placeholder)
             )
         }
     }
@@ -754,7 +759,7 @@ fun FavoriteProductItemCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Edytuj",
+                        contentDescription = stringResource(R.string.edit_product_description),
                         tint = Color.White,
                         modifier = Modifier.size(20.dp),
                     )
@@ -768,7 +773,7 @@ fun FavoriteProductItemCard(
             ) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = "Ulubione",
+                    contentDescription = stringResource(R.string.favorite_product_description),
                     tint = if (isFavorite) Color(0xFFFF4D4D) else Color(0xFF888888),
                     modifier = Modifier.size(20.dp),
                 )
@@ -806,7 +811,7 @@ fun FavoriteProductItemCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Dodaj",
+                    contentDescription = stringResource(R.string.add_description),
                     tint = Color.White,
                     modifier = Modifier.size(18.dp),
                 )
@@ -888,7 +893,7 @@ fun MealDatePickerDialog(
         confirmButton = {
             TextButton(onClick = {
                 datePickerState.selectedDateMillis?.let { onDateSelected(it) }
-            }) { Text("OK") }
+            }) { Text(stringResource(R.string.ok)) }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Anuluj") }

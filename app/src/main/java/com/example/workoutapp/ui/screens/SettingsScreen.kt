@@ -85,7 +85,7 @@ fun SettingsScreen(
         }
 
         Text(
-            text = "Dzienny cel makroskładników",
+            text = stringResource(R.string.settings_macro_goal),
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
@@ -93,10 +93,30 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        MacroInputRow("Kalorie (kcal)", targetKcal,    Color(0xFFE040FB), viewModel::onTargetKcalChange)
-        MacroInputRow("Białko (g)",     targetProtein, Color(0xFF40C4FF), viewModel::onTargetProteinChange)
-        MacroInputRow("Tłuszcze (g)",   targetFats,    Color(0xFFFFD740), viewModel::onTargetFatsChange)
-        MacroInputRow("Węglowodany (g)",targetCarbs,   Color(0xFFB388FF), viewModel::onTargetCarbsChange)
+        MacroInputRow(
+            stringResource(R.string.settings_kcal_label),
+            targetKcal,
+            Color(0xFFE040FB),
+            viewModel::onTargetKcalChange
+        )
+        MacroInputRow(
+            stringResource(R.string.settings_protein_label),
+            targetProtein,
+            Color(0xFF40C4FF),
+            viewModel::onTargetProteinChange
+        )
+        MacroInputRow(
+            stringResource(R.string.settings_fats_label),
+            targetFats,
+            Color(0xFFFFD740),
+            viewModel::onTargetFatsChange
+        )
+        MacroInputRow(
+            stringResource(R.string.settings_carbs_label),
+            targetCarbs,
+            Color(0xFFB388FF),
+            viewModel::onTargetCarbsChange
+        )
     }
 }
 

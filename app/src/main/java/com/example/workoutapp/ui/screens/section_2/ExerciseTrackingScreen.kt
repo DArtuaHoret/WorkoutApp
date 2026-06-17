@@ -12,6 +12,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
+import com.example.workoutapp.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +46,9 @@ fun ActiveWorkoutScreen(
     var showDescription by remember { mutableStateOf(false) }
     var showExitDialog by remember { mutableStateOf(false) }
 
+    val lang = LocalConfiguration.current.locales[0].language
+    LaunchedEffect(Unit) { viewModel.setLang(lang) }
+
     BackHandler(enabled = !isWorkoutFinished) {
         showExitDialog = true
     }
@@ -64,17 +70,27 @@ fun ActiveWorkoutScreen(
                     onClick = { showExitDialog = true },
                     modifier = Modifier.offset(x = (-12).dp),
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Wróć", tint = Color.White)
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.close_description),
+                        tint = Color.White
+                    )
                 }
+
                 Text(
-                    "Aktywny trening",
+                    text = stringResource(R.string.active_workout_title),
                     color = Color.White,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.offset(x = (-16).dp).weight(1f),
                 )
+
                 IconButton(onClick = { showDescription = true }) {
-                    Icon(Icons.Default.Info, "Informacje o ćwiczeniu", tint = Color.White)
+                    Icon(
+                        Icons.Default.Info,
+                        contentDescription = stringResource(R.string.exercise_info_description),
+                        tint = Color.White
+                    )
                 }
             }
 
@@ -104,7 +120,10 @@ fun ActiveWorkoutScreen(
 
                 key(currentSet, exerciseName, isResting, restsCompleted) {
                     ExerciseTimer(
-                        title = if (isResting) "ODPOCZYNEK" else "WYKONANIE ĆWICZENIA",
+                        title = if (isResting)
+                            stringResource(R.string.rest_phase_title)
+                        else
+                            stringResource(R.string.exercise_phase_title),
                         resetKey = Triple(currentSet, isResting, restsCompleted),
                         initialSeconds = restTime,
                         initialIsRunning = isResting,
@@ -127,8 +146,8 @@ fun ActiveWorkoutScreen(
         if (showDescription) {
             CenteredDescriptionDialog(
                 initialDescription = exerciseDescription,
-                onVisibleChange = { showDescription = it }
-                //onSave = { updatedText -> viewModel.updateDescription(updatedText) }
+                onVisibleChange = { showDescription = it },
+                onSave = { updatedText -> viewModel.updateDescription(updatedText) }
             )
         }
 

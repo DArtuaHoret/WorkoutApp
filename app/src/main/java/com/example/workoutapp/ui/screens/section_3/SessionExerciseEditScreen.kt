@@ -24,12 +24,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.res.stringResource
+import com.example.workoutapp.R
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +53,9 @@ fun SessionExerciseEditScreen(
     val exerciseName by viewModel.exerciseName.collectAsState()
     val sets by viewModel.sets.collectAsState()
 
+    val lang = LocalConfiguration.current.locales[0].language
+    LaunchedEffect(Unit) { viewModel.setLang(lang) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -67,10 +74,11 @@ fun SessionExerciseEditScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Powrót",
+                    contentDescription = stringResource(R.string.close_description),
                     tint = Color.White
                 )
             }
+
             Text(
                 text = exerciseName,
                 color = Color.White,
@@ -78,12 +86,15 @@ fun SessionExerciseEditScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.offset(x = (-16).dp).weight(1f)
             )
-            IconButton(onClick = {
-                viewModel.deleteExercise { onDeleteExerciseClick() }
-            }) {
+
+            IconButton(
+                onClick = {
+                    viewModel.deleteExercise { onDeleteExerciseClick() }
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Usuń ćwiczenie",
+                    contentDescription = stringResource(R.string.delete_exercise_description),
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
@@ -97,7 +108,7 @@ fun SessionExerciseEditScreen(
         ) {
             item {
                 Text(
-                    text = "Serie",
+                    text = stringResource(R.string.sets),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -129,7 +140,7 @@ fun SessionExerciseEditScreen(
             item {
                 ActionButton(
                     onClick = { viewModel.onAddSet() },
-                    label = "DODAJ SERIĘ",
+                    label = stringResource(R.string.add_set),
                     style = ActionButtonStyle.DarkOutlined
                 )
             }
@@ -139,7 +150,7 @@ fun SessionExerciseEditScreen(
 
         ActionButton(
             onClick = { viewModel.save { onSaveClick() } },
-            label = "ZAPISZ ZMIANY",
+            label = stringResource(R.string.save_changes),
             icon = null,
             style = ActionButtonStyle.LightFilled
         )

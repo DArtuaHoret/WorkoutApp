@@ -12,6 +12,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.stringResource
+import com.example.workoutapp.R
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,12 +82,13 @@ private fun MealDetailsContent(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Powrót",
+                    contentDescription = stringResource(R.string.close_description),
                     tint = Color.White,
                 )
             }
+
             Text(
-                text = "Co zjadłem",
+                text = stringResource(R.string.meal_details_title),
                 color = Color.White,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
@@ -97,7 +100,7 @@ private fun MealDetailsContent(
         }
 
         if (dateLabel.isNotBlank()) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = dateLabel,
                 color = Color(0xFFAAAAAA),
@@ -116,9 +119,13 @@ private fun MealDetailsContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text(text = "🍽️", fontSize = 48.sp)
                     Text(
-                        text = "Nic jeszcze nie zostało dodane",
+                        text = stringResource(R.string.meal_details_empty_emoji),
+                        fontSize = 48.sp
+                    )
+
+                    Text(
+                        text = stringResource(R.string.meal_details_empty_text),
                         color = Color(0xFF888888),
                         fontSize = 16.sp,
                     )

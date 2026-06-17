@@ -91,6 +91,10 @@ class ExerciseTrackingViewModel(
 
     private var currentExerciseSets: List<UnifiedSet> = emptyList()
 
+    private var lang: String = "pl"
+
+    fun setLang(lang: String) { this.lang = lang }
+
     val isWorkoutActive: StateFlow<Boolean> get() = // trening aktywny gdy nie skończony
         _isWorkoutFinished.map { !it }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 
@@ -134,8 +138,9 @@ class ExerciseTrackingViewModel(
             val items = sessionRepository.getItemsForSessionOnce(sessionId)
             exerciseList = items.map { item ->
                 val exerciseName = runCatching {
-                    exerciseRepository.getExerciseById(item.exerciseId)
-                        .first().firstOrNull()?.name ?: "Ćwiczenie"
+                    val ex = exerciseRepository.getExerciseById(item.exerciseId).first().firstOrNull()
+                    if (lang == "en" && ex?.nameEn?.isNotBlank() == true) ex.nameEn else ex?.name // ← NOWE
+                        ?: "Ćwiczenie"
                 }.getOrElse { "Ćwiczenie" }
 
                 val sets = sessionRepository.getSetsForSessionItemOnce(item.id)
@@ -258,7 +263,32 @@ class ExerciseTrackingViewModel(
             restTime = _restTime.value
         )
     }
-    fun updateDescription(newDesc: String) { _exerciseDescription.value = newDesc }
+    fun updateDescription(newDesc: String) {
+
+        _exerciseDescription.value = newDesc
+
+        exerciseList = exerciseList.toMutableList().apply {
+            this[currentIndex] = this[currentIndex].copy(
+                note = newDesc
+            )
+        }
+
+        val id = sessionId ?: return
+
+        viewModelScope.launch {
+
+            val item = sessionRepository
+                .getItemsForSessionOnce(id)
+                .getOrNull(currentIndex)
+                ?: return@launch
+
+            sessionRepository.updateSessionItem(
+                item.copy(
+                    note = newDesc
+                )
+            )
+        }
+    }
 }
 
 // ── Konwertery ───────────────────────────────────────────────────────────────

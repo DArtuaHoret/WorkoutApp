@@ -103,8 +103,23 @@
     <string name="diet_scan_barcode">SCAN BARCODE</string>
     <string name="diet_library">LIBRARY</string>
     <string name="diet_loading">Loading…</string>
-    <string name="diet_no_results">No results for </string>
+    <!-- AddMealSearchScreen -->
+    <string name="diet_no_results_for">No results found for "%1$s".</string>
     <string name="diet_add_custom">ADD YOUR PRODUCT</string>
+
+
+
+    <!-- Title -->
+
+
+    <!-- Nutrition targets -->
+    <string name="settings_macro_goal">Daily macronutrient target</string>
+
+    <string name="settings_kcal_label">Calories (kcal)</string>
+    <string name="settings_protein_label">Protein (g)</string>
+    <string name="settings_fats_label">Fats (g)</string>
+    <string name="settings_carbs_label">Carbohydrates (g)</string>
+
 
     <!-- BottomNav -->
     <string name="nav_templates_icon">📋</string>
@@ -117,4 +132,168 @@
     <string name="nav_diet_label">Diet</string>
     <string name="nav_settings_icon">⚙️</string>
     <string name="nav_settings_label">Settings</string>
+
+    <!-- ActiveWorkoutScreen -->
+    <string name="active_workout_title">Active workout</string>
+    <string name="exercise_info_description">Exercise information</string>
+    <string name="rest_phase_title">REST</string>
+    <string name="exercise_phase_title">PERFORM EXERCISE</string>
+
+    <!-- MealDetailsScreen -->
+    <string name="meal_details_title">What I ate</string>
+    <string name="meal_details_empty_emoji">🍽️</string>
+    <string name="meal_details_empty_text">Nothing added yet</string>
+
+    <!-- SessionExerciseEditScreen -->
+    <string name="delete_exercise_description">Delete exercise</string>
+
+    <!-- TemplateExercisesScreen -->
+    <string name="template_exercises_empty">No exercises in this workout</string>
+
+    <!-- WorkoutHistoryScreen -->
+    <string name="workout_history_title">Workout history</string>
+    <string name="view_workout_details_button">VIEW WORKOUT DETAILS</string>
+    <string name="select_assign_workout_button">SELECT AND ASSIGN WORKOUT</string>
+    <string name="view_stats_button">VIEW STATISTICS</string>
+
+    <!-- WorkoutDetailsScreen -->
+    <string name="workout_details_title">Day details</string>
+    <string name="delete_workout_button">DELETE WORKOUT</string>
+    <string name="view_details_button">VIEW DETAILS</string>
+    <string name="start_workout_button">START WORKOUT</string>
+    <string name="workout_start_date_restriction">A workout can only be started on the day it is scheduled for</string>
+    <string name="nutrient_label_kcal">Kcal</string>
+    <string name="nutrient_label_protein">Prot.</string>
+    <string name="nutrient_label_fat">Fats</string>
+    <string name="nutrient_label_carbs">Carbs</string>
+    <string name="unit_kcal">kcal</string>
+    <string name="unit_grams">g</string>
+
+    <!-- WorkoutStatsScreen -->
+    <string name="stats_title">STATISTICS</string>
+    <string name="stats_date_range">Range: %1$s — %2$s</string>
+    <string name="stats_attendance_header">ATTENDANCE</string>
+    <string name="stats_distribution_time_header">DISTRIBUTION &amp; TIME</string>
+
+    <!-- reusableContents/Section_2 -->
+    <string name="weight_label_colon">WEIGHT:</string>
+    <string name="reps_label_colon">REPS:</string>
+    <string name="rest_label_colon">REST:</string>
+    <string name="details_title">Details</string>
+    <string name="close_description">Close</string>
+    <string name="exercise_description_label">Exercise description</string>
+    <string name="no_description">No description.</string>
+    <string name="edit_button">EDIT</string>
+
+    <string name="save">Save</string>
+    <string name="decrease_description">Minus</string>
+    <string name="increase_description">Plus</string>
+    <string name="pause_description">Pause</string>
+    <string name="start_description">Start</string>
+    <string name="finished_label">Finished</string>
+    <string name="exit_workout_dialog_title">Stop the workout?</string>
+    <string name="exit_workout_dialog_message">If you leave, the progress of the current workout will be lost. Are you sure you want to leave this screen?</string>
+    <string name="end_workout_button">END WORKOUT</string>
+    <string name="stay_button">STAY</string>
+    <string name="workout_success_title">Workout finished!</string>
+    <string name="workout_success_message">Your workout was completed successfully and saved to the calendar.</string>
+    <string name="ok_button">OK</string>
+
+    <!-- TrainingProgressCard -->
+    <string name="completed_workouts_title">COMPLETED WORKOUTS</string>
+    <string name="all_workouts_count">Total workouts: %1$d</string>
+    <string name="completed_workouts_count">Completed workouts: %1$d</string>
+
+    <!-- MuscleGroupDistributionCard -->
+    <string name="muscle_group_distribution">MUSCLE GROUP DISTRIBUTION</string>
+
+    <!-- AverageTimeCard -->
+    <string name="average_training_time">AVERAGE TRAINING DURATION</string>
+    <string name="minutes_short">min</string>
+    <string name="seconds_short">s</string>
+    <string name="timer_icon_description">Timer</string>
+
+    <!-- CompletedWorkoutCard -->
+    <string name="workout_set">Workout: %1$s</string>
+    <string name="workout_time">Time: %1$s – %2$s</string>
+    <string name="workout_started">Started: %1$s</string>
+    <string name="workout_completed">COMPLETED</string>
+    <string name="workout_not_completed">NOT COMPLETED</string>
+
+    <!-- Action buttons -->
+    <string name="choose_and_assign_workout">CHOOSE AND ASSIGN WORKOUT</string>
+    <string name="view_statistics">VIEW STATISTICS</string>
+
+    <!-- Date dialogs -->
+    <string name="choose_date">Choose date</string>
+    <string name="confirm">CONFIRM</string>
+    <string name="choose">Choose</string>
+
+    <!-- Date range -->
+    <string name="choose_data_range">SELECT DATA RANGE</string>
+    <string name="date_from">From date:</string>
+    <string name="date_to">To date:</string>
+    <string name="confirm_range">CONFIRM RANGE</string>
+
+    <!-- Template selection -->
+    <string name="choose_template">Choose template</string>
+    <string name="no_templates_available">No templates available.\nCreate them in the Templates section.</string>
+    <string name="cancel">CANCEL</string>
+
+    <!-- Nutrition -->
+    <string name="kcal">Kcal</string>
+    <string name="protein">Protein</string>
+    <string name="fat">Fat</string>
+    <string name="carbohydrates_short">Carbs</string>
+
+    <!-- SessionExerciseEditScreen -->
+    <string name="sets">Sets</string>
+
+
+    <!-- LoggedProductItemCard -->
+
+    <string name="grams">Grams</string>
+    <string name="grams_unit">g</string>
+
+    <!-- Preview texts -->
+    <string name="upper_body">UPPER BODY</string>
+    <string name="legs">LEGS</string>
+    <string name="cardio_training">CARDIO TRAINING</string>
+    <string name="slower_tempo_note">I focused on a slower tempo</string>
+
+    <!-- Muscle groups previews -->
+    <string name="chest">Chest</string>
+
+    <string name="legs_group">Legs</string>
+    <string name="arms">Arms</string>
+    <string name="abs">Abs</string>
+    <string name="shoulders">Shoulders</string>
+
+    <!-- Template previews -->
+    <string name="template_fbw">FBW Workout (Full Body Workout)</string>
+    <string name="template_ppl">Push / Pull / Legs</string>
+    <string name="template_chest_triceps">Chest + Triceps</string>
+    <string name="template_cardio">45 min Cardio</string>
+
+    <!-- ProductCard -->
+    <string name="add_product_description">Add %1$s</string>
+
+    <!-- Editable product -->
+    <string name="product_name_placeholder">Product name (e.g. Apple)</string>
+    <string name="product_description_placeholder">Short description (e.g. Rich in fiber...)</string>
+
+    <!-- Nutrients -->
+    <string name="energy_label">ENERGY</string>
+    <string name="protein_label">PROTEIN</string>
+    <string name="fat_label">FAT</string>
+    <string name="carbohydrates_label">CARBOHYDRATES</string>
+
+    <!-- FavoriteProductItemCard -->
+    <string name="edit_product_description">Edit</string>
+    <string name="favorite_product_description">Favorite</string>
+    <string name="add_description">Add</string>
+
+    <!-- MealDatePickerDialog -->
+    <string name="ok">OK</string>
+
 </resources>

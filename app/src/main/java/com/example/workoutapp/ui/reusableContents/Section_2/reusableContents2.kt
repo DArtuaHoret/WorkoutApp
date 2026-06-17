@@ -4,6 +4,8 @@ import android.util.Size
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.ui.res.stringResource
+import com.example.workoutapp.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -155,9 +157,30 @@ fun ExerciseSetCardDetailed(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    AdjustableRow(label = "CIĘŻAR:", value = weight, onValueChange = onWeightChange, step = 5, unit = "kg", enabled = enabled)
-                    AdjustableRow(label = "POWTÓRZENIA:", value = reps, onValueChange = onRepsChange, step = 1, minValue = 1, enabled = enabled)
-                    AdjustableRow(label = "ODPOCZYNEK:", value = rest, onValueChange = onRestChange, step = 10, unit = "s", enabled = enabled)
+                    AdjustableRow(
+                        label = stringResource(R.string.weight_label_colon),
+                        value = weight,
+                        onValueChange = onWeightChange,
+                        step = 5,
+                        unit = "kg",
+                        enabled = enabled
+                    )
+                    AdjustableRow(
+                        label = stringResource(R.string.reps_label_colon),
+                        value = reps,
+                        onValueChange = onRepsChange,
+                        step = 1,
+                        minValue = 1,
+                        enabled = enabled
+                    )
+                    AdjustableRow(
+                        label = stringResource(R.string.rest_label_colon),
+                        value = rest,
+                        onValueChange = onRestChange,
+                        step = 10,
+                        unit = "s",
+                        enabled = enabled
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(24.dp))
@@ -227,12 +250,12 @@ private fun PreviewExerciseSetCardDetailed() {
 @Composable
 fun ExerciseDescriptionContent(
     initialDescription: String,
-    //onSave: (String) -> Unit,
+    onSave: (String) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    //var description by remember { mutableStateOf(initialDescription) }
-    //var isEditing by remember { mutableStateOf(false) }
+    var description by remember { mutableStateOf(initialDescription) }
+    var isEditing by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -242,14 +265,14 @@ fun ExerciseDescriptionContent(
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Szczegóły",
+                text = stringResource(R.string.details_title),
                 style = MaterialTheme.typography.headlineSmall,
                 color = Color.White,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Zamknij",
+                contentDescription = stringResource(R.string.close_description),
                 tint = Color.White,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -260,11 +283,11 @@ fun ExerciseDescriptionContent(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        /*if (isEditing) {
+        if (isEditing) {
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Opis ćwiczenia") },
+                label = { Text(stringResource(R.string.exercise_description_label)) },
                 modifier = Modifier.fillMaxWidth().height(150.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
@@ -274,15 +297,17 @@ fun ExerciseDescriptionContent(
             )
         } else {
             Text(
-                text = description.ifEmpty { "Brak opisu." },
+                text = description.ifEmpty {
+                    stringResource(R.string.no_description)
+                },
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color(0xFFE0E0E0),
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-        }*/
+        }
 
 
-        /*if (!isEditing) {
+        if (!isEditing) {
             Button(
                 onClick = { isEditing = true },
                 modifier = Modifier
@@ -298,28 +323,28 @@ fun ExerciseDescriptionContent(
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
             ) {
                 Text(
-                    text = "EDYTUJ",
+                    text = stringResource(R.string.edit_button),
                     style = MaterialTheme.typography.titleMedium,
 
                 )
             }
         } else {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = { isEditing = false }) { Text("Anuluj", color = Color.Gray) }
+                TextButton(onClick = { isEditing = false }) {
+                    Text(
+                        stringResource(R.string.cancel),
+                        color = Color.Gray
+                    )
+                }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = { onSave(description); isEditing = false },
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)
-                ) { Text("Zapisz") }
+                ) { Text(stringResource(R.string.save)) }
             }
-        }*/
-        Text(
-            text = initialDescription.ifEmpty { "Brak opisu." },
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color(0xFFE0E0E0),
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
+        }
+
     }
 }
 
@@ -328,7 +353,7 @@ fun ExerciseDescriptionContent(
 fun CenteredDescriptionDialog(
     initialDescription: String,
     onVisibleChange: (Boolean) -> Unit,
-    //onSave: (String) -> Unit
+    onSave: (String) -> Unit
 ) {
 
     Box(
@@ -345,7 +370,7 @@ fun CenteredDescriptionDialog(
     ) {
         ExerciseDescriptionContent(
             initialDescription = initialDescription,
-            //onSave = onSave,
+            onSave = onSave,
             onDismiss = { onVisibleChange(false) },
             modifier = Modifier
                 .fillMaxWidth(0.85f)
@@ -373,7 +398,7 @@ private fun PreviewCenteredDescriptionDialog() {
                     CenteredDescriptionDialog(
                         initialDescription = currentDescription,
                         onVisibleChange = { isDialogVisible = it },
-                        //onSave = { currentDescription = it }
+                        onSave = { currentDescription = it }
                     )
                 }
             }
@@ -423,14 +448,14 @@ private fun PreviewEditingContentWrapper(
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Szczegóły",
+                text = stringResource(R.string.details_title),
                 style = MaterialTheme.typography.headlineSmall,
                 color = Color.White,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Zamknij",
+                contentDescription = stringResource(R.string.close_description),
                 tint = Color.White,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -468,7 +493,7 @@ private fun PreviewEditingContentWrapper(
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
         ) {
             Text(
-                text = "ZAPISZ",
+                text = stringResource(R.string.save),
                 style = MaterialTheme.typography.titleMedium,
             )
         }
@@ -556,7 +581,7 @@ fun ExerciseTimer(
             if (isExercisePhase) {
                 // Faza ćwiczenia — zawsze pokazuj "Skończono"
                 Text(
-                    text = "Skończono",
+                    text = stringResource(R.string.finished_label),
                     color = Color.White,
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold
@@ -572,7 +597,7 @@ fun ExerciseTimer(
             } else {
                 // Faza odpoczynku — timer doszedł do zera
                 Text(
-                    text = "Skończono",
+                    text = stringResource(R.string.finished_label),
                     color = Color.White,
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold
@@ -597,7 +622,7 @@ fun ExerciseTimer(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Remove,
-                        contentDescription = "Minus",
+                        contentDescription = stringResource(R.string.decrease_description),
                         tint = Color.White,
                         modifier = Modifier.size(48.dp)
                     )
@@ -609,7 +634,11 @@ fun ExerciseTimer(
                 ) {
                     Icon(
                         imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
-                        contentDescription = if (isRunning) "Pauza" else "Start",
+                        contentDescription =
+                            if (isRunning)
+                                stringResource(R.string.pause_description)
+                            else
+                                stringResource(R.string.start_description),
                         tint = Color.White,
                         modifier = Modifier.size(48.dp)
                     )
@@ -621,7 +650,7 @@ fun ExerciseTimer(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Plus",
+                        contentDescription = stringResource(R.string.increase_description),
                         tint = Color.White,
                         modifier = Modifier.size(48.dp)
                     )
@@ -652,10 +681,10 @@ private fun PreviewRestTimer() {
 // 1. KARTA KOMUNIKATU (Sama zawartość wizualna)
 @Composable
 fun ExitConfirmationDialog(
-    title: String = "Przerwać trening?",
-    message: String = "Jeśli wyjdziesz, postęp obecnego treningu zostanie utracony. Czy na pewno chcesz opuścić ten ekran?",
-    confirmText: String = "ZAKOŃCZ TRENING",
-    dismissText: String = "ZOSTAŃ",
+    title: String = stringResource(R.string.exit_workout_dialog_title),
+    message: String = stringResource(R.string.exit_workout_dialog_message),
+    confirmText: String = stringResource(R.string.end_workout_button),
+    dismissText: String = stringResource(R.string.stay_button),
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
@@ -728,10 +757,10 @@ private fun PreviewExitConfirmationDialog() {
 // 2. PEŁNOEKRANOWY KONTENER (Zaciemnione tło + wycentrowana karta)
 @Composable
 fun CenteredExitConfirmationDialog(
-    title: String = "Przerwać trening?",
-    message: String = "Jeśli wyjdziesz, postęp obecnego treningu zostanie utracony. Czy na pewno chcesz opuścić ten ekran?",
-    confirmText: String = "ZAKOŃCZ TRENING",
-    dismissText: String = "ZOSTAŃ",
+    title: String = stringResource(R.string.exit_workout_dialog_title),
+    message: String = stringResource(R.string.exit_workout_dialog_message),
+    confirmText: String = stringResource(R.string.end_workout_button),
+    dismissText: String = stringResource(R.string.stay_button),
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -787,9 +816,9 @@ private fun PreviewCenteredExitConfirmationDialog() {
 
 @Composable
 fun WorkoutSuccessDialog(
-    title: String = "Trening zakończony",
-    message: String = "Twój trening zakończył się sukcesem i został pomyślnie zapisany w kalendarzu.",
-    confirmText: String = "OK",
+    title: String = stringResource(R.string.workout_success_title),
+    message: String = stringResource(R.string.workout_success_message),
+    confirmText: String = stringResource(R.string.ok_button),
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -846,9 +875,9 @@ private fun PreviewWorkoutSuccessDialog() {
 
 @Composable
 fun CenteredWorkoutSuccessDialog(
-    title: String = "Trening zakończony!",
-    message: String = "Twój trening zakończył się sukcesem i został pomyślnie zapisany w kalendarzu.",
-    confirmText: String = "OK",
+    title: String = stringResource(R.string.workout_success_title),
+    message: String = stringResource(R.string.workout_success_message),
+    confirmText: String = stringResource(R.string.ok_button),
     onConfirm: () -> Unit
 ) {
     Box(

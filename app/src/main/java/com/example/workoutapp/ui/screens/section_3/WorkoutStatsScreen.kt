@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.res.stringResource
+import com.example.workoutapp.R
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -62,10 +64,14 @@ fun WorkoutStatsScreen(
                 onClick = onBackClick,
                 modifier = Modifier.offset(x = (-12).dp),
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Powrót", tint = Color.White)
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.close_description),
+                    tint = Color.White
+                )
             }
             Text(
-                "STATYSTYKI",
+                text = stringResource(R.string.stats_title),
                 color = Color.White,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
@@ -81,7 +87,11 @@ fun WorkoutStatsScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = "Zakres: ${uiState.startDate.format(rangeFormatter)} — ${uiState.endDate.format(rangeFormatter)}",
+                text = stringResource(
+                    R.string.stats_date_range,
+                    uiState.startDate.format(rangeFormatter),
+                    uiState.endDate.format(rangeFormatter)
+                ),
                 color = Color(0xFFAAAAAA),
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),
@@ -90,7 +100,7 @@ fun WorkoutStatsScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
-                    "FREKWENCJA",
+                    text = stringResource(R.string.stats_attendance_header),
                     color = Color(0xFFE5D5C5),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
@@ -106,7 +116,7 @@ fun WorkoutStatsScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
-                    "ROZKŁAD & CZAS",
+                    text = stringResource(R.string.stats_distribution_time_header),
                     color = Color(0xFFE5D5C5),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,

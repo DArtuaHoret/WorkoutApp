@@ -6,7 +6,10 @@
 
     <!-- Wspólne - reusable components -->
     <string name="edit">Edytuj</string>
-    <string name="delete">Usuń</string>
+
+    <string name="sets">Serie</string>
+
+
     <string name="search">Szukaj</string>
     <string name="expand">Rozwiń</string>
     <string name="add_exercise_to">Dodaj %s</string>
@@ -106,7 +109,7 @@
     <string name="diet_scan_barcode">SKANUJ KOD KRESKOWY</string>
     <string name="diet_library">BIBLIOTEKA</string>
     <string name="diet_loading">Ładowanie…</string>
-    <string name="diet_no_results">Brak wyników dla </string>
+    <string name="diet_no_results_for">Nie znaleziono wyników dla „%1$s”.</string>
     <string name="diet_add_custom">DODAJ SWÓJ PRODUKT</string>
 
     <!-- BottomNav -->
@@ -120,6 +123,178 @@
     <string name="nav_diet_label">Dieta</string>
     <string name="nav_settings_icon">⚙️</string>
     <string name="nav_settings_label">Ustawienia</string>
+
+    <!-- ActiveWorkoutScreen -->
+    <string name="active_workout_title">Aktywny trening</string>
+    <string name="exercise_info_description">Informacje o ćwiczeniu</string>
+    <string name="rest_phase_title">ODPOCZYNEK</string>
+    <string name="exercise_phase_title">WYKONANIE ĆWICZENIA</string>
+
+    <!-- MealDetailsScreen -->
+    <string name="meal_details_title">Co zjadłem</string>
+    <string name="meal_details_empty_emoji">🍽️</string>
+    <string name="meal_details_empty_text">Nic jeszcze nie zostało dodane</string>
+
+    <!-- SessionExerciseEditScreen -->
+    <string name="delete_exercise_description">Usuń ćwiczenie</string>
+
+    <!-- TemplateExercisesScreen -->
+    <string name="template_exercises_empty">Brak ćwiczeń w tym treningu</string>
+
+    <!-- WorkoutHistoryScreen -->
+    <string name="workout_history_title">Historia treningów</string>
+    <string name="view_workout_details_button">ZOBACZ SZCZEGÓŁY TRENINGU</string>
+    <string name="select_assign_workout_button">WYBIERZ I PRZYPISZ TRENING</string>
+    <string name="view_stats_button">OBEJRZYJ STATYSTYKI</string>
+
+    <!-- WorkoutDetailsScreen -->
+    <string name="workout_details_title">Szczegóły dnia</string>
+    <string name="delete_workout_button">USUŃ TRENING</string>
+    <string name="view_details_button">ZOBACZYĆ SZCZEGÓŁY</string>
+    <string name="start_workout_button">ROZPOCZĄĆ TRENING</string>
+    <string name="workout_start_date_restriction">Trening można rozpocząć tylko w dniu, na który jest zaplanowany</string>
+    <string name="nutrient_label_kcal">Kcal</string>
+    <string name="nutrient_label_protein">Prot.</string>
+    <string name="nutrient_label_fat">Fats</string>
+    <string name="nutrient_label_carbs">Carbs</string>
+    <string name="unit_kcal">kcal</string>
+    <string name="unit_grams">g</string>
+
+    <!-- WorkoutStatsScreen -->
+    <string name="stats_title">STATYSTYKI</string>
+    <string name="stats_date_range">Zakres: %1$s — %2$s</string>
+    <string name="stats_attendance_header">FREKWENCJA</string>
+    <string name="stats_distribution_time_header">ROZKŁAD &amp; CZAS</string>
+
+    <!-- Title -->
+
+
+    <!-- Nutrition targets -->
+    <string name="settings_macro_goal">Dzienny cel makroskładników</string>
+
+    <string name="settings_kcal_label">Kalorie (kcal)</string>
+    <string name="settings_protein_label">Białko (g)</string>
+    <string name="settings_fats_label">Tłuszcze (g)</string>
+    <string name="settings_carbs_label">Węglowodany (g)</string>
+
+    <!-- reusableContents/Section_2 -->
+    <string name="weight_label_colon">CIĘŻAR:</string>
+    <string name="reps_label_colon">POWTÓRZENIA:</string>
+    <string name="rest_label_colon">ODPOCZYNEK:</string>
+    <string name="details_title">Szczegóły</string>
+    <string name="close_description">Zamknij</string>
+    <string name="exercise_description_label">Opis ćwiczenia</string>
+    <string name="no_description">Brak opisu.</string>
+    <string name="edit_button">EDYTUJ</string>
+
+    <string name="save">Zapisz</string>
+    <string name="decrease_description">Minus</string>
+    <string name="increase_description">Plus</string>
+    <string name="pause_description">Pauza</string>
+    <string name="start_description">Start</string>
+    <string name="finished_label">Skończono</string>
+    <string name="exit_workout_dialog_title">Przerwać trening?</string>
+    <string name="exit_workout_dialog_message">Jeśli wyjdziesz, postęp obecnego treningu zostanie utracony. Czy na pewno chcesz opuścić ten ekran?</string>
+    <string name="end_workout_button">ZAKOŃCZ TRENING</string>
+    <string name="stay_button">ZOSTAŃ</string>
+    <string name="workout_success_title">Trening zakończony!</string>
+    <string name="workout_success_message">Twój trening zakończył się sukcesem i został pomyślnie zapisany w kalendarzu.</string>
+    <string name="ok_button">OK</string>
+
+    <!-- TrainingProgressCard -->
+    <string name="completed_workouts_title">ZREALIZOWANO TRENINGÓW</string>
+    <string name="all_workouts_count">Wszystkich treningów: %1$d</string>
+    <string name="completed_workouts_count">Zrealizowano treningów: %1$d</string>
+
+    <!-- MuscleGroupDistributionCard -->
+    <string name="muscle_group_distribution">ROZKŁAD GRUP MIĘŚNIOWYCH</string>
+
+    <!-- AverageTimeCard -->
+    <string name="average_training_time">ŚREDNI CZAS PROWADZENIA TRENINGU</string>
+    <string name="minutes_short">min</string>
+    <string name="seconds_short">s</string>
+    <string name="timer_icon_description">Stoper</string>
+
+    <!-- CompletedWorkoutCard -->
+    <string name="workout_set">Zestaw: %1$s</string>
+    <string name="workout_time">Czas: %1$s – %2$s</string>
+    <string name="workout_started">Rozpoczęto: %1$s</string>
+    <string name="workout_completed">ZREALIZOWANO</string>
+    <string name="workout_not_completed">NIEZREALIZOWANO</string>
+
+    <!-- Action buttons -->
+    <string name="choose_and_assign_workout">WYBIERZ I PRZYPISZ TRENING</string>
+    <string name="view_statistics">OBEJRZYJ STATYSTYKI</string>
+
+    <!-- Date dialogs -->
+    <string name="choose_date">Wybierz datę</string>
+    <string name="confirm">ZATWIERDŹ</string>
+    <string name="choose">Wybierz</string>
+
+    <!-- Date range -->
+    <string name="choose_data_range">WYBIERZ ZAKRES REPREZENTACJI DANYCH</string>
+    <string name="date_from">Data od:</string>
+    <string name="date_to">Data do:</string>
+    <string name="confirm_range">ZATWIERDŹ ZAKRES</string>
+
+    <!-- Template selection -->
+    <string name="choose_template">Wybierz szablon</string>
+    <string name="no_templates_available">Brak dostępnych szablonów.\nUtwórz je w sekcji Szablony.</string>
+    <string name="cancel">ANULUJ</string>
+
+    <!-- Nutrition -->
+    <string name="kcal">Kcal</string>
+    <string name="protein">Białko</string>
+    <string name="fat">Tłuszcze</string>
+    <string name="carbohydrates_short">Węgl.</string>
+
+    <!-- LoggedProductItemCard -->
+    <string name="delete">Usuń</string>
+    <string name="grams">Gramy</string>
+    <string name="grams_unit">g</string>
+
+    <!-- Preview texts -->
+    <string name="upper_body">GÓRA CIAŁA</string>
+    <string name="legs">NOGI</string>
+    <string name="cardio_training">TRENING CARDIO</string>
+    <string name="slower_tempo_note">Skupiłem się na wolniejszym tempie</string>
+
+    <!-- Muscle groups previews -->
+    <string name="chest">Klatka</string>
+
+    <string name="legs_group">Nogi</string>
+    <string name="arms">Ramiona</string>
+    <string name="abs">Brzuch</string>
+    <string name="shoulders">Barki</string>
+
+    <!-- Template previews -->
+    <string name="template_fbw">Trening FBW (Full Body Workout)</string>
+    <string name="template_ppl">Push / Pull / Legs</string>
+    <string name="template_chest_triceps">Klatka + Triceps</string>
+    <string name="template_cardio">Kardio 45 min</string>
+
+    <!-- ProductCard -->
+    <string name="add_product_description">Dodaj %1$s</string>
+
+    <!-- Editable product -->
+    <string name="product_name_placeholder">Nazwa produktu (np. Jabłko)</string>
+    <string name="product_description_placeholder">Krótki opis (np. Bogate w błonnik...)</string>
+
+    <!-- Nutrients -->
+    <string name="energy_label">ENERGIA</string>
+    <string name="protein_label">BIAŁKO</string>
+    <string name="fat_label">TŁUSZCZE</string>
+    <string name="carbohydrates_label">WĘGLOWODANY</string>
+
+    <!-- FavoriteProductItemCard -->
+    <string name="edit_product_description">Edytuj</string>
+    <string name="favorite_product_description">Ulubione</string>
+    <string name="add_description">Dodaj</string>
+
+    <!-- MealDatePickerDialog -->
+    <string name="ok">OK</string>
+
+
 
 
 </resources>

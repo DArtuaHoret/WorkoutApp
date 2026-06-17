@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.workoutapp.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,7 +46,7 @@ fun WorkoutHistoryScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Historia treningów",
+                text = stringResource(R.string.workout_history_title),
                 color = Color.White,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
@@ -71,7 +73,7 @@ fun WorkoutHistoryScreen(
 
                     ActionButton(
                         onClick = onViewWorkoutDetailsClick,
-                        label = "ZOBACZ SZCZEGÓŁY TRENINGU",
+                        label = stringResource(R.string.view_workout_details_button),
                         icon = null,
                         style = ActionButtonStyle.LightFilled
                     )
@@ -79,13 +81,13 @@ fun WorkoutHistoryScreen(
 
                 ActionButton(
                     onClick = { showTemplateSelectionDialog = true },
-                    label = "WYBIERZ I PRZYPISZ TRENING",
+                    label = stringResource(R.string.select_assign_workout_button),
                     style = ActionButtonStyle.LightFilled
                 )
 
                 ActionButton(
                     onClick = { showStatsRangeSelector = true },
-                    label = "OBEJRZYJ STATYSTYKI",
+                    label = stringResource(R.string.view_stats_button),
                     icon = null,
                     style = ActionButtonStyle.LightFilled
                 )

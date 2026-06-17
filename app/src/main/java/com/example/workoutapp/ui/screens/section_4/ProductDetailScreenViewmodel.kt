@@ -133,6 +133,13 @@ class ProductDetailViewModel(
         val isFavorite  = savedStateHandle.get<Boolean>("isFavorite") ?: false
         val canDelete = savedStateHandle.get<Boolean>("canDelete") ?: false
 
+        android.util.Log.d("ProductDetail", "=== buildInitialState ===")
+        android.util.Log.d("ProductDetail", "id: '$id'")
+        android.util.Log.d("ProductDetail", "name: '$name'")
+        android.util.Log.d("ProductDetail", "isEditMode: $isEditMode")
+        android.util.Log.d("ProductDetail", "canDelete: $canDelete")
+        android.util.Log.d("ProductDetail", "All keys: ${savedStateHandle.keys()}")
+
         return when {
             isEditMode -> ProductDetailUiState.Create(
                 productName        = name,

@@ -157,7 +157,12 @@ fun ProductDetailScreen(
                         }
                     }
 
+                    Text(
+                        text = "canDelete: ${state.canDelete}",
+                        color = Color.Red
+                    )
                     if (state.canDelete) {
+
                         ActionButton(
                             onClick = { viewModel.deleteProduct { onBackClick() } },
                             label = stringResource(R.string.product_detail_delete),

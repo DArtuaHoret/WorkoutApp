@@ -31,7 +31,7 @@ class Converters {
         FoodProduct::class,
         FoodEntry::class
     ],
-    version = 3,
+    version = 1,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -46,14 +46,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        // Migracja dodająca kolumnę plannedRestTime do workout_session_sets
-        val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
-                    "ALTER TABLE workout_session_sets ADD COLUMN plannedRestTime INTEGER NOT NULL DEFAULT 60"
-                )
-            }
-        }
+
 
         private val PREPOPULATE_CALLBACK = object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
@@ -175,8 +168,6 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "workout_nutrition_db"
                 )
-                    .addMigrations(MIGRATION_1_2)
-                    .fallbackToDestructiveMigration()
                     .addCallback(PREPOPULATE_CALLBACK)
                     .build()
                 INSTANCE = instance

@@ -52,6 +52,10 @@ class TemplateExercisesViewModel(
     private val _exercises = MutableStateFlow<List<SessionExerciseEntry>>(emptyList())
     val exercises: StateFlow<List<SessionExerciseEntry>> = _exercises
 
+    private var lang: String = "pl" // ← NOWE
+
+    fun setLang(lang: String) { this.lang = lang } // ← NOWE
+
     init {
         observeExercises()
     }
@@ -71,7 +75,8 @@ class TemplateExercisesViewModel(
                                 val exercise = runCatching {
                                     exerciseRepository.getExerciseById(item.exerciseId).first().firstOrNull()
                                 }.getOrNull()
-                                val exerciseName = exercise?.name ?: "Ćwiczenie"
+                                val exerciseName = if (lang == "en" && exercise?.nameEn?.isNotBlank() == true) // ← NOWE
+                                    exercise.nameEn else exercise?.name ?: "Ćwiczenie"
                                 val exercisePhotoUrl = exercise?.photoUrl
 
                                 val sets = setsArray[index].map { set ->
@@ -114,7 +119,8 @@ class TemplateExercisesViewModel(
                 val exercise = runCatching {
                     exerciseRepository.getExerciseById(item.exerciseId).first().firstOrNull()
                 }.getOrNull()
-                val exerciseName = exercise?.name ?: "Ćwiczenie"
+                val exerciseName = if (lang == "en" && exercise?.nameEn?.isNotBlank() == true) // ← NOWE
+                    exercise.nameEn else exercise?.name ?: "Ćwiczenie"
                 val exercisePhotoUrl = exercise?.photoUrl
 
                 val sets = sessionRepository.getSetsForSessionItemOnce(item.id)
