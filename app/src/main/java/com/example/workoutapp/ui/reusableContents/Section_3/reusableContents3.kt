@@ -460,7 +460,9 @@ private fun PreviewAverageTimeCard() {
 @Composable
 fun CompletedWorkoutCard(
     workoutName: String,
-    timeRange: String,
+    note: String,
+    startedAtFormatted: String?,
+    finishedAtFormatted: String?,
     icon: ImageVector,
     isCompleted: Boolean = true,
     modifier: Modifier = Modifier
@@ -505,12 +507,31 @@ fun CompletedWorkoutCard(
                     fontWeight = FontWeight.Bold
                 )
 
-                Text(
-                    text = if (isCompleted) "Zrealizowano: $timeRange" else "Zaplanowano: $timeRange",
-                    color = Color(0xFF888888),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
+                if (note.isNotBlank()) {
+                    Text(
+                        text = note,
+                        color = Color(0xFF888888),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                val timeText = when {
+                    startedAtFormatted != null && finishedAtFormatted != null ->
+                        "Czas: $startedAtFormatted – $finishedAtFormatted"
+                    startedAtFormatted != null ->
+                        "Rozpoczęto: $startedAtFormatted"
+                    else -> null
+                }
+
+                if (timeText != null) {
+                    Text(
+                        text = timeText,
+                        color = Color(0xFF888888),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(2.dp))
 
@@ -546,7 +567,9 @@ private fun PreviewSingleCompletedWorkoutCard() {
         ) {
             CompletedWorkoutCard(
                 workoutName = "GÓRA CIAŁA",
-                timeRange = "18:30 - 19:45",
+                note = "Skupiłem się na wolniejszym tempie",
+                startedAtFormatted = "18:30",
+                finishedAtFormatted = "19:45",
                 icon = Icons.Filled.FitnessCenter,
                 isCompleted = true
             )
@@ -565,7 +588,9 @@ private fun PreviewSingleUncompletedWorkoutCard() {
         ) {
             CompletedWorkoutCard(
                 workoutName = "NOGI",
-                timeRange = "17:00 - 18:15",
+                note = "",
+                startedAtFormatted = null,
+                finishedAtFormatted = null,
                 icon = Icons.Filled.FitnessCenter,
                 isCompleted = false
             )
@@ -585,14 +610,18 @@ private fun PreviewCompletedWorkoutsList() {
         ) {
             CompletedWorkoutCard(
                 workoutName = "GÓRA CIAŁA",
-                timeRange = "18:30 - 19:45",
+                note = "Skupiłem się na wolniejszym tempie",
+                startedAtFormatted = "18:30",
+                finishedAtFormatted = "19:45",
                 icon = Icons.Default.FitnessCenter,
                 isCompleted = true
             )
 
             CompletedWorkoutCard(
                 workoutName = "TRENING CARDIO",
-                timeRange = "07:00 - 07:45",
+                note = "",
+                startedAtFormatted = null,
+                finishedAtFormatted = null,
                 icon = Icons.AutoMirrored.Filled.DirectionsRun,
                 isCompleted = false
             )

@@ -24,7 +24,9 @@ import java.util.Date
 data class WorkoutSessionData(
     val id: String,
     val workoutName: String,
-    val timeRange: String,
+    val note: String,
+    val startedAtFormatted: String?,
+    val finishedAtFormatted: String?,
     val icon: ImageVector,
     val isCompleted: Boolean,
 
@@ -138,6 +140,10 @@ class WorkoutDetailsViewModel(
     private fun loadSessions() {
         viewModelScope.launch {
             sessionRepository.getSessionsForDate(date).collect { sessions ->
+                val timeFormatter = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).apply {
+                    timeZone = java.util.TimeZone.getDefault()
+                }
+
                 val sessionsWithNames = sessions.map { session ->
                     val templateName = session.workoutTemplateId?.let { templateId ->
                         runCatching {
@@ -148,7 +154,9 @@ class WorkoutDetailsViewModel(
                     WorkoutSessionData(
                         id = session.id.toString(),
                         workoutName = templateName,
-                        timeRange = date.toString(),
+                        note = session.note ?: "",
+                        startedAtFormatted = session.startedAt?.let { timeFormatter.format(it) },
+                        finishedAtFormatted = session.finishedAt?.let { timeFormatter.format(it) },
                         icon = Icons.Filled.FitnessCenter,
                         isCompleted = session.status == "DONE"
                     )

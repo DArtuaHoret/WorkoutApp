@@ -58,42 +58,51 @@ class TemplateExercisesViewModel(
 
     private fun observeExercises() {
         viewModelScope.launch {
-            // Obserwuj items sesji — gdy coś się zmieni (np. po edycji), odświeży listę
-            sessionRepository.getItemsForSession(sessionId).collect { items ->
-                val exerciseEntries = items.map { item ->
-                    val exercise = runCatching {
-                        exerciseRepository.getExerciseById(item.exerciseId).first().firstOrNull()
-                    }.getOrNull()
-                    val exerciseName = exercise?.name ?: "Ćwiczenie"
-                    val exercisePhotoUrl = exercise?.photoUrl
-
-                    // Dla każdego itemu obserwuj jego serie reaktywnie
-                    val sets = sessionRepository.getSetsForSessionItem(item.id).first()
-                        .map { set ->
-                            SessionExerciseSetEntry(
-                                sessionItemId = item.id,
-                                sessionSetId = set.id,
-                                exerciseId = item.exerciseId,
-                                exerciseName = exerciseName,
-                                setNumber = set.setNumber,
-                                plannedReps = set.plannedReps,
-                                plannedWeight = set.plannedWeight,
-                                plannedRestTime = set.plannedRestTime,
-                                note = item.note
-                            )
+            sessionRepository.getItemsForSession(sessionId)
+                .flatMapLatest { items ->
+                    if (items.isEmpty()) {
+                        flowOf(emptyList())
+                    } else {
+                        val setsFlows = items.map { item ->
+                            sessionRepository.getSetsForSessionItem(item.id)
                         }
+                        combine(setsFlows) { setsArray ->
+                            items.mapIndexed { index, item ->
+                                val exercise = runCatching {
+                                    exerciseRepository.getExerciseById(item.exerciseId).first().firstOrNull()
+                                }.getOrNull()
+                                val exerciseName = exercise?.name ?: "Ćwiczenie"
+                                val exercisePhotoUrl = exercise?.photoUrl
 
-                    SessionExerciseEntry(
-                        sessionItemId = item.id,
-                        exerciseId = item.exerciseId,
-                        exerciseName = exerciseName,
-                        photoUrl = exercisePhotoUrl,
-                        note = item.note,
-                        sets = sets
-                    )
+                                val sets = setsArray[index].map { set ->
+                                    SessionExerciseSetEntry(
+                                        sessionItemId = item.id,
+                                        sessionSetId = set.id,
+                                        exerciseId = item.exerciseId,
+                                        exerciseName = exerciseName,
+                                        setNumber = set.setNumber,
+                                        plannedReps = set.plannedReps,
+                                        plannedWeight = set.plannedWeight,
+                                        plannedRestTime = set.plannedRestTime,
+                                        note = item.note
+                                    )
+                                }
+
+                                SessionExerciseEntry(
+                                    sessionItemId = item.id,
+                                    exerciseId = item.exerciseId,
+                                    exerciseName = exerciseName,
+                                    photoUrl = exercisePhotoUrl,
+                                    note = item.note,
+                                    sets = sets
+                                )
+                            }
+                        }
+                    }
                 }
-                _exercises.value = exerciseEntries
-            }
+                .collect { exerciseEntries ->
+                    _exercises.value = exerciseEntries
+                }
         }
     }
 

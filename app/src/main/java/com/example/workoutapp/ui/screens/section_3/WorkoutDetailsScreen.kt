@@ -118,7 +118,9 @@ fun WorkoutDetailsScreen(
             items(uiState.workoutSessions, key = { it.id }) { session ->
                 CompletedWorkoutCard(
                     workoutName = session.workoutName,
-                    timeRange = session.timeRange,
+                    note = session.note,
+                    startedAtFormatted = session.startedAtFormatted,
+                    finishedAtFormatted = session.finishedAtFormatted,
                     icon = session.icon,
                     isCompleted = session.isCompleted,
                     modifier = Modifier.clickable {
@@ -132,6 +134,9 @@ fun WorkoutDetailsScreen(
         // ── POPRAWKA 2: strefa przycisków — stała, nad progress barami ──
         AnimatedVisibility(visible = selectedSessionId != null) {
             val selectedSession = uiState.workoutSessions.find { it.id == selectedSessionId }
+
+            val isToday = uiState.date == java.time.LocalDate.now()
+
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
@@ -155,7 +160,10 @@ fun WorkoutDetailsScreen(
                     icon = null,
                     style = ActionButtonStyle.LightFilled
                 )
-                if (selectedSession?.isCompleted != true) {
+
+
+                if (selectedSession?.isCompleted != true && isToday) {
+
                     ActionButton(
                         onClick = {
                             val templateId =
@@ -165,6 +173,14 @@ fun WorkoutDetailsScreen(
                         label = "ROZPOCZĄĆ TRENING",
                         icon = null,
                         style = ActionButtonStyle.LightFilled
+                    )
+                } else if (selectedSession?.isCompleted != true && !isToday) {
+                    Text(
+                        text = "Trening można rozpocząć tylko w dniu, na który jest zaplanowany",
+                        color = Color(0xFFAAAAAA),
+                        fontSize = 13.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

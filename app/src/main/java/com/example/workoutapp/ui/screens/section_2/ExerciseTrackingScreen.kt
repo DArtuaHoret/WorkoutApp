@@ -127,8 +127,8 @@ fun ActiveWorkoutScreen(
         if (showDescription) {
             CenteredDescriptionDialog(
                 initialDescription = exerciseDescription,
-                onVisibleChange = { showDescription = it },
-                onSave = { updatedText -> viewModel.updateDescription(updatedText) }
+                onVisibleChange = { showDescription = it }
+                //onSave = { updatedText -> viewModel.updateDescription(updatedText) }
             )
         }
 

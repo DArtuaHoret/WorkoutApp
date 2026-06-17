@@ -170,7 +170,11 @@ fun AppNavigation() {
                         onClick = {
                             val isOnActiveWorkout =
                                 currentDestination?.hasRoute(Destinations.ActiveWorkout::class) == true
-                            if (isOnActiveWorkout) {
+                            val isClickingWorkoutSection = item.destination == Destinations.Workout
+
+                            if (isOnActiveWorkout && isClickingWorkoutSection) {
+                                // Już jesteśmy w treningu — nic nie robimy
+                            } else if (isOnActiveWorkout) {
                                 pendingNavDestination = item.destination
                                 showExitWorkoutDialog = true
                             } else {
@@ -430,12 +434,7 @@ fun AppNavigation() {
                                         dateIso = viewModel.date.toString(),
                                         sessionId = sessionId
                                     )
-                                ) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                }
+                                )
                             }
                         },
                         onMealIconClick = {
@@ -626,11 +625,11 @@ fun AppNavigation() {
                 showExitWorkoutDialog = false
                 pendingNavDestination?.let { dest ->
                     navController.navigate(dest) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+                        popUpTo(Destinations.TemplatesGraph) {
+                            inclusive = false
+                            saveState = false
                         }
                         launchSingleTop = true
-                        restoreState = true
                     }
                 }
                 pendingNavDestination = null

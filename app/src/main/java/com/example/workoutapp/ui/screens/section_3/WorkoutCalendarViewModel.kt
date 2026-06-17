@@ -67,6 +67,7 @@ class WorkoutCalendarViewModel(
                 WorkoutSession(
                     status = "PLANNED",
                     scheduledAt = scheduledAt,
+                    note = template.description,
                     workoutTemplateId = tmplId
                 )
             )

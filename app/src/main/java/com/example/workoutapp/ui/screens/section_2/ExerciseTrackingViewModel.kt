@@ -34,7 +34,8 @@ private data class UnifiedExercise(
     val exerciseId: Long,
     val exerciseName: String,
     val setCount: Int,
-    val sets: List<UnifiedSet>
+    val sets: List<UnifiedSet>,
+    val note: String = ""
 )
 
 class ExerciseTrackingViewModel(
@@ -113,7 +114,8 @@ class ExerciseTrackingViewModel(
                     exerciseId = entry.exerciseId,
                     exerciseName = entry.exerciseName,
                     setCount = entry.setCount,
-                    sets = sets.map { it.toUnified() }
+                    sets = sets.map { it.toUnified() },
+                    note = entry.note ?: ""
                 )
             }
             if (exerciseList.isNotEmpty()) applyExerciseToUi(0)
@@ -125,7 +127,7 @@ class ExerciseTrackingViewModel(
     private fun loadFromSession(sessionId: Long) {
         viewModelScope.launch {
             val session = sessionRepository.getSessionByIdOnce(sessionId)
-            if (session != null && session.startedAt == null) {
+            if (session != null && session.finishedAt == null) {
                 sessionRepository.updateSession(session.copy(startedAt = Date()))
             }
 
@@ -141,7 +143,8 @@ class ExerciseTrackingViewModel(
                     exerciseId = item.exerciseId,
                     exerciseName = exerciseName,
                     setCount = sets.size,
-                    sets = sets.map { it.toUnified() }
+                    sets = sets.map { it.toUnified() },
+                    note = item.note ?: ""
                 )
             }
             if (exerciseList.isNotEmpty()) applyExerciseToUi(0)
@@ -163,7 +166,8 @@ class ExerciseTrackingViewModel(
         _isResting.value = false
         updateUiForCurrentSet()
         _exerciseName.value = entry.exerciseName
-        _exerciseId.value = entry.exerciseId  // NOWE - zapisujemy ID
+        _exerciseId.value = entry.exerciseId
+        _exerciseDescription.value = entry.note
 
 
         viewModelScope.launch {

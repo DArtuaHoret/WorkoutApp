@@ -31,7 +31,7 @@ class Converters {
         FoodProduct::class,
         FoodEntry::class
     ],
-    version = 2,  // ZMIANA: 1 → 2
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -176,6 +176,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "workout_nutrition_db"
                 )
                     .addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration()
                     .addCallback(PREPOPULATE_CALLBACK)
                     .build()
                 INSTANCE = instance

@@ -227,12 +227,12 @@ private fun PreviewExerciseSetCardDetailed() {
 @Composable
 fun ExerciseDescriptionContent(
     initialDescription: String,
-    onSave: (String) -> Unit,
+    //onSave: (String) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var description by remember { mutableStateOf(initialDescription) }
-    var isEditing by remember { mutableStateOf(false) }
+    //var description by remember { mutableStateOf(initialDescription) }
+    //var isEditing by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -260,7 +260,7 @@ fun ExerciseDescriptionContent(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (isEditing) {
+        /*if (isEditing) {
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -279,11 +279,10 @@ fun ExerciseDescriptionContent(
                 color = Color(0xFFE0E0E0),
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-        }
+        }*/
 
-        Spacer(modifier = Modifier.height(24.dp))
 
-        if (!isEditing) {
+        /*if (!isEditing) {
             Button(
                 onClick = { isEditing = true },
                 modifier = Modifier
@@ -314,7 +313,13 @@ fun ExerciseDescriptionContent(
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)
                 ) { Text("Zapisz") }
             }
-        }
+        }*/
+        Text(
+            text = initialDescription.ifEmpty { "Brak opisu." },
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color(0xFFE0E0E0),
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
     }
 }
 
@@ -323,7 +328,7 @@ fun ExerciseDescriptionContent(
 fun CenteredDescriptionDialog(
     initialDescription: String,
     onVisibleChange: (Boolean) -> Unit,
-    onSave: (String) -> Unit
+    //onSave: (String) -> Unit
 ) {
 
     Box(
@@ -340,7 +345,7 @@ fun CenteredDescriptionDialog(
     ) {
         ExerciseDescriptionContent(
             initialDescription = initialDescription,
-            onSave = onSave,
+            //onSave = onSave,
             onDismiss = { onVisibleChange(false) },
             modifier = Modifier
                 .fillMaxWidth(0.85f)
@@ -368,7 +373,7 @@ private fun PreviewCenteredDescriptionDialog() {
                     CenteredDescriptionDialog(
                         initialDescription = currentDescription,
                         onVisibleChange = { isDialogVisible = it },
-                        onSave = { currentDescription = it }
+                        //onSave = { currentDescription = it }
                     )
                 }
             }
