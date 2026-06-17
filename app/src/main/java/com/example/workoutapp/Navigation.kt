@@ -45,7 +45,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.example.workoutapp.ui.reusableContents.Section_2.CenteredExitConfirmationDialog
+import com.example.workoutapp.ui.screens.section_3.LoggedProductItem
+import com.example.workoutapp.ui.screens.section_3.MealDetailsScreen
 import com.example.workoutapp.ui.screens.section_3.WorkoutDetailsViewModel
+import com.example.workoutapp.ui.screens.section_4.AddMealSearchViewModel
+import com.example.workoutapp.ui.screens.section_4.FavoriteProductsViewModel
 
 
 // --- Type-safe destinations ---
@@ -99,7 +103,7 @@ sealed interface Destinations {
         val exerciseId: String,
         val exerciseName: String
     ) : Destinations
-
+    @Serializable data class MealProducts(val dateMillis: Long) : Destinations
     @Serializable data object DietGraph : Destinations
     @Serializable data class Diet(val initialQuery: String = "") : Destinations
     @Serializable data object BarcodeScanner : Destinations
@@ -372,6 +376,31 @@ fun AppNavigation() {
                     )
                 }
 
+                composable<Destinations.MealProducts> { backStackEntry ->
+                    MealDetailsScreen(
+                        viewModel = viewModel(
+                            viewModelStoreOwner = backStackEntry,
+                            factory = WorkoutAppViewModelProvider.Factory
+                        ),
+                        onBackClick = { navController.popBackStack() },
+                        onProductClick = { product ->
+                            navController.navigate(
+                                Destinations.ProductDetail(
+                                    id          = product.id,
+                                    name        = product.name,
+                                    description = product.description,
+                                    kcal        = product.kcal,
+                                    protein     = product.protein,
+                                    fat         = product.fat,
+                                    carbs       = product.carbs,
+                                    canDelete   = true,
+                                )
+                            )
+                        },
+                    )
+                }
+
+
                 composable<Destinations.HistoryDetails> { backStackEntry ->
                     val viewModel: WorkoutDetailsViewModel = viewModel(
                         viewModelStoreOwner = backStackEntry, factory = WorkoutAppViewModelProvider.Factory
@@ -408,6 +437,14 @@ fun AppNavigation() {
                                     launchSingleTop = true
                                 }
                             }
+                        },
+                        onMealIconClick = {
+                            // date jest dostępne z viewModel
+                            val dateMillis = viewModel.date
+                                .atStartOfDay()
+                                .toInstant(java.time.ZoneOffset.UTC)
+                                .toEpochMilli()
+                            navController.navigate(Destinations.MealProducts(dateMillis))
                         }
                     )
                 }
@@ -462,11 +499,12 @@ fun AppNavigation() {
                 startDestination = Destinations.Diet(),
             ) {
                 composable<Destinations.Diet> { backStackEntry ->
+                    val viewModel: AddMealSearchViewModel = viewModel(
+                        viewModelStoreOwner = backStackEntry,
+                        factory = WorkoutAppViewModelProvider.Factory
+                    )
                     AddMealSearchScreen(
-                        viewModel = viewModel(
-                            viewModelStoreOwner = backStackEntry,
-                            factory = WorkoutAppViewModelProvider.Factory
-                        ),
+                        viewModel = viewModel,
                         onProductCardClick = { product ->
                             navController.navigate(
                                 Destinations.ProductDetail(
@@ -481,7 +519,11 @@ fun AppNavigation() {
                                 )
                             )
                         },
-                        onProductQuickAddClick = { /* TODO */ },
+                        onProductQuickAddClick = { product, dateMillis ->
+                            viewModel.quickAddProduct(product, dateMillis) {
+                                navController.navigate(Destinations.MealProducts(dateMillis))
+                            }
+                        },
                         onAddCustomProductClick = {
                             navController.navigate(Destinations.ProductCreate())
                         },
@@ -531,11 +573,12 @@ fun AppNavigation() {
                 }
 
                 composable<Destinations.Library> { backStackEntry ->
+                    val viewModel: FavoriteProductsViewModel = viewModel(
+                        viewModelStoreOwner = backStackEntry,
+                        factory = WorkoutAppViewModelProvider.Factory
+                    )
                     FavoriteProductsScreen(
-                        viewModel = viewModel(
-                            viewModelStoreOwner = backStackEntry,
-                            factory = WorkoutAppViewModelProvider.Factory
-                        ),
+                        viewModel = viewModel,
                         onBackClick = { navController.popBackStack() },
                         onProductClick = { product ->
                             navController.navigate(
@@ -565,6 +608,11 @@ fun AppNavigation() {
                                     isFavorite  = product.isFavorite,
                                 )
                             )
+                        },
+                        onProductQuickAddClick = { product, dateMillis ->
+                            viewModel.quickAddProduct(product, dateMillis) {
+                                navController.navigate(Destinations.MealProducts(dateMillis))
+                            }
                         },
                     )
                 }

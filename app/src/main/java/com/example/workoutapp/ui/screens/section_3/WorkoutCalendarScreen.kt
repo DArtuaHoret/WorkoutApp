@@ -65,14 +65,17 @@ fun WorkoutHistoryScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
+                /*
                 if (workoutDays.contains(selectedDate)) {
+                */
+
                     ActionButton(
                         onClick = onViewWorkoutDetailsClick,
                         label = "ZOBACZ SZCZEGÓŁY TRENINGU",
                         icon = null,
                         style = ActionButtonStyle.LightFilled
                     )
-                }
+                //}
 
                 ActionButton(
                     onClick = { showTemplateSelectionDialog = true },

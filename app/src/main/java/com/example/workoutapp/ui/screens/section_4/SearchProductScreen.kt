@@ -23,6 +23,7 @@ import com.example.workoutapp.R
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.example.workoutapp.ui.reusableContents.Section_1.WorkoutTextField
+import com.example.workoutapp.ui.reusableContents.Section_4.MealDatePickerDialog
 import com.example.workoutapp.ui.reusableContents.Section_4.ProductCard
 
 data class ProductSearchItem(
@@ -39,7 +40,7 @@ data class ProductSearchItem(
 fun AddMealSearchScreen(
     viewModel: AddMealSearchViewModel = viewModel(),
     onProductCardClick: (ProductSearchItem) -> Unit,
-    onProductQuickAddClick: (ProductSearchItem) -> Unit,
+    onProductQuickAddClick: (ProductSearchItem, Long) -> Unit,
     onScanBarcodeClick: () -> Unit,
     onAddCustomProductClick: () -> Unit,
     onLibraryClick: () -> Unit,
@@ -47,11 +48,27 @@ fun AddMealSearchScreen(
 ) {
     val query by viewModel.query.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
+    val showDatePicker by viewModel.showDatePicker.collectAsState()
+
+
+
+    if (showDatePicker) {
+        MealDatePickerDialog(
+            onDateSelected = { millis ->
+                viewModel.confirmDateAndAddProduct(millis)
+            },
+            onDismiss = {
+                viewModel.dismissDatePicker()
+            }
+        )
+    }
 
     val searchResults = when (val state = uiState) {
         is AddMealSearchUiState.Success -> state.results
         else -> emptyList()
     }
+
+
 
     Column(
         modifier = modifier
@@ -146,7 +163,9 @@ fun AddMealSearchScreen(
                                     productName = product.name,
                                     productDescription = product.description,
                                     onCardClick = { onProductCardClick(product) },
-                                    onAddClick = { onProductQuickAddClick(product) },
+                                    onAddClick = {
+                                        viewModel.showDatePickerForProduct(product)
+                                    }
                                 )
                             }
                         }
@@ -166,19 +185,5 @@ fun AddMealSearchScreen(
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-    }
-}
-
-@Preview(name = "AddMealSearchScreen – empty", showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun PreviewAddMealSearchEmpty() {
-    MaterialTheme {
-        AddMealSearchScreen(
-            onProductCardClick = {},
-            onProductQuickAddClick = {},
-            onScanBarcodeClick = {},
-            onAddCustomProductClick = {},
-            onLibraryClick = {},
-        )
     }
 }

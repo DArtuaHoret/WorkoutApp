@@ -62,6 +62,12 @@ interface FoodDao {
     @Delete
     suspend fun deleteEntry(entry: FoodEntry)
 
+    @Query("SELECT * FROM food_products WHERE isActive = 1")
+    fun getAllActiveProducts(): Flow<List<FoodProduct>>
+
+    @Query("SELECT * FROM food_entries WHERE id = :entryId LIMIT 1")
+    suspend fun getEntryById(entryId: Long): FoodEntry?
+
 
     @Query("SELECT * FROM food_entries WHERE eatenAt >= :startOfDay AND eatenAt <= :endOfDay ORDER BY eatenAt DESC")
     fun getEntriesForDate(startOfDay: Long, endOfDay: Long): Flow<List<FoodEntry>>

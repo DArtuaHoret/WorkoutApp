@@ -48,7 +48,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import com.example.workoutapp.ui.reusableContents.Section_4.NutrientChip
 import java.time.format.DateTimeFormatter
 
 
@@ -1069,3 +1076,200 @@ private fun PreviewCenteredTemplateSelectionDialogEmpty() {
         )
     }
 }
+
+
+data class NutritionItem(
+    val label: String,
+    val current: Float,
+    val total: Float,
+    val unit: String,
+    val color: Color
+)
+
+@Composable
+fun NutritionProgressBar(
+    item: NutritionItem,
+    modifier: Modifier = Modifier
+) {
+    val progress = if (item.total > 0f) (item.current / item.total).coerceIn(0f, 1f) else 0f
+
+    Column(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(4.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(Color(0xFF333333))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(progress)
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(item.color)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // ── POPRAWKA 1: label i wartość w jednej linii ──
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                text = item.label,
+                color = Color(0xFFAAAAAA),
+                fontSize = 11.sp
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "${item.current.toInt()}",
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Text(
+            text = "/${item.total.toInt()} ${item.unit}",
+            color = Color(0xFF777777),
+            fontSize = 11.sp
+        )
+    }
+}
+
+@Composable
+fun NutritionProgressBarRow(
+    kcal: NutritionItem,
+    protein: NutritionItem,
+    fats: NutritionItem,
+    carbs: NutritionItem,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color(0xFF1A1A1A))
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        NutritionProgressBar(item = kcal, modifier = Modifier.weight(1f))
+        NutritionProgressBar(item = protein, modifier = Modifier.weight(1f))
+        NutritionProgressBar(item = fats, modifier = Modifier.weight(1f))
+        NutritionProgressBar(item = carbs, modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun LoggedProductItemCard(
+    productName: String,
+    productDescription: String = "",
+    kcal: String,
+    protein: String,
+    fat: String,
+    carbs: String,
+    grams: String,
+    onCardClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onGramsChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color(0xFF1A1A1A), shape = RoundedCornerShape(14.dp))
+            .border(width = 2.dp, color = Color.White, shape = RoundedCornerShape(14.dp))
+            .clickable(onClick = onCardClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        // ── Header row: name + delete ────────────────────────────────────────
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = productName,
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (productDescription.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = productDescription,
+                        color = Color(0xFF888888),
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+
+            IconButton(
+                onClick = onDeleteClick,
+                modifier = Modifier.size(32.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Usuń",
+                    tint = Color(0xFFFF4D4D),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // ── Nutrient chips ───────────────────────────────────────────────────
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            NutrientChip(label = "Kcal",     value = kcal)
+            NutrientChip(label = "Białko",   value = "${protein}g")
+            NutrientChip(label = "Tłuszcze", value = "${fat}g")
+            NutrientChip(label = "Węgl.",    value = "${carbs}g")
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ── Grams text field ─────────────────────────────────────────────────
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            OutlinedTextField(
+                value = grams,
+                onValueChange = { onGramsChange(it) },
+                label = {
+                    Text(
+                        text = "Gramy",
+                        color = Color(0xFF888888),
+                        fontSize = 12.sp,
+                    )
+                },
+                suffix = {
+                    Text(
+                        text = "g",
+                        color = Color(0xFF888888),
+                        fontSize = 14.sp,
+                    )
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor   = Color.White,
+                    unfocusedBorderColor = Color(0xFF555555),
+                    focusedTextColor     = Color.White,
+                    unfocusedTextColor   = Color.White,
+                    cursorColor          = Color.White,
+                ),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.width(130.dp),
+            )
+        }
+    }
+}
+

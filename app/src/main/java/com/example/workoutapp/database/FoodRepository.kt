@@ -18,6 +18,10 @@ interface FoodRepository {
     suspend fun setFavorite(productId: Long, isFavorite: Boolean)
     fun getFavoriteAndCustomProducts(): Flow<List<FoodProduct>>
 
+    fun getAllActiveProducts(): Flow<List<FoodProduct>>
+    suspend fun deleteEntryById(entryId: Long)
+    suspend fun updateEntryGrams(entryId: Long, newGrams: Double)
+
     suspend fun insertEntry(entry: FoodEntry)
     suspend fun updateEntry(entry: FoodEntry)
     suspend fun deleteEntry(entry: FoodEntry)
@@ -65,6 +69,21 @@ class FoodRepositoryImpl(private val foodDao: FoodDao) : FoodRepository {
 
     override fun getFavoriteAndCustomProducts(): Flow<List<FoodProduct>> =
         foodDao.getFavoriteAndCustomProducts()
+
+    override fun getAllActiveProducts(): Flow<List<FoodProduct>> =
+        foodDao.getAllActiveProducts()
+
+    override suspend fun deleteEntryById(entryId: Long) =
+        withContext(Dispatchers.IO) {
+            val entry = foodDao.getEntryById(entryId) ?: return@withContext
+            foodDao.deleteEntry(entry)
+        }
+
+    override suspend fun updateEntryGrams(entryId: Long, newGrams: Double) =
+        withContext(Dispatchers.IO) {
+            val entry = foodDao.getEntryById(entryId) ?: return@withContext
+            foodDao.updateEntry(entry.copy(grams = newGrams))
+        }
 
 
 

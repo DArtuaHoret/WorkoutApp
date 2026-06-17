@@ -77,6 +77,7 @@ import androidx.compose.ui.res.painterResource
 import com.example.workoutapp.R
 import com.example.workoutapp.drawableResIdByName
 import java.io.File
+import java.util.Calendar
 
 private val FieldShape    = RoundedCornerShape(14.dp)
 private val FieldBgColor  = Color(0xFF1A1A1A)
@@ -1155,3 +1156,12 @@ fun resolveImageModel(context: Context, photoUrl: String?): Any? {
     val resId = context.resources.getIdentifier(photoUrl, "raw", context.packageName)
     return if (resId != 0) resId else null
 }
+
+fun Long.toLocalNoonMillis(): Long =
+    Calendar.getInstance().apply {
+        timeInMillis = this@toLocalNoonMillis
+        set(Calendar.HOUR_OF_DAY, 12)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis

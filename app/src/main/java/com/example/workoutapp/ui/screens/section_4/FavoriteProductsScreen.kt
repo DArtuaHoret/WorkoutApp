@@ -19,6 +19,7 @@ import com.example.workoutapp.R
 import com.example.workoutapp.WorkoutAppViewModelProvider
 import com.example.workoutapp.ui.reusableContents.Section_4.FavoriteProductItemCard
 import com.example.workoutapp.ui.reusableContents.Section_4.LibraryTabButton
+import com.example.workoutapp.ui.reusableContents.Section_4.MealDatePickerDialog
 
 data class FavoriteProductItem(
     val id: String,
@@ -37,10 +38,25 @@ fun FavoriteProductsScreen(
     viewModel: FavoriteProductsViewModel = viewModel(factory = WorkoutAppViewModelProvider.Factory),
     onBackClick: () -> Unit,
     onProductClick: (FavoriteProductItem) -> Unit,
+    onProductQuickAddClick: (FavoriteProductItem, Long) -> Unit,
     onEditClick: (FavoriteProductItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val showDatePicker by viewModel.showDatePicker.collectAsState()
+    // pendingProduct nie jest potrzebny w UI bezpośrednio
+
+    // Obsługa dialogu daty - teraz zarządzana przez ViewModel
+    if (showDatePicker) {
+        MealDatePickerDialog(
+            onDateSelected = { millis ->
+                viewModel.confirmDateAndAddProduct(millis)
+            },
+            onDismiss = {
+                viewModel.dismissDatePicker()
+            }
+        )
+    }
 
     Column(
         modifier = modifier
@@ -143,7 +159,9 @@ fun FavoriteProductsScreen(
                         onCardClick = { onProductClick(product) },
                         onEditClick = { onEditClick(product) },
                         onRemoveFavoriteClick = { viewModel.onToggleFavorite(product) },
-                        onAddClick = { /* TODO */ }
+                        onAddClick = {
+                            viewModel.showDatePickerForProduct(product)
+                        }
                     )
                 }
             }

@@ -11,6 +11,7 @@ import com.example.workoutapp.ui.screens.section_1.ExerciseSearchViewModel
 import com.example.workoutapp.ui.screens.section_1.TemplateDetailViewModel
 import com.example.workoutapp.ui.screens.section_1.TemplateListViewModel
 import com.example.workoutapp.ui.screens.section_2.ExerciseTrackingViewModel
+import com.example.workoutapp.ui.screens.section_3.MealDetailsViewModel
 import com.example.workoutapp.ui.screens.section_3.TemplateExercisesViewModel
 import com.example.workoutapp.ui.screens.section_3.SessionExerciseEditViewModel
 import com.example.workoutapp.ui.screens.section_3.WorkoutCalendarViewModel
@@ -57,9 +58,18 @@ object WorkoutAppViewModelProvider {
             )
         }
 
+        initializer<MealDetailsViewModel> {
+            MealDetailsViewModel(
+                savedStateHandle = this.createSavedStateHandle(),
+                foodRepository   = workoutApp().foodRepository,
+            )
+        }
+
+
         initializer<AddMealSearchViewModel> {
             AddMealSearchViewModel(
-                savedStateHandle = this.createSavedStateHandle()
+                savedStateHandle = this.createSavedStateHandle(),
+                foodRepository   = workoutApp().foodRepository,
             )
         }
 
@@ -116,9 +126,11 @@ object WorkoutAppViewModelProvider {
 
         initializer<WorkoutDetailsViewModel> {
             WorkoutDetailsViewModel(
-                savedStateHandle = this.createSavedStateHandle(),
-                sessionRepository = workoutApp().workoutSessionRepository,
-                templateRepository = workoutApp().workoutTemplateRepository
+                savedStateHandle   = this.createSavedStateHandle(),
+                sessionRepository  = workoutApp().workoutSessionRepository,
+                templateRepository = workoutApp().workoutTemplateRepository,
+                foodRepository     = workoutApp().foodRepository,
+                settingsRepository = workoutApp().settingsRepository,  // ← dodaj
             )
         }
 

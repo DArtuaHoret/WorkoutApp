@@ -1,52 +1,43 @@
 package com.example.workoutapp.ui.screens.section_3
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.outlined.Eco
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
 import com.example.workoutapp.ui.reusableContents.Section_3.CompletedWorkoutCard
+import com.example.workoutapp.ui.reusableContents.Section_3.NutritionItem
+import com.example.workoutapp.ui.reusableContents.Section_3.NutritionProgressBarRow
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutDetailsScreen(
     viewModel: WorkoutDetailsViewModel,
     onBackClick: () -> Unit,
     onViewExercisesClick: (String) -> Unit,
     onStartWorkoutClick: (sessionId: String, templateId: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMealIconClick: () -> Unit,
+
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -67,69 +58,86 @@ fun WorkoutDetailsScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(horizontal = 16.dp),
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(
-                onClick = onBackClick,
-                modifier = Modifier.offset(x = (-12).dp),
+        // ── HEADER ──────────────────────────────────────────────
+        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Powrót",
-                    tint = Color.White
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.offset(x = (-12).dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Powrót",
+                        tint = Color.White
+                    )
+                }
+                Text(
+                    text = "Szczegóły dnia",
+                    color = Color.White,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.offset(x = (-16).dp)
                 )
+
+                Spacer(modifier = Modifier.weight(1f))  // ← dodaj to
+
+                IconButton(
+                    onClick = onMealIconClick,
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Eco,
+                        contentDescription = "Dieta",
+                        tint = Color.White,
+                        modifier = Modifier.size(26.dp),
+                    )
+                }
             }
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Szczegóły dnia",
-                color = Color.White,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.offset(x = (-16).dp)
+                text = formattedDateHeader,
+                color = Color(0xFFAAAAAA),
+                fontSize = 16.sp,
+                modifier = Modifier.padding(bottom = 24.dp)
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = formattedDateHeader,
-            color = Color(0xFFAAAAAA),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-
-        Column(
+        // ── LISTA TRENINGÓW (tylko karty, scrollowalna) ─────────
+        LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
         ) {
-            uiState.workoutSessions.forEach { session ->
+            items(uiState.workoutSessions, key = { it.id }) { session ->
                 CompletedWorkoutCard(
                     workoutName = session.workoutName,
                     timeRange = session.timeRange,
                     icon = session.icon,
                     isCompleted = session.isCompleted,
                     modifier = Modifier.clickable {
-                        selectedSessionId = if (selectedSessionId == session.id) null else session.id
+                        selectedSessionId =
+                            if (selectedSessionId == session.id) null else session.id
                     }
                 )
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        if (selectedSessionId != null) {
+        // ── POPRAWKA 2: strefa przycisków — stała, nad progress barami ──
+        AnimatedVisibility(visible = selectedSessionId != null) {
             val selectedSession = uiState.workoutSessions.find { it.id == selectedSessionId }
-
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp)
+                    .background(Color.Black)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 ActionButton(
                     onClick = {
@@ -147,11 +155,11 @@ fun WorkoutDetailsScreen(
                     icon = null,
                     style = ActionButtonStyle.LightFilled
                 )
-
                 if (selectedSession?.isCompleted != true) {
                     ActionButton(
                         onClick = {
-                            val templateId = uiState.sessionToTemplateId[selectedSessionId!!] ?: ""
+                            val templateId =
+                                uiState.sessionToTemplateId[selectedSessionId!!] ?: ""
                             onStartWorkoutClick(selectedSessionId!!, templateId)
                         },
                         label = "ROZPOCZĄĆ TRENING",
@@ -161,5 +169,13 @@ fun WorkoutDetailsScreen(
                 }
             }
         }
+
+        // ── PROGRESS BARY — zawsze na samym dole ────────────────
+        NutritionProgressBarRow(
+            kcal = NutritionItem("Kcal", uiState.currentKcal, uiState.totalKcal, "kcal", Color(0xFFE040FB)),
+            protein = NutritionItem("Prot.", uiState.currentProtein, uiState.totalProtein, "g", Color(0xFF40C4FF)),
+            fats = NutritionItem("Fats", uiState.currentFats, uiState.totalFats, "g", Color(0xFFFFD740)),
+            carbs = NutritionItem("Carbs", uiState.currentCarbs, uiState.totalCarbs, "g", Color(0xFFB388FF))
+        )
     }
 }
