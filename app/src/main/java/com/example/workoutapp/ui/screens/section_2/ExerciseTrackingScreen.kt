@@ -31,6 +31,7 @@ fun ActiveWorkoutScreen(
 ) {
     val exerciseName by viewModel.exerciseName.collectAsState()
     val exerciseDescription by viewModel.exerciseDescription.collectAsState()
+    val exercisePhotoUrl by viewModel.exercisePhotoUrl.collectAsState()
     val currentSet by viewModel.currentSet.collectAsState()
     val reps by viewModel.reps.collectAsState()
     val weight by viewModel.weight.collectAsState()
@@ -95,7 +96,8 @@ fun ActiveWorkoutScreen(
                     onRepsChange = viewModel::updateReps,
                     rest = restTime,
                     onRestChange = viewModel::updateRestTime,
-                    enabled = !isResting
+                    enabled = !isResting,
+                    photoUrl = exercisePhotoUrl
                 )
 
                 Spacer(modifier = Modifier.height(48.dp))

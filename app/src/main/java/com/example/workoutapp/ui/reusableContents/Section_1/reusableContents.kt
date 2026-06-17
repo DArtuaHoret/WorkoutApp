@@ -118,8 +118,8 @@ fun TemplateCard(
                 color = Color.White,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
+                //maxLines = 2,
+                //overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
 
@@ -294,8 +294,8 @@ fun ExerciseItemCard(
                         color = Color.White,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis,
+                        //maxLines = 3,
+                        //overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
                     Row {
@@ -321,7 +321,9 @@ fun ExerciseItemCard(
 
         if (note.isNotBlank()) {
             Spacer(modifier = Modifier.height(6.dp))
-            Text(text = note, color = Color(0xFFCCCCCC), fontSize = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(text = note, color = Color(0xFFCCCCCC), fontSize = 14.sp, //maxLines = 2, overflow = TextOverflow.Ellipsis)
+            )
+
         }
     }
 }

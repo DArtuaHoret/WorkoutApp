@@ -1,5 +1,6 @@
 package com.example.workoutapp.ui.reusableContents.Section_2
 
+import android.util.Size
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,9 +26,16 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButton
 import com.example.workoutapp.ui.reusableContents.Section_1.ActionButtonStyle
+import com.example.workoutapp.ui.reusableContents.Section_1.resolveImageModel
 import kotlinx.coroutines.delay
 
 
@@ -99,8 +107,12 @@ fun ExerciseSetCardDetailed(
     rest: Int,
     onRestChange: (Int) -> Unit,
     enabled: Boolean = true,
+    photoUrl: String? = null,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val imageModel = remember(photoUrl) { resolveImageModel(context, photoUrl) }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -124,8 +136,6 @@ fun ExerciseSetCardDetailed(
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    //maxLines = 2,
-                    //overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -152,12 +162,30 @@ fun ExerciseSetCardDetailed(
 
                 Spacer(modifier = Modifier.width(24.dp))
 
-                Icon(
-                    imageVector = Icons.Default.FitnessCenter,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(70.dp)
-                )
+                // Wyświetl zdjęcie TAK SAMO JAK W ExerciseItemCard
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFF2C2C2C)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (imageModel != null) {
+                        AsyncImage(
+                            model = imageModel,
+                            contentDescription = exerciseName,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Fit,
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.FitnessCenter,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+                }
             }
         }
     }
@@ -458,10 +486,24 @@ fun ExerciseTimer(
     var isRunning by remember(resetKey) { mutableStateOf(initialIsRunning) }
     var finishClickHandled by remember(resetKey) { mutableStateOf(false) }
 
+    val toneGen = remember { android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 100) }
+
+    DisposableEffect(Unit) {
+        onDispose { toneGen.release() }
+    }
+
     LaunchedEffect(key1 = timeLeft, key2 = isRunning) {
         if (isRunning && timeLeft > 0) {
             delay(1000L)
             timeLeft--
+
+            if (!isExercisePhase && timeLeft in 0..4) {
+                if (timeLeft == 0) {
+                    toneGen.startTone(android.media.ToneGenerator.TONE_CDMA_ANSWER, 600)
+                } else {
+                    toneGen.startTone(android.media.ToneGenerator.TONE_CDMA_ANSWER, 120)
+                }
+            }
         } else if (timeLeft == 0 && isRunning) {
             isRunning = false
             onTimerFinished()

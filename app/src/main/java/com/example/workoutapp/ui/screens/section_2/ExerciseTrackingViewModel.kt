@@ -31,6 +31,7 @@ private data class UnifiedSet(
 
 // Ujednolicona reprezentacja ćwiczenia
 private data class UnifiedExercise(
+    val exerciseId: Long,
     val exerciseName: String,
     val setCount: Int,
     val sets: List<UnifiedSet>
@@ -51,6 +52,12 @@ class ExerciseTrackingViewModel(
 
     private var exerciseList: List<UnifiedExercise> = emptyList()
     private var currentIndex = 0
+
+    private val _exercisePhotoUrl = MutableStateFlow<String?>(null)
+    val exercisePhotoUrl: StateFlow<String?> = _exercisePhotoUrl.asStateFlow()
+
+    private val _exerciseId = MutableStateFlow<Long?>(null)
+    val exerciseId: StateFlow<Long?> = _exerciseId.asStateFlow()
 
     private val modifiedSets = mutableMapOf<Pair<Int, Int>, UnifiedSet>()
 
@@ -103,6 +110,7 @@ class ExerciseTrackingViewModel(
             exerciseList = entries.map { entry ->
                 val sets = templateRepository.getSetsForItem(entry.itemId).first()
                 UnifiedExercise(
+                    exerciseId = entry.exerciseId,
                     exerciseName = entry.exerciseName,
                     setCount = entry.setCount,
                     sets = sets.map { it.toUnified() }
@@ -130,6 +138,7 @@ class ExerciseTrackingViewModel(
 
                 val sets = sessionRepository.getSetsForSessionItemOnce(item.id)
                 UnifiedExercise(
+                    exerciseId = item.exerciseId,
                     exerciseName = exerciseName,
                     setCount = sets.size,
                     sets = sets.map { it.toUnified() }
@@ -138,6 +147,8 @@ class ExerciseTrackingViewModel(
             if (exerciseList.isNotEmpty()) applyExerciseToUi(0)
         }
     }
+
+
 
     // ── Wspólna logika UI ────────────────────────────────────────────────────
 
@@ -152,6 +163,13 @@ class ExerciseTrackingViewModel(
         _isResting.value = false
         updateUiForCurrentSet()
         _exerciseName.value = entry.exerciseName
+        _exerciseId.value = entry.exerciseId  // NOWE - zapisujemy ID
+
+
+        viewModelScope.launch {
+            val exercise = exerciseRepository.getExerciseById(entry.exerciseId).first().firstOrNull()
+            _exercisePhotoUrl.value = exercise?.photoUrl
+        }
     }
 
     private fun updateUiForCurrentSet() {
