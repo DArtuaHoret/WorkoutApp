@@ -99,7 +99,7 @@
 
     <!-- AddMealSearchScreen -->
     <string name="diet_title">Diet</string>
-    <string name="diet_search_placeholder">Search for a product (e.g. apple)…</string>
+    <string name="diet_search_placeholder">Search for a product (enter a barcode)</string>
     <string name="diet_scan_barcode">SCAN BARCODE</string>
     <string name="diet_library">LIBRARY</string>
     <string name="diet_loading">Loading…</string>
@@ -305,5 +305,16 @@
         <item>Sat</item>
         <item>Sun</item>
     </string-array>
+
+
+        <!-- Notification channel name -->
+        <string name="notification_channel_name">Workout in progress</string>
+        <string name="notification_channel_description">Shows progress of active workout</string>
+
+        <!-- Notification statuses -->
+        <string name="notification_rest">Rest</string>
+        <string name="notification_rest_with_time">Rest — %d s left</string>
+        <string name="notification_exercising">Performing exercise</string>
+        <string name="notification_workout_in_progress">Workout in progress</string>
 
 </resources>

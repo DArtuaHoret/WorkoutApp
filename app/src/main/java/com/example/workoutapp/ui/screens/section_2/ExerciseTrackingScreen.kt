@@ -157,7 +157,11 @@ fun ActiveWorkoutScreen(
 
                 key(currentSet, exerciseName, isResting, restsCompleted) {
                     ExerciseTimer(
-                        title = if (isResting) "ODPOCZYNEK" else "WYKONANIE ĆWICZENIA",
+                        title = if (isResting) {
+                            stringResource(R.string.rest_phase_title)
+                        } else {
+                            stringResource(R.string.exercise_phase_title)
+                        },
                         resetKey = Triple(currentSet, isResting, restsCompleted),
                         initialSeconds = restTime,
                         initialIsRunning = isResting,

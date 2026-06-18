@@ -105,7 +105,7 @@
 
     <!-- AddMealSearchScreen -->
     <string name="diet_title">Dieta</string>
-    <string name="diet_search_placeholder">Wyszukaj produkt (np. jabłko)…</string>
+    <string name="diet_search_placeholder">Wyszukaj produkt (wpisz kod kreskowy)</string>
     <string name="diet_scan_barcode">SKANUJ KOD KRESKOWY</string>
     <string name="diet_library">BIBLIOTEKA</string>
     <string name="diet_loading">Ładowanie…</string>
@@ -305,6 +305,16 @@
         <item>Nd</item>
     </string-array>
 
+
+    <!-- Nazwa kanału powiadomień -->
+    <string name="notification_channel_name">Trening w trakcie</string>
+    <string name="notification_channel_description">Pokazuje postęp aktywnego treningu</string>
+
+    <!-- Statusy powiadomień -->
+    <string name="notification_rest">Odpoczynek</string>
+    <string name="notification_rest_with_time">Odpoczynek — pozostało %d s</string>
+    <string name="notification_exercising">Wykonanie ćwiczenia</string>
+    <string name="notification_workout_in_progress">Trening w trakcie</string>
 
 
 

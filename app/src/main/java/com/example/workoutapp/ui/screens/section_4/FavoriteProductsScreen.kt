@@ -44,9 +44,7 @@ fun FavoriteProductsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val showDatePicker by viewModel.showDatePicker.collectAsState()
-    // pendingProduct nie jest potrzebny w UI bezpośrednio
 
-    // Obsługa dialogu daty - teraz zarządzana przez ViewModel
     if (showDatePicker) {
         MealDatePickerDialog(
             onDateSelected = { millis ->

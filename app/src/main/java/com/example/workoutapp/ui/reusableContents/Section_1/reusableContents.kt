@@ -75,7 +75,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.example.workoutapp.R
-import com.example.workoutapp.drawableResIdByName
 import java.io.File
 import java.util.Calendar
 

@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.Locale
 
 val Context.dataStore by preferencesDataStore(name = "settings")
 
@@ -40,11 +41,13 @@ class SettingsRepository(private val context: Context) {
     }
 
     private fun getCurrentAppLocale(): String {
-        val locales = AppCompatDelegate.getApplicationLocales()
-        return if (!locales.isEmpty) {
-            locales[0]?.language ?: "en"
-        } else {
-            "en"
+        val explicitLocales = AppCompatDelegate.getApplicationLocales()
+        if (!explicitLocales.isEmpty) {
+            return explicitLocales[0]?.language ?: "pl"
         }
+
+
+        val systemLanguage = Locale.getDefault().language
+        return if (systemLanguage == "en") "en" else "pl"
     }
 }

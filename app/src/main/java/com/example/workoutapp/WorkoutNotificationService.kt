@@ -7,6 +7,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.example.workoutapp.R
+
+
 
 class WorkoutNotificationService : Service() {
 
@@ -46,13 +49,23 @@ class WorkoutNotificationService : Service() {
         secondsLeft: Int
     ): android.app.Notification {
         val statusText = if (isResting) {
-            if (secondsLeft >= 0) "Odpoczynek — pozostało ${secondsLeft}s" else "Odpoczynek"
+            if (secondsLeft >= 0) {
+                getString(R.string.notification_rest_with_time, secondsLeft)
+            } else {
+                getString(R.string.notification_rest)
+            }
         } else {
-            "Wykonanie ćwiczenia"
+            getString(R.string.notification_exercising)
+        }
+
+        val title = if (exerciseName.isBlank()) {
+            getString(R.string.notification_workout_in_progress)
+        } else {
+            exerciseName
         }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(exerciseName.ifBlank { "Trening w trakcie" })
+            .setContentTitle(title)
             .setContentText(statusText)
             .setSmallIcon(android.R.drawable.ic_popup_reminder)
             .setOngoing(true)
@@ -65,10 +78,10 @@ class WorkoutNotificationService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Trening w trakcie",
+                getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Pokazuje postęp aktywnego treningu"
+                description = getString(R.string.notification_channel_description)
             }
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)

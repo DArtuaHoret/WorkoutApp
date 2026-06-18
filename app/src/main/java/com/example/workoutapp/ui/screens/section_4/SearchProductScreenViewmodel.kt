@@ -28,7 +28,7 @@ sealed interface AddMealSearchUiState {
 
 class AddMealSearchViewModel(
     savedStateHandle: SavedStateHandle,
-    private val foodRepository: FoodRepository,  // DODAJ
+    private val foodRepository: FoodRepository,
 ) : ViewModel() {
 
     private val args = savedStateHandle.toRoute<Destinations.Diet>()
@@ -44,19 +44,18 @@ class AddMealSearchViewModel(
     val pendingProduct: StateFlow<ProductSearchItem?> = _pendingProduct.asStateFlow()
     val showDatePicker: StateFlow<Boolean> = _showDatePicker.asStateFlow()
 
-    // NOWA: metoda do otwierania dialogu daty
+
     fun showDatePickerForProduct(product: ProductSearchItem) {
         _pendingProduct.value = product
         _showDatePicker.value = true
     }
 
-    // NOWA: metoda do zamykania dialogu daty
+
     fun dismissDatePicker() {
         _pendingProduct.value = null
         _showDatePicker.value = false
     }
 
-    // NOWA: metoda do potwierdzenia daty i dodania produktu
     fun confirmDateAndAddProduct(dateMillis: Long) {
         val product = _pendingProduct.value
         if (product != null) {

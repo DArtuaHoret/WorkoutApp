@@ -27,7 +27,6 @@ class FavoriteProductsViewModel(
     private val _showFavorites = MutableStateFlow(true)
     private val _uiState = MutableStateFlow<FavoriteProductsUiState>(FavoriteProductsUiState.Favorites())
 
-    // NOWE: stan dla dialogu daty
     private val _pendingProduct = MutableStateFlow<FavoriteProductItem?>(null)
     private val _showDatePicker = MutableStateFlow(false)
 
@@ -46,19 +45,19 @@ class FavoriteProductsViewModel(
         }
     }
 
-    // NOWA: metoda do otwierania dialogu daty
+
     fun showDatePickerForProduct(product: FavoriteProductItem) {
         _pendingProduct.value = product
         _showDatePicker.value = true
     }
 
-    // NOWA: metoda do zamykania dialogu daty
+
     fun dismissDatePicker() {
         _pendingProduct.value = null
         _showDatePicker.value = false
     }
 
-    // NOWA: metoda do potwierdzenia daty i dodania produktu
+
     fun confirmDateAndAddProduct(dateMillis: Long) {
         val product = _pendingProduct.value
         if (product != null) {

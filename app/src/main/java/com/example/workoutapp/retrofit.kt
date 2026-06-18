@@ -85,7 +85,6 @@ object OpenFoodRetrofitClient {
 }
 
 
-// API interfaces
 
 
 interface OpenFoodApiService {
