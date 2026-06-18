@@ -15,9 +15,9 @@ class ExerciseSearchViewModel(
     private val _showOnlyCustom = MutableStateFlow(false)
     val showOnlyCustom: StateFlow<Boolean> = _showOnlyCustom.asStateFlow()
 
-    private val _lang = MutableStateFlow("pl") // ← NOWE
+    private val _lang = MutableStateFlow("pl")
 
-    fun setLang(lang: String) { _lang.value = lang } // ← NOWE
+    fun setLang(lang: String) { _lang.value = lang }
 
     val filteredExercises: StateFlow<List<ExerciseOption>> =
         combine(
@@ -30,7 +30,7 @@ class ExerciseSearchViewModel(
                 .map {
                     ExerciseOption(
                         id = it.exerciseId.toString(),
-                        name = if (lang == "en" && it.exerciseNameEn.isNotBlank()) // ← NOWE
+                        name = if (lang == "en" && it.exerciseNameEn.isNotBlank())
                             it.exerciseNameEn else it.exerciseName,
                         muscleGroup = it.muscleGroupName,
                         isCustom = it.isCustom,
