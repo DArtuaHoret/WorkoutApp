@@ -85,7 +85,8 @@ class ExerciseDetailViewModel(
 
                 exerciseRepository.updateExercise(
                     existingExercise.copy(
-                        name     = _exerciseName.value,
+                        name     = if (lang == "en" && existingExercise.nameEn.isNotBlank()) existingExercise.name else _exerciseName.value,
+                        nameEn   = if (lang == "en" && existingExercise.nameEn.isNotBlank()) _exerciseName.value else existingExercise.nameEn,
                         photoUrl = _photoUrl.value,
                     )
                 )
@@ -125,7 +126,17 @@ class ExerciseDetailViewModel(
                     exerciseRepository.getActiveExercises().first()
                         .lastOrNull { it.name == _exerciseName.value }?.id ?: return@launch
                 } else {
-                    args.exerciseId.toLong()
+                    val existingId = args.exerciseId.toLong()
+                    val existingExercise = exerciseRepository.getExerciseById(existingId)
+                        .first().firstOrNull() ?: return@launch
+                    exerciseRepository.updateExercise(
+                        existingExercise.copy(
+                            name     = if (lang == "en" && existingExercise.nameEn.isNotBlank()) existingExercise.name else _exerciseName.value,
+                            nameEn   = if (lang == "en" && existingExercise.nameEn.isNotBlank()) _exerciseName.value else existingExercise.nameEn,
+                            photoUrl = _photoUrl.value,
+                        )
+                    )
+                    existingId
                 }
 
                 val allGroups = exerciseRepository.getAllMuscleGroups().first()

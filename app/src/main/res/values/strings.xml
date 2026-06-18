@@ -39,6 +39,7 @@
     <string name="add_set">DODAJ SERIĘ</string>
     <string name="delete_exercise">USUŃ ĆWICZENIE</string>
     <string name="save_exercise">ZAPISZ ĆWICZENIE</string>
+    <string name="exercise_name_required">Nazwa ćwiczenia jest wymagana</string>
 
     <!-- ExerciseSearchScreen -->
     <string name="exercise_search_title">Wyszukiwanie ćwiczeń</string>

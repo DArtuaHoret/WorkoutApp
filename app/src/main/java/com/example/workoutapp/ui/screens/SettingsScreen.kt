@@ -84,6 +84,8 @@ fun SettingsScreen(
             )
         }
 
+        Spacer(modifier = Modifier.height(12.dp))
+
         Text(
             text = stringResource(R.string.settings_macro_goal),
             color = Color.White,

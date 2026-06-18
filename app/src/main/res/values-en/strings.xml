@@ -33,6 +33,7 @@
     <string name="add_set">ADD SET</string>
     <string name="delete_exercise">DELETE EXERCISE</string>
     <string name="save_exercise">SAVE EXERCISE</string>
+    <string name="exercise_name_required">Name is required</string>
 
     <!-- ExerciseSearchScreen -->
     <string name="exercise_search_title">Exercise search</string>

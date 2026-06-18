@@ -51,6 +51,8 @@ fun ExerciseDetailScreen(
     val photoUrl             by viewModel.photoUrl.collectAsState()
     val context = LocalContext.current
 
+    val canSave = exerciseName.isNotBlank()
+
     val lang = LocalConfiguration.current.locales[0].language
     LaunchedEffect(Unit) { viewModel.setLang(lang) }
 
@@ -154,6 +156,14 @@ fun ExerciseDetailScreen(
                         onValueChange = viewModel::onExerciseNameChange,
                         placeholder = stringResource(R.string.exercise_name_placeholder),
                     )
+
+                    if (exerciseName.isBlank()) {
+                        Text(
+                            text = stringResource(R.string.exercise_name_required),
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                        )
+                    }
                 }
             }
 
@@ -229,11 +239,13 @@ fun ExerciseDetailScreen(
 
         ActionButton(
             onClick = {
+                if (!exerciseName.isNotBlank()) return@ActionButton
                 viewModel.saveExercise()
                 onSaveClick()
             },
             label = stringResource(R.string.save_exercise),
             icon = null,
+            enabled = canSave,
             style = ActionButtonStyle.LightFilled,
         )
 
