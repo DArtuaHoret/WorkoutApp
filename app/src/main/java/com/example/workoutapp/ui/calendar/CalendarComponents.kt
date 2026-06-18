@@ -3,6 +3,8 @@ package com.example.workoutapp.ui.calendar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.res.stringArrayResource
+import com.example.workoutapp.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -85,7 +87,7 @@ fun CalendarHeader(
 //dni tygodnia
 @Composable
 fun WeekDaysRow(modifier: Modifier = Modifier) {
-    val daysOfWeek = listOf("Pn", "Wt", "Śr", "Czw", "Pt", "So", "Nd")
+    val daysOfWeek = stringArrayResource(R.array.week_days_short)
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween

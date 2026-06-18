@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.platform.LocalConfiguration
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.Locale
@@ -35,11 +36,15 @@ fun WorkoutCalendar(
         mutableStateOf(selectedDate?.let { YearMonth.from(it) } ?: YearMonth.now())
     }
 
-    val localePl = Locale.forLanguageTag("pl")
-    val formatter = DateTimeFormatter.ofPattern("LLLL yyyy", localePl)
+    val currentLocale = LocalConfiguration.current.locales[0]
+    val formatter = remember(currentLocale) {
+        DateTimeFormatter.ofPattern("LLLL yyyy", currentLocale)
+    }
 
     val headerTitle = currentYearMonth.format(formatter)
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(localePl) else it.toString() }
+        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(currentLocale) else it.toString() }
+
+
 
     val firstDayOfMonth = currentYearMonth.atDay(1)
     val totalDaysInMonth = currentYearMonth.lengthOfMonth()

@@ -128,6 +128,7 @@ sealed interface Destinations {
         val carbs: String = "",
         val isEditMode: Boolean = false,
         val isFavorite: Boolean = false,
+        val canDelete: Boolean = false,
     ) : Destinations
 
     @Serializable data object Library : Destinations
@@ -603,6 +604,7 @@ fun AppNavigation() {
                                     carbs       = product.carbs,
                                     isEditMode  = true,
                                     isFavorite  = product.isFavorite,
+                                    canDelete   = true,
                                 )
                             )
                         },

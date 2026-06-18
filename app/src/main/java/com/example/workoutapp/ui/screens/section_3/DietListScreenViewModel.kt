@@ -10,12 +10,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import java.util.Calendar
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 
 data class MealDetailsUiState(
     val products: List<LoggedProductItem> = emptyList(),
-    val dateLabel: String = "",
+    val date: LocalDate? = null,
     val isLoading: Boolean = false,
 )
 
@@ -31,11 +32,15 @@ class MealDetailsViewModel(
         (savedStateHandle.get<Long>("dateMillis") ?: System.currentTimeMillis()).toLocalNoonMillis()
     )
 
+    private val localDate: LocalDate = date.toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+
     init {
         viewModelScope.launch {
             combine(
-                foodRepository.getEntriesForDate(date),    // Flow<List<FoodEntry>>
-                foodRepository.getAllActiveProducts(),       // Flow<List<FoodProduct>>
+                foodRepository.getEntriesForDate(date),
+                foodRepository.getAllActiveProducts(),
             ) { entries, products ->
                 val productMap = products.associateBy { it.id }
                 entries.mapNotNull { entry ->
@@ -54,7 +59,7 @@ class MealDetailsViewModel(
             }.collect { items ->
                 _uiState.value = MealDetailsUiState(
                     products  = items,
-                    dateLabel = date.toDateLabel(),
+                    date      = localDate,
                     isLoading = false,
                 )
             }
@@ -73,18 +78,4 @@ class MealDetailsViewModel(
             foodRepository.updateEntryGrams(product.id.toLong(), grams)
         }
     }
-}
-
-private fun Date.toDateLabel(): String {
-    val cal = Calendar.getInstance().apply { time = this@toDateLabel }
-    val months = listOf(
-        "stycznia","lutego","marca","kwietnia","maja","czerwca",
-        "lipca","sierpnia","września","października","listopada","grudnia",
-    )
-    val days = listOf(
-        "Niedziela","Poniedziałek","Wtorek","Środa","Czwartek","Piątek","Sobota",
-    )
-    val datePart = "${cal.get(Calendar.DAY_OF_MONTH)} ${months[cal.get(Calendar.MONTH)]} ${cal.get(Calendar.YEAR)}"
-    val dayOfWeek = days[cal.get(Calendar.DAY_OF_WEEK) - 1]
-    return "${datePart.uppercase()} ($dayOfWeek)"
 }

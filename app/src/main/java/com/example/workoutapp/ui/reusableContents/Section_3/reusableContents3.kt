@@ -781,88 +781,40 @@ fun DateBox(label: String, date: LocalDate?, onClick: () -> Unit, modifier: Modi
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CenteredDateSelectionDialog(
     initialDate: LocalDate = LocalDate.now(),
     onVisibleChange: (Boolean) -> Unit,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    var tempDate by remember { mutableStateOf(initialDate) }
+    val initialMillis = remember(initialDate) {
+        initialDate.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+    }
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
 
-    val pickerStartDate = remember { initialDate }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.6f))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) {
+    DatePickerDialog(
+        onDismissRequest = { onVisibleChange(false) },
+        confirmButton = {
+            TextButton(onClick = {
+                datePickerState.selectedDateMillis?.let { millis ->
+                    val selected = java.time.Instant.ofEpochMilli(millis)
+                        .atZone(java.time.ZoneOffset.UTC)
+                        .toLocalDate()
+                    onDateSelected(selected)
+                }
                 onVisibleChange(false)
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.85f)
-                .wrapContentHeight()
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) {}
-                .border(2.dp, Color.White, RoundedCornerShape(14.dp)),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(R.string.choose_date),
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                WheelDatePicker(
-                    startDate = pickerStartDate,
-                    textColor = Color.White,
-                    selectorProperties = WheelPickerDefaults.selectorProperties(
-                        color = Color(0xFFD7DAD7).copy(alpha = 0.2f),
-                        border = BorderStroke(width = 1.dp, color = Color(0xFFFFFFFF))
-                    ),
-                    onSnappedDate = { snappedDate ->
-                        tempDate = snappedDate
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                ActionButton(
-                    onClick = {
-                        onDateSelected(tempDate)
-                        onVisibleChange(false)
-                    },
-                    label = stringResource(R.string.confirm),
-                    icon = null,
-                    style = ActionButtonStyle.LightFilled
-                )
+            }) {
+                Text(stringResource(R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onVisibleChange(false) }) {
+                Text(stringResource(R.string.cancel))
             }
         }
-    }
-}
-
-@Preview(name = "Centered Date Selection Dialog - Preview", showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun PreviewCenteredDateSelectionDialog() {
-    MaterialTheme {
-        CenteredDateSelectionDialog(
-            onVisibleChange = {},
-            onDateSelected = {}
-        )
+    ) {
+        DatePicker(state = datePickerState)
     }
 }
 
@@ -938,7 +890,7 @@ fun CenteredDateRangeSelector(
                         .padding(vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Data do:", color = Color.Gray, fontSize = 16.sp)
+                    Text(stringResource(R.string.date_to), color = Color.Gray, fontSize = 16.sp)
                     Text(endDate.toString(), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
 
@@ -959,8 +911,11 @@ fun CenteredDateRangeSelector(
         CenteredDateSelectionDialog(
             initialDate = startDate,
             onVisibleChange = { showStartDialog = it },
-            onDateSelected = {
-                startDate = it
+            onDateSelected = { selected ->
+                startDate = selected
+                if (startDate.isAfter(endDate)) {
+                    endDate = startDate
+                }
                 showStartDialog = false
             }
         )
@@ -970,12 +925,16 @@ fun CenteredDateRangeSelector(
         CenteredDateSelectionDialog(
             initialDate = endDate,
             onVisibleChange = { showEndDialog = it },
-            onDateSelected = {
-                endDate = it
+            onDateSelected = { selected ->
+                endDate = selected
+                if (endDate.isBefore(startDate)) {
+                    startDate = endDate
+                }
                 showEndDialog = false
             }
         )
     }
+
 }
 
 @Preview(name = "Centered Date Range Selector - Preview", showBackground = true, backgroundColor = 0xFF000000)

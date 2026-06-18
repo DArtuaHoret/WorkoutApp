@@ -157,22 +157,13 @@ fun ProductDetailScreen(
                         }
                     }
 
-                    Text(
-                        text = "canDelete: ${state.canDelete}",
-                        color = Color.Red
-                    )
-                    if (state.canDelete) {
 
-                        ActionButton(
-                            onClick = { viewModel.deleteProduct { onBackClick() } },
-                            label = stringResource(R.string.product_detail_delete),
-                            icon = Icons.Default.Delete,
-                            style = ActionButtonStyle.DangerFilled,
-                        )
-                    }
+
+
                 }
 
                 is ProductDetailUiState.Create -> {
+
                     EditableProductDetailHeaderCard(
                         productName = state.productName,
                         onProductNameChange = viewModel::onProductNameChange,
@@ -253,6 +244,18 @@ fun ProductDetailScreen(
                                 tint = if (state.isFavorite) Color(0xFFFF4D4D) else Color.White,
                             )
                         }
+
+
+                    }
+
+                    if (state.canDelete) {
+
+                        ActionButton(
+                            onClick = { viewModel.deleteProduct { onBackClick() } },
+                            label = stringResource(R.string.product_detail_delete),
+                            icon = Icons.Default.Delete,
+                            style = ActionButtonStyle.DangerFilled,
+                        )
                     }
                 }
             }

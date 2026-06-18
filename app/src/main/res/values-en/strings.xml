@@ -296,4 +296,14 @@
     <!-- MealDatePickerDialog -->
     <string name="ok">OK</string>
 
+    <string-array name="week_days_short">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
+
 </resources>

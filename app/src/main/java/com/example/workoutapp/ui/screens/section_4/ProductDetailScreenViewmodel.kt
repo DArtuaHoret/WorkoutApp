@@ -26,6 +26,7 @@ sealed interface ProductDetailUiState {
         val carbs: String              = "",
         val isFavorite: Boolean        = false,
         val editId: String?            = null,
+        val canDelete: Boolean         = false,
     ) : ProductDetailUiState
 }
 
@@ -113,11 +114,19 @@ class ProductDetailViewModel(
     }
 
     fun deleteProduct(onDeleted: () -> Unit) {
-        val current = _uiState.value as? ProductDetailUiState.View ?: return
         viewModelScope.launch {
-            val product = foodRepository.findActiveByName(current.args.name) ?: return@launch
-            foodRepository.deactivateProduct(product.id)
-            onDeleted()
+            when (val current = _uiState.value) {
+                is ProductDetailUiState.View -> {
+                    val product = foodRepository.findActiveByName(current.args.name) ?: return@launch
+                    foodRepository.deactivateProduct(product.id)
+                    onDeleted()
+                }
+                is ProductDetailUiState.Create -> {
+                    val productId = current.editId?.toLongOrNull() ?: return@launch
+                    foodRepository.deactivateProduct(productId)
+                    onDeleted()
+                }
+            }
         }
     }
 
@@ -150,6 +159,7 @@ class ProductDetailViewModel(
                 carbs              = carbs,
                 editId             = id.takeIf { it.isNotEmpty() },
                 isFavorite         = isFavorite,
+                canDelete          = canDelete,
             )
             id.isNotEmpty() -> ProductDetailUiState.View(
                 args = ProductDetailArgs(id, name, description, kcal, protein, fat, carbs),

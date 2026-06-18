@@ -295,6 +295,17 @@
     <string name="ok">OK</string>
 
 
+    <string-array name="week_days_short">
+        <item>Pn</item>
+        <item>Wt</item>
+        <item>Śr</item>
+        <item>Czw</item>
+        <item>Pt</item>
+        <item>So</item>
+        <item>Nd</item>
+    </string-array>
+
+
 
 
 </resources>

@@ -7,6 +7,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Eco
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
+import java.time.format.DateTimeFormatter
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -45,7 +48,7 @@ fun MealDetailsScreen(
 
     MealDetailsContent(
         products = uiState.products,
-        dateLabel = uiState.dateLabel,
+        date = uiState.date,
         onBackClick = onBackClick,
         onProductClick = onProductClick,
         onDeleteClick = viewModel::onDeleteProduct,
@@ -54,16 +57,34 @@ fun MealDetailsScreen(
     )
 }
 
+
 @Composable
 private fun MealDetailsContent(
     products: List<LoggedProductItem>,
-    dateLabel: String,
+    date: java.time.LocalDate?,
     onBackClick: () -> Unit,
     onProductClick: (LoggedProductItem) -> Unit,
     onDeleteClick: (LoggedProductItem) -> Unit,
     onGramsChange: (LoggedProductItem, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val currentLocale = LocalConfiguration.current.locales[0]
+
+    val dateLabel = remember(date, currentLocale) {
+        val d = date
+        if (d == null) {
+            ""
+        } else {
+            val datePartFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", currentLocale)
+            val datePart = d.format(datePartFormatter).uppercase(currentLocale)
+            val dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", currentLocale)
+            val dayOfWeek = d.format(dayOfWeekFormatter).replaceFirstChar { c ->
+                if (c.isLowerCase()) c.titlecase(currentLocale) else c.toString()
+            }
+            "$datePart ($dayOfWeek)"
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()

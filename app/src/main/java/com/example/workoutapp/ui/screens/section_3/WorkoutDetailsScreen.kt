@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,13 +44,14 @@ fun WorkoutDetailsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    val formattedDateHeader = remember(uiState.date) {
-        val localePl = Locale.forLanguageTag("pl-PL")
-        val datePartFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", localePl)
-        val datePart = uiState.date.format(datePartFormatter).uppercase(localePl)
-        val dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", localePl)
+    val currentLocale = LocalConfiguration.current.locales[0]
+
+    val formattedDateHeader = remember(uiState.date, currentLocale) {
+        val datePartFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", currentLocale)
+        val datePart = uiState.date.format(datePartFormatter).uppercase(currentLocale)
+        val dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", currentLocale)
         val dayOfWeek = uiState.date.format(dayOfWeekFormatter).replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase(localePl) else it.toString()
+            if (it.isLowerCase()) it.titlecase(currentLocale) else it.toString()
         }
         "$datePart ($dayOfWeek)"
     }
