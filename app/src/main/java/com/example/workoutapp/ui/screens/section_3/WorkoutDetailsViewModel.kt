@@ -36,7 +36,6 @@ data class WorkoutSessionData(
 data class WorkoutDetailsUiState(
     val date: LocalDate = LocalDate.now(),
     val workoutSessions: List<WorkoutSessionData> = emptyList(),
-    // Mapa sessionId → templateId potrzebna do nawigacji do timera
     val sessionToTemplateId: Map<String, String> = emptyMap(),
 
     val currentKcal: Float = 2f,
@@ -53,14 +52,13 @@ class WorkoutDetailsViewModel(
     savedStateHandle: SavedStateHandle,
     private val sessionRepository: WorkoutSessionRepository,
     private val templateRepository: WorkoutTemplateRepository,
-    private val foodRepository: FoodRepository,               // ← dodaj
+    private val foodRepository: FoodRepository,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val args = savedStateHandle.toRoute<Destinations.HistoryDetails>()
     val date: LocalDate = LocalDate.parse(args.dateIsoString)
 
-    // Konwersja LocalDate → Date (południe, żeby uniknąć problemów z strefą czasową)
     private val dateAsDate: Date = run {
         val cal = Calendar.getInstance()
         cal.set(date.year, date.monthValue - 1, date.dayOfMonth, 12, 0, 0)
@@ -166,7 +164,6 @@ class WorkoutDetailsViewModel(
                     it.id.toString() to (it.workoutTemplateId?.toString() ?: "")
                 }
 
-                // ← .copy() zamiast nowego WorkoutDetailsUiState(...)
                 _uiState.value = _uiState.value.copy(
                     date = date,
                     workoutSessions = sessionsWithNames,

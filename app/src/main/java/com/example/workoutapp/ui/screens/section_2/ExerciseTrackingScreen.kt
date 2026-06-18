@@ -24,6 +24,12 @@ import com.example.workoutapp.ui.reusableContents.Section_2.CenteredWorkoutSucce
 import com.example.workoutapp.ui.reusableContents.Section_2.ExerciseSetCardDetailed
 import com.example.workoutapp.ui.reusableContents.Section_2.ExerciseTimer
 import com.example.workoutapp.ui.screens.section_2.ExerciseTrackingViewModel
+import android.content.Intent
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import com.example.workoutapp.WorkoutNotificationService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +48,37 @@ fun ActiveWorkoutScreen(
     val isResting by viewModel.isResting.collectAsState()
     val restsCompleted by viewModel.restsCompleted.collectAsState()
     val isWorkoutFinished by viewModel.isWorkoutFinished.collectAsState()
+
+    // powiad
+    val context = LocalContext.current
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* nie musimy reagować na wynik — jeśli odmówi, po prostu nie zobaczy powiadomienia */ }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    LaunchedEffect(exerciseName, isResting, restTime) {
+        val intent = Intent(context, WorkoutNotificationService::class.java).apply {
+            putExtra(WorkoutNotificationService.EXTRA_EXERCISE_NAME, exerciseName)
+            putExtra(WorkoutNotificationService.EXTRA_IS_RESTING, isResting)
+            putExtra(WorkoutNotificationService.EXTRA_SECONDS_LEFT, if (isResting) restTime else -1)
+        }
+        context.startService(intent)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            context.stopService(Intent(context, WorkoutNotificationService::class.java))
+        }
+    }
+
+
+
 
     var showDescription by remember { mutableStateOf(false) }
     var showExitDialog by remember { mutableStateOf(false) }
@@ -120,10 +157,7 @@ fun ActiveWorkoutScreen(
 
                 key(currentSet, exerciseName, isResting, restsCompleted) {
                     ExerciseTimer(
-                        title = if (isResting)
-                            stringResource(R.string.rest_phase_title)
-                        else
-                            stringResource(R.string.exercise_phase_title),
+                        title = if (isResting) "ODPOCZYNEK" else "WYKONANIE ĆWICZENIA",
                         resetKey = Triple(currentSet, isResting, restsCompleted),
                         initialSeconds = restTime,
                         initialIsRunning = isResting,
@@ -135,7 +169,17 @@ fun ActiveWorkoutScreen(
                             } else {
                                 viewModel.onDoneClick()
                             }
-                        }
+                        },
+                        onTick = { seconds ->
+                            viewModel.onTimerTick(seconds)
+                            val intent = Intent(context, WorkoutNotificationService::class.java).apply {
+                                putExtra(WorkoutNotificationService.EXTRA_EXERCISE_NAME, exerciseName)
+                                putExtra(WorkoutNotificationService.EXTRA_IS_RESTING, isResting)
+                                putExtra(WorkoutNotificationService.EXTRA_SECONDS_LEFT, if (isResting) seconds else -1)
+                            }
+                            context.startService(intent)
+                        },
+                        onRunningChanged = { running -> viewModel.onTimerRunningChanged(running) }
                     )
                 }
 

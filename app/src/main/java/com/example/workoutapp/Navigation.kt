@@ -52,7 +52,7 @@ import com.example.workoutapp.ui.screens.section_4.AddMealSearchViewModel
 import com.example.workoutapp.ui.screens.section_4.FavoriteProductsViewModel
 
 
-// --- Type-safe destinations ---
+
 sealed interface Destinations {
 
     @Serializable data object Settings : Destinations
@@ -134,7 +134,7 @@ sealed interface Destinations {
 }
 
 
-// --- Metadane dla bottom bara ---
+
 data class BottomNavItem(
     val destination: Destinations,
     val icon: String,
@@ -147,7 +147,7 @@ fun AppNavigation() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    // ── Stan dialogu ochrony aktywnego treningu ───────────────────────────
+    // stan dialogu ochrony aktywnego treningu
     var showExitWorkoutDialog by remember { mutableStateOf(false) }
     var pendingNavDestination by remember { mutableStateOf<Destinations?>(null) }
 
@@ -173,7 +173,6 @@ fun AppNavigation() {
                             val isClickingWorkoutSection = item.destination == Destinations.Workout
 
                             if (isOnActiveWorkout && isClickingWorkoutSection) {
-                                // Już jesteśmy w treningu — nic nie robimy
                             } else if (isOnActiveWorkout) {
                                 pendingNavDestination = item.destination
                                 showExitWorkoutDialog = true
@@ -217,7 +216,7 @@ fun AppNavigation() {
                 )
             }
 
-            // ── Zagnieżdżony graf sekcji 1 ───────────────────────────────
+            // sekcja 1
             navigation<Destinations.TemplatesGraph>(
                 startDestination = Destinations.Templates,
             ) {
@@ -316,7 +315,7 @@ fun AppNavigation() {
                 }
             }
 
-            // ── Sekcja 2 ─────────────────────────────────────────────────
+            // sekcja 2
             navigation<Destinations.WorkoutGraph>(startDestination = Destinations.Workout) {
 
                 composable<Destinations.Workout> {
@@ -341,7 +340,7 @@ fun AppNavigation() {
                 }
             }
 
-            // ── Zagnieżdżony graf sekcji 3 (HISTORIA) ───────────────────
+            // sekcja 3
             navigation<Destinations.HistoryGraph>(startDestination = Destinations.HistoryCalendar) {
 
                 composable<Destinations.HistoryCalendar> { backStackEntry ->
@@ -438,7 +437,6 @@ fun AppNavigation() {
                             }
                         },
                         onMealIconClick = {
-                            // date jest dostępne z viewModel
                             val dateMillis = viewModel.date
                                 .atStartOfDay()
                                 .toInstant(java.time.ZoneOffset.UTC)
@@ -493,7 +491,7 @@ fun AppNavigation() {
                 }
             }
 
-            // ── Zagnieżdżony graf sekcji 4 ───────────────────────────────
+            // sekcja 4
             navigation<Destinations.DietGraph>(
                 startDestination = Destinations.Diet(),
             ) {
@@ -618,7 +616,7 @@ fun AppNavigation() {
             }
         }
     }
-    // ── Dialog potwierdzenia wyjścia z aktywnego treningu ─────────────
+    // dialog potwierdzenia wyjścia z aktywnego treningu
     if (showExitWorkoutDialog) {
         CenteredExitConfirmationDialog(
             onConfirm = {

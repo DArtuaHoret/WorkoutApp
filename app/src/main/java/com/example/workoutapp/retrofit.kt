@@ -11,9 +11,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import okhttp3.OkHttpClient
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Models
-// ─────────────────────────────────────────────────────────────────────────────
 
 @JsonClass(generateAdapter = true)
 data class OpenFoodSearchResponse(
@@ -53,9 +50,9 @@ data class OpenFoodProductDto(
 
 typealias OpenFoodNutrimentsDto = OpenFoodProductDto.OpenFoodNutrimentsDto
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Retrofit client
-// ─────────────────────────────────────────────────────────────────────────────
+
+// retrofit client
+
 
 object OpenFoodRetrofitClient {
 
@@ -87,9 +84,9 @@ object OpenFoodRetrofitClient {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // API interfaces
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 interface OpenFoodApiService {
     @GET("search")

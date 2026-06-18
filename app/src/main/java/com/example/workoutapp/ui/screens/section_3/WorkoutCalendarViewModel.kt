@@ -62,7 +62,6 @@ class WorkoutCalendarViewModel(
                 date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
             )
 
-            // 1. Utwórz WorkoutSession
             val sessionId = sessionRepository.saveSession(
                 WorkoutSession(
                     status = "PLANNED",
@@ -72,7 +71,6 @@ class WorkoutCalendarViewModel(
                 )
             )
 
-            // 2. Skopiuj każdy WorkoutTemplateItem → WorkoutSessionItem
             val templateItems = templateRepository.getItemsForTemplate(tmplId).first()
             templateItems.forEach { templateItem ->
                 val sessionItemId = sessionRepository.saveSessionItem(
@@ -85,7 +83,6 @@ class WorkoutCalendarViewModel(
                     )
                 )
 
-                // 3. Skopiuj każdy WorkoutTemplateSet → WorkoutSessionSet (z restTime!)
                 val templateSets = templateRepository.getSetsForItem(templateItem.id).first()
                 templateSets.forEach { templateSet ->
                     sessionRepository.saveSessionSet(
@@ -94,7 +91,7 @@ class WorkoutCalendarViewModel(
                             setNumber = templateSet.setNumber,
                             plannedReps = templateSet.reps,
                             plannedWeight = templateSet.weight,
-                            plannedRestTime = templateSet.restTime  // ← kopiujemy restTime
+                            plannedRestTime = templateSet.restTime
                         )
                     )
                 }

@@ -34,7 +34,6 @@ class SettingsViewModel(
     fun onLanguageChange(lang: String) {
         viewModelScope.launch {
             settingsRepository.setLanguage(lang)
-            // Restart Activity żeby Android załadował nowe strings.xml
             AppCompatDelegate.setApplicationLocales(
                 LocaleListCompat.forLanguageTags(lang)
             )

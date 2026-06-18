@@ -61,7 +61,6 @@ fun WorkoutDetailsScreen(
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // ── HEADER ──────────────────────────────────────────────
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Spacer(modifier = Modifier.height(16.dp))
             Row(
@@ -86,7 +85,7 @@ fun WorkoutDetailsScreen(
                     modifier = Modifier.offset(x = (-16).dp)
                 )
 
-                Spacer(modifier = Modifier.weight(1f))  // ← dodaj to
+                Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(
                     onClick = onMealIconClick,
@@ -109,7 +108,6 @@ fun WorkoutDetailsScreen(
             )
         }
 
-        // ── LISTA TRENINGÓW (tylko karty, scrollowalna) ─────────
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(horizontal = 16.dp),
@@ -133,7 +131,6 @@ fun WorkoutDetailsScreen(
             }
         }
 
-        // ── POPRAWKA 2: strefa przycisków — stała, nad progress barami ──
         AnimatedVisibility(visible = selectedSessionId != null) {
             val selectedSession = uiState.workoutSessions.find { it.id == selectedSessionId }
 
@@ -188,7 +185,7 @@ fun WorkoutDetailsScreen(
             }
         }
 
-        // ── PROGRESS BARY — zawsze na samym dole ────────────────
+        // progress bary
         NutritionProgressBarRow(
             kcal = NutritionItem(
                 stringResource(R.string.nutrient_label_kcal),

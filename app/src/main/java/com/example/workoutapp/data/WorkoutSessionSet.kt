@@ -36,7 +36,7 @@ data class WorkoutSessionSet(
     var actualReps: Int = 0,
     var plannedWeight: Double,
     var actualWeight: Double = 0.0,
-    var plannedRestTime: Int = 60,  // NOWE: czas odpoczynku skopiowany z WorkoutTemplateSet
+    var plannedRestTime: Int = 60,
     var isDone: Boolean = false,
     var note: String? = null,
     var workoutSessionItemId: Long,

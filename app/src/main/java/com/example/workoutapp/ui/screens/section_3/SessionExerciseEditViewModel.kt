@@ -19,7 +19,7 @@ data class SessionSetState(
     val setNumber: Int,
     val reps: Int = 8,
     val weight: Int = 0,
-    val restTime: Int = 60  // NOWE
+    val restTime: Int = 60
 )
 
 class SessionExerciseEditViewModel(

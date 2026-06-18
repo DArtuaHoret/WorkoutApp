@@ -27,7 +27,6 @@ class MealDetailsViewModel(
     private val _uiState = MutableStateFlow(MealDetailsUiState(isLoading = true))
     val uiState: StateFlow<MealDetailsUiState> = _uiState.asStateFlow()
 
-    // Datę możesz przekazać przez savedStateHandle: savedStateHandle.get<Long>("dateMillis")
     private val date: Date = Date(
         (savedStateHandle.get<Long>("dateMillis") ?: System.currentTimeMillis()).toLocalNoonMillis()
     )

@@ -45,14 +45,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17  // ZMIEŃ z 11 na 17
-        targetCompatibility = JavaVersion.VERSION_17  // ZMIEŃ z 11 na 17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlin {
         jvmToolchain(17)
     }
-    // DODAJ ten blok - wymusza spójną wersję JVM dla wszystkich zadań
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -85,10 +84,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation(libs.androidx.navigation.compose)
-    // ML Kit Barcode Scanning
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
-// CameraX - potrzebny do podglądu kamery
     implementation("androidx.camera:camera-camera2:1.3.4")
     implementation("androidx.camera:camera-lifecycle:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")

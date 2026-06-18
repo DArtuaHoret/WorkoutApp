@@ -35,10 +35,10 @@ private fun PreviewWorkoutHistoryScreenOctober() {
         WorkoutHistoryScreen(
             selectedDate = selectedDate,
             workoutDays = mockWorkoutDays,
-            availableTemplates = emptyList(), // POPRAWIONE
+            availableTemplates = emptyList(),
             onDateSelected = { selectedDate = it },
             onBackClick = {},
-            onAssignWorkoutClick = { _ -> }, // POPRAWIONE
+            onAssignWorkoutClick = { _ -> },
             onViewStatsClick = { _, _ -> },
             onViewWorkoutDetailsClick = {}
         )
@@ -63,10 +63,10 @@ private fun PreviewWorkoutHistoryScreenMay() {
         WorkoutHistoryScreen(
             selectedDate = selectedDate,
             workoutDays = mockWorkoutDays,
-            availableTemplates = emptyList(), // POPRAWIONE
+            availableTemplates = emptyList(),
             onDateSelected = { selectedDate = it },
             onBackClick = {},
-            onAssignWorkoutClick = { _ -> }, // POPRAWIONE
+            onAssignWorkoutClick = { _ -> },
             onViewStatsClick = { _, _ -> },
             onViewWorkoutDetailsClick = {}
         )
@@ -91,10 +91,10 @@ private fun PreviewWorkoutHistoryScreenJanuary() {
         WorkoutHistoryScreen(
             selectedDate = selectedDate,
             workoutDays = mockWorkoutDays,
-            availableTemplates = emptyList(), // POPRAWIONE
+            availableTemplates = emptyList(),
             onDateSelected = { selectedDate = it },
             onBackClick = {},
-            onAssignWorkoutClick = { _ -> }, // POPRAWIONE
+            onAssignWorkoutClick = { _ -> },
             onViewStatsClick = { _, _ -> },
             onViewWorkoutDetailsClick = {}
         )
@@ -107,20 +107,18 @@ private fun PreviewWorkoutHistoryScreenJanuary() {
 @Composable
 private fun PreviewHistoryWithSelectionOverlay() {
     MaterialTheme {
-        // Box służy do symulacji kontenera aplikacji
         Box(modifier = Modifier.fillMaxSize()) {
             WorkoutHistoryScreen(
                 selectedDate = LocalDate.now(),
                 workoutDays = setOf(LocalDate.now()),
-                availableTemplates = emptyList(), // POPRAWIONE
+                availableTemplates = emptyList(),
                 onDateSelected = {},
                 onBackClick = {},
-                onAssignWorkoutClick = { _ -> }, // POPRAWIONE
+                onAssignWorkoutClick = { _ -> },
                 onViewStatsClick = { _, _ -> },
                 onViewWorkoutDetailsClick = {}
             )
 
-            // Wymuszamy widoczność dialogu w Preview
             CenteredDateSelectionDialog(
                 onVisibleChange = {},
                 onDateSelected = {}
@@ -138,14 +136,13 @@ private fun PreviewHistoryWithRangeActive() {
             WorkoutHistoryScreen(
                 selectedDate = LocalDate.now(),
                 workoutDays = setOf(LocalDate.now()),
-                availableTemplates = emptyList(), // POPRAWIONE
+                availableTemplates = emptyList(),
                 onDateSelected = {},
                 onBackClick = {},
-                onAssignWorkoutClick = { _ -> }, // POPRAWIONE
+                onAssignWorkoutClick = { _ -> },
                 onViewStatsClick = { _, _ -> },
                 onViewWorkoutDetailsClick = {}
             )
-            // Wymuszenie renderowania otwartego selektora zakresu
             CenteredDateRangeSelector(
                 onVisibleChange = {},
                 onDateRangeConfirmed = { _, _ -> }

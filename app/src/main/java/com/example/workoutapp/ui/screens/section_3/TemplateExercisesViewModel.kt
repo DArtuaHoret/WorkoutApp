@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
-// Ćwiczenie z pogrupowanymi seriami — do wyświetlenia na liście
+// cwiczenie z pogrupowanymi seriami — do wyświetlenia na liście
 data class SessionExerciseEntry(
     val sessionItemId: Long,
     val exerciseId: Long,
@@ -25,7 +25,7 @@ data class SessionExerciseEntry(
     val sets: List<SessionExerciseSetEntry>
 )
 
-// Pojedyncza seria — do wyświetlenia w ekranie edycji
+// seria do wyświetlenia w ekranie edycji
 data class SessionExerciseSetEntry(
     val sessionItemId: Long,
     val sessionSetId: Long,
@@ -48,13 +48,12 @@ class TemplateExercisesViewModel(
     val sessionId = args.templateId.toLongOrNull() ?: 0L
     val sessionName = args.templateName
 
-    // Pogrupowane ćwiczenia — każde ćwiczenie zawiera listę swoich serii
     private val _exercises = MutableStateFlow<List<SessionExerciseEntry>>(emptyList())
     val exercises: StateFlow<List<SessionExerciseEntry>> = _exercises
 
-    private var lang: String = "pl" // ← NOWE
+    private var lang: String = "pl"
 
-    fun setLang(lang: String) { this.lang = lang } // ← NOWE
+    fun setLang(lang: String) { this.lang = lang }
 
     init {
         observeExercises()
@@ -75,7 +74,7 @@ class TemplateExercisesViewModel(
                                 val exercise = runCatching {
                                     exerciseRepository.getExerciseById(item.exerciseId).first().firstOrNull()
                                 }.getOrNull()
-                                val exerciseName = if (lang == "en" && exercise?.nameEn?.isNotBlank() == true) // ← NOWE
+                                val exerciseName = if (lang == "en" && exercise?.nameEn?.isNotBlank() == true)
                                     exercise.nameEn else exercise?.name ?: "Ćwiczenie"
                                 val exercisePhotoUrl = exercise?.photoUrl
 
@@ -111,7 +110,6 @@ class TemplateExercisesViewModel(
         }
     }
 
-    // Odśwież dane — wywołaj po powrocie z ekranu edycji
     fun refresh() {
         viewModelScope.launch {
             val items = sessionRepository.getItemsForSessionOnce(sessionId)
@@ -119,7 +117,7 @@ class TemplateExercisesViewModel(
                 val exercise = runCatching {
                     exerciseRepository.getExerciseById(item.exerciseId).first().firstOrNull()
                 }.getOrNull()
-                val exerciseName = if (lang == "en" && exercise?.nameEn?.isNotBlank() == true) // ← NOWE
+                val exerciseName = if (lang == "en" && exercise?.nameEn?.isNotBlank() == true)
                     exercise.nameEn else exercise?.name ?: "Ćwiczenie"
                 val exercisePhotoUrl = exercise?.photoUrl
 

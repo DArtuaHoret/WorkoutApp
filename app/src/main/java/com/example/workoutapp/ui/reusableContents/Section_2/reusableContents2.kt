@@ -185,7 +185,6 @@ fun ExerciseSetCardDetailed(
 
                 Spacer(modifier = Modifier.width(24.dp))
 
-                // Wyświetl zdjęcie TAK SAMO JAK W ExerciseItemCard
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -508,13 +507,24 @@ fun ExerciseTimer(
     resetKey: Any = Unit,
     initialSeconds: Int = 59,
     initialIsRunning: Boolean = false,
-    isExercisePhase: Boolean = false, // true = faza ćwiczenia (od razu "Skończono"), false = faza odpoczynku (timer)
+    isExercisePhase: Boolean = false,
     onTimerFinished: () -> Unit = {},
-    onFinishClick: () -> Unit = {}
+    onFinishClick: () -> Unit = {},
+    onTick: (Int) -> Unit = {},          // powiad
+    onRunningChanged: (Boolean) -> Unit = {}  // powiad
 ) {
     var timeLeft by remember(resetKey) { mutableIntStateOf(initialSeconds) }
     var isRunning by remember(resetKey) { mutableStateOf(initialIsRunning) }
     var finishClickHandled by remember(resetKey) { mutableStateOf(false) }
+
+    // powiad
+    LaunchedEffect(timeLeft) {
+        onTick(timeLeft)
+    }
+
+    LaunchedEffect(isRunning) {
+        onRunningChanged(isRunning)
+    }
 
     val toneGen = remember { android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 100) }
 
@@ -561,7 +571,6 @@ fun ExerciseTimer(
             modifier = Modifier
                 .size(300.dp)
                 .clickable(
-                    // Klikalne gdy: faza ćwiczenia (zawsze) LUB faza odpoczynku gdy timer doszedł do zera
                     enabled = isExercisePhase || (timeLeft <= 0 && !finishClickHandled),
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
@@ -579,7 +588,6 @@ fun ExerciseTimer(
             }
 
             if (isExercisePhase) {
-                // Faza ćwiczenia — zawsze pokazuj "Skończono"
                 Text(
                     text = stringResource(R.string.finished_label),
                     color = Color.White,
@@ -587,7 +595,6 @@ fun ExerciseTimer(
                     fontWeight = FontWeight.Bold
                 )
             } else if (timeLeft > 0) {
-                // Faza odpoczynku — odliczanie
                 Text(
                     text = timeLeft.toString(),
                     color = Color.White,
@@ -595,7 +602,6 @@ fun ExerciseTimer(
                     fontWeight = FontWeight.Bold
                 )
             } else {
-                // Faza odpoczynku — timer doszedł do zera
                 Text(
                     text = stringResource(R.string.finished_label),
                     color = Color.White,
@@ -607,7 +613,6 @@ fun ExerciseTimer(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Przyciski +/- i play/pause tylko w fazie odpoczynku gdy timer jeszcze biegnie
         if (!isExercisePhase && timeLeft > 0) {
             Row(
                 modifier = Modifier
@@ -666,7 +671,6 @@ fun ExerciseTimer(
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewRestTimer() {
-    // Dodajemy Box z czarnym tłem, aby zasymulować środowisko z ExerciseTrackingScreen
     Box(modifier = Modifier.background(Color.Black).padding(16.dp)) {
         ExerciseTimer(
             title = "ODPOCZYNEK",
@@ -678,7 +682,7 @@ private fun PreviewRestTimer() {
     }
 }
 
-// 1. KARTA KOMUNIKATU (Sama zawartość wizualna)
+
 @Composable
 fun ExitConfirmationDialog(
     title: String = stringResource(R.string.exit_workout_dialog_title),
@@ -733,7 +737,7 @@ fun ExitConfirmationDialog(
     }
 }
 
-// PODGLĄD DLA KARTY KOMUNIKATU
+
 @Preview(showBackground = true, backgroundColor = 0xFF000000, name = "1. Exit Confirmation Card")
 @Composable
 private fun PreviewExitConfirmationDialog() {
@@ -752,9 +756,8 @@ private fun PreviewExitConfirmationDialog() {
     }
 }
 
-// -------------------------------------------------------------------------
 
-// 2. PEŁNOEKRANOWY KONTENER (Zaciemnione tło + wycentrowana karta)
+
 @Composable
 fun CenteredExitConfirmationDialog(
     title: String = stringResource(R.string.exit_workout_dialog_title),
@@ -772,7 +775,6 @@ fun CenteredExitConfirmationDialog(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) {
-                // Zamknięcie po kliknięciu poza obszarem karty
                 onDismiss()
             },
         contentAlignment = Alignment.Center
@@ -788,7 +790,6 @@ fun CenteredExitConfirmationDialog(
                 .fillMaxWidth(0.85f)
                 .wrapContentHeight()
                 .clickable(
-                    // Blokada propagacji kliknięć w obrębie karty
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {}
@@ -796,7 +797,6 @@ fun CenteredExitConfirmationDialog(
     }
 }
 
-// PODGLĄD DLA PEŁNOEKRANOWEGO KONTENERA
 @Preview(showBackground = true, name = "2. Centered Exit Dialog Overlay")
 @Composable
 private fun PreviewCenteredExitConfirmationDialog() {
@@ -804,7 +804,7 @@ private fun PreviewCenteredExitConfirmationDialog() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White) // Użycie bieli wizualizuje przezroczystość nakładki
+                .background(Color.White)
         ) {
             CenteredExitConfirmationDialog(
                 onConfirm = {},
@@ -845,7 +845,6 @@ fun WorkoutSuccessDialog(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Pojedynczy przycisk zatwierdzający
         ActionButton(
             onClick = onConfirm,
             label = confirmText,
@@ -855,7 +854,6 @@ fun WorkoutSuccessDialog(
     }
 }
 
-// PODGLĄD DLA KARTY KOMUNIKATU O SUKCESIE
 @Preview(showBackground = true, backgroundColor = 0xFF000000, name = "3. Workout Success Card")
 @Composable
 private fun PreviewWorkoutSuccessDialog() {
@@ -888,7 +886,6 @@ fun CenteredWorkoutSuccessDialog(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) {
-                // Zamknięcie po kliknięciu poza obszarem karty traktujemy jako zatwierdzenie (OK)
                 onConfirm()
             },
         contentAlignment = Alignment.Center
@@ -902,7 +899,6 @@ fun CenteredWorkoutSuccessDialog(
                 .fillMaxWidth(0.85f)
                 .wrapContentHeight()
                 .clickable(
-                    // Blokada propagacji kliknięć w obrębie karty, aby kliknięcie w tekst nie zamykało okna
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {}
@@ -918,7 +914,7 @@ private fun PreviewCenteredWorkoutSuccessDialog() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White) // Użycie bieli wizualizuje przezroczystość nakładki
+                .background(Color.White)
         ) {
             CenteredWorkoutSuccessDialog(
                 onConfirm = {}

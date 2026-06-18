@@ -44,7 +44,7 @@ class SettingsRepository(private val context: Context) {
         return if (!locales.isEmpty) {
             locales[0]?.language ?: "en"
         } else {
-            "en" // fallback gdy nigdy nie ustawiono - locale systemowe
+            "en"
         }
     }
 }

@@ -130,7 +130,7 @@ object WorkoutAppViewModelProvider {
                 sessionRepository  = workoutApp().workoutSessionRepository,
                 templateRepository = workoutApp().workoutTemplateRepository,
                 foodRepository     = workoutApp().foodRepository,
-                settingsRepository = workoutApp().settingsRepository,  // ← dodaj
+                settingsRepository = workoutApp().settingsRepository,
             )
         }
 

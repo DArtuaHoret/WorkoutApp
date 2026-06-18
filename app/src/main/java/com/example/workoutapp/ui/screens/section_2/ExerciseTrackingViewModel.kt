@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Date
 
-// Ujednolicona reprezentacja serii — niezależnie od źródła (Template lub Session)
+// seria
 private data class UnifiedSet(
     val setNumber: Int,
     val reps: Int,
@@ -29,7 +29,7 @@ private data class UnifiedSet(
     val restTime: Int
 )
 
-// Ujednolicona reprezentacja ćwiczenia
+// cwik
 private data class UnifiedExercise(
     val exerciseId: Long,
     val exerciseName: String,
@@ -47,7 +47,6 @@ class ExerciseTrackingViewModel(
 
     private val args = savedStateHandle.toRoute<Destinations.ActiveWorkout>()
 
-    // Jeśli sessionId jest podany → czytamy z WorkoutSession*, inaczej z WorkoutTemplate*
     private val sessionId: Long? = args.sessionId?.toLongOrNull()
     private val templateId: String = args.templateId
 
@@ -106,7 +105,6 @@ class ExerciseTrackingViewModel(
         }
     }
 
-    // ── Ładowanie z WorkoutTemplate* (sekcja 1 / stara ścieżka) ─────────────
 
     private fun loadFromTemplate(templateId: String) {
         viewModelScope.launch {
@@ -126,7 +124,6 @@ class ExerciseTrackingViewModel(
         }
     }
 
-    // ── Ładowanie z WorkoutSession* (sekcja 3 / trening z kalendarza) ────────
 
     private fun loadFromSession(sessionId: Long) {
         viewModelScope.launch {
@@ -139,7 +136,7 @@ class ExerciseTrackingViewModel(
             exerciseList = items.map { item ->
                 val exerciseName = runCatching {
                     val ex = exerciseRepository.getExerciseById(item.exerciseId).first().firstOrNull()
-                    if (lang == "en" && ex?.nameEn?.isNotBlank() == true) ex.nameEn else ex?.name // ← NOWE
+                    if (lang == "en" && ex?.nameEn?.isNotBlank() == true) ex.nameEn else ex?.name
                         ?: "Ćwiczenie"
                 }.getOrElse { "Ćwiczenie" }
 
@@ -158,7 +155,6 @@ class ExerciseTrackingViewModel(
 
 
 
-    // ── Wspólna logika UI ────────────────────────────────────────────────────
 
     private fun applyExerciseToUi(index: Int) {
         if (index < 0 || index >= exerciseList.size) return
@@ -193,7 +189,7 @@ class ExerciseTrackingViewModel(
     }
 
     private fun saveModificationsToSession() {
-        val id = sessionId ?: return // zapisujemy tylko dla sesji, nie szablonu
+        val id = sessionId ?: return
         viewModelScope.launch {
             modifiedSets.forEach { (key, modifiedSet) ->
                 val (exerciseIdx, setNumber) = key
@@ -289,9 +285,23 @@ class ExerciseTrackingViewModel(
             )
         }
     }
+
+    // przenosimy stan timera do viewmodel
+    private val _timerSecondsLeft = MutableStateFlow(0)
+    val timerSecondsLeft: StateFlow<Int> = _timerSecondsLeft.asStateFlow()
+
+    private val _timerRunning = MutableStateFlow(false)
+    val timerRunning: StateFlow<Boolean> = _timerRunning.asStateFlow()
+    fun onTimerTick(secondsLeft: Int) {
+        _timerSecondsLeft.value = secondsLeft
+    }
+
+    fun onTimerRunningChanged(running: Boolean) {
+        _timerRunning.value = running
+    }
 }
 
-// ── Konwertery ───────────────────────────────────────────────────────────────
+
 
 private fun WorkoutTemplateSet.toUnified() = UnifiedSet(
     setNumber = setNumber,
@@ -304,6 +314,6 @@ private fun WorkoutSessionSet.toUnified() = UnifiedSet(
     setNumber = setNumber,
     reps = plannedReps,
     weight = plannedWeight.toInt(),
-    restTime = plannedRestTime  // teraz czytamy rzeczywisty czas odpoczynku
+    restTime = plannedRestTime
 )
 

@@ -106,7 +106,7 @@ fun WeekDaysRow(modifier: Modifier = Modifier) {
 @Composable
 fun CalendarDaySlot(
     dayNumber: Int,
-    isCurrentMonth: Boolean,     //false dla dni z poprzedniego/następnego miesiąca
+    isCurrentMonth: Boolean,
     isSelected: Boolean,         //true jeśli to aktualnie kliknięty dzień (biała obwódka)
     hasWorkout: Boolean,         //true jeśli w tym dniu zrealizowano trening (ciemnoszary kafel)
     onClick: () -> Unit,

@@ -4,7 +4,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-// --- Mocki dla celów podglądu ---
 class FakeSessionExerciseEditViewModel : SessionExerciseEditViewModel(...) {
     override val exerciseName: StateFlow<String> = MutableStateFlow("Wyciskanie na ławce")
     override val sets: StateFlow<List<ExerciseSet>> = MutableStateFlow(
@@ -14,7 +13,6 @@ class FakeSessionExerciseEditViewModel : SessionExerciseEditViewModel(...) {
         )
     )
 
-    // Nadpisz metody na puste implementacje, aby uniknąć błędów
     override fun onAddSet() {}
     override fun onDeleteSet(index: Int) {}
     override fun onSetChange(index: Int, set: ExerciseSet) {}

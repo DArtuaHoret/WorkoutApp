@@ -62,7 +62,6 @@ import java.time.format.DateTimeFormatter
 
 
 
-// -----------------Anzh-----------
 @Composable
 fun TrainingProgressCard(
     totalSessions: Int,
@@ -1019,7 +1018,7 @@ fun CenteredTemplateSelectionDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth(0.85f)
-                .fillMaxHeight(0.65f) // Ograniczamy wysokość, aby lista mogła się swobodnie przewijać
+                .fillMaxHeight(0.65f)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
@@ -1166,7 +1165,6 @@ fun NutritionProgressBar(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // ── POPRAWKA 1: label i wartość w jednej linii ──
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 text = item.label,
@@ -1234,7 +1232,6 @@ fun LoggedProductItemCard(
             .clickable(onClick = onCardClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
-        // ── Header row: name + delete ────────────────────────────────────────
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -1276,7 +1273,7 @@ fun LoggedProductItemCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // ── Nutrient chips ───────────────────────────────────────────────────
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -1301,7 +1298,6 @@ fun LoggedProductItemCard(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // ── Grams text field ─────────────────────────────────────────────────
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),

@@ -10,12 +10,11 @@ import com.example.workoutapp.data.WorkoutTemplateItem
 import com.example.workoutapp.data.WorkoutTemplateSet
 import kotlinx.coroutines.flow.Flow
 
-// com/example/workoutapp/data/TemplateExerciseEntry.kt
 data class TemplateExerciseEntry(
     val itemId: Long,
     val exerciseId: Long,
     val exerciseName: String,
-    val exerciseNameEn: String, // ← NOWE
+    val exerciseNameEn: String,
     val orderIndex: Int,
     val note: String?,
     val setCount: Int,
@@ -29,10 +28,10 @@ data class TemplateExerciseEntry(
 @Dao
 interface WorkoutTemplateDao {
 
-    // ── Szablony ──────────────────────────────────────────────────────────────
+    // szablony
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertWorkoutTemplate(template: WorkoutTemplate): Long  // zwraca id!
+    suspend fun insertWorkoutTemplate(template: WorkoutTemplate): Long
 
     @Update
     suspend fun updateWorkoutTemplate(template: WorkoutTemplate)
@@ -48,10 +47,10 @@ interface WorkoutTemplateDao {
     @Query("SELECT * FROM workout_template_items WHERE id = :itemId")
     suspend fun getItemById(itemId: Long): WorkoutTemplateItem?
 
-    // ── Template Items ────────────────────────────────────────────────────────
+    // cwiki szablonu
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertWorkoutTemplateItem(item: WorkoutTemplateItem): Long  // zwraca id!
+    suspend fun insertWorkoutTemplateItem(item: WorkoutTemplateItem): Long
 
     @Update
     suspend fun updateWorkoutTemplateItem(item: WorkoutTemplateItem)
@@ -62,7 +61,7 @@ interface WorkoutTemplateDao {
     @Query("SELECT * FROM workout_template_items WHERE workoutTemplateId = :templateId ORDER BY orderIndex ASC")
     fun getItemsForTemplate(templateId: Long): Flow<List<WorkoutTemplateItem>>
 
-    // ── Template Sets ─────────────────────────────────────────────────────────
+    // serii
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWorkoutTemplateSet(set: WorkoutTemplateSet)
@@ -74,9 +73,9 @@ interface WorkoutTemplateDao {
     suspend fun deleteSetsForItem(itemId: Long)
 
     @Query("SELECT * FROM workout_template_sets WHERE workoutTemplateItemId = :itemId ORDER BY setNumber")
-    fun getSetsForItem(itemId: Long): Flow<List<WorkoutTemplateSet>>  // Flow zamiast List
+    fun getSetsForItem(itemId: Long): Flow<List<WorkoutTemplateSet>>
 
-    // ── JOIN: ćwiczenia szablonu ze wszystkimi danymi ─────────────────────────
+    // ćwiczenia szablonu ze wszystkimi danymi
 
     @Query("""
         SELECT 

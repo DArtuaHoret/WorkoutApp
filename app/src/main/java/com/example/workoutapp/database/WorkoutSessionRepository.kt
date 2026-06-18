@@ -20,7 +20,7 @@ interface WorkoutSessionRepository {
     suspend fun getSetsForSessionItemOnce(itemId: Long): List<WorkoutSessionSet>
     suspend fun saveSession(session: WorkoutSession): Long
     suspend fun updateSession(session: WorkoutSession)
-    suspend fun saveSessionItem(item: WorkoutSessionItem): Long  // zwraca id
+    suspend fun saveSessionItem(item: WorkoutSessionItem): Long  
     suspend fun updateSessionItem(item: WorkoutSessionItem)
 
     suspend fun deleteSession(sessionId: Long)

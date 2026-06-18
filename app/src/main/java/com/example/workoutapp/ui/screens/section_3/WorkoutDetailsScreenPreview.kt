@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
 
-// Mock ViewModel dla podglądu
+
 class FakeWorkoutDetailsViewModel(initialState: WorkoutDetailsUiState) : WorkoutDetailsViewModel(
     savedStateHandle = SavedStateHandle(),
     sessionRepository = object : com.example.workoutapp.database.WorkoutSessionRepository { /* puste */ },

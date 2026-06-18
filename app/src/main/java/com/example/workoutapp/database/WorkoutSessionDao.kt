@@ -41,7 +41,7 @@ interface WorkoutSessionDao {
 
     // item sesji
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertWorkoutSessionItem(item: WorkoutSessionItem): Long  // zwraca id
+    suspend fun insertWorkoutSessionItem(item: WorkoutSessionItem): Long
 
     @Update
     suspend fun updateWorkoutSessionItem(item: WorkoutSessionItem)
@@ -58,7 +58,7 @@ interface WorkoutSessionDao {
     @Query("DELETE FROM workout_session_items WHERE id = :itemId")
     suspend fun deleteSessionItem(itemId: Long)
 
-    // set sesji
+     //set sesji
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWorkoutSessionSet(set: WorkoutSessionSet)
 
