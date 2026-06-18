@@ -153,7 +153,7 @@
 
     <!-- WorkoutHistoryScreen -->
     <string name="workout_history_title">Workout history</string>
-    <string name="view_workout_details_button">VIEW WORKOUT DETAILS</string>
+    <string name="view_workout_details_button">VIEW DETAILS</string>
     <string name="select_assign_workout_button">SELECT AND ASSIGN WORKOUT</string>
     <string name="view_stats_button">VIEW STATISTICS</string>
 
