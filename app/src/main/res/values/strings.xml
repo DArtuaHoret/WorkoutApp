@@ -40,6 +40,7 @@
     <string name="delete_exercise">USUŃ ĆWICZENIE</string>
     <string name="save_exercise">ZAPISZ ĆWICZENIE</string>
     <string name="exercise_name_required">Nazwa ćwiczenia jest wymagana</string>
+    <string name="product_name_required">Nazwa produktu jest wymagana</string>
 
     <!-- ExerciseSearchScreen -->
     <string name="exercise_search_title">Wyszukiwanie ćwiczeń</string>
@@ -155,9 +156,9 @@
     <string name="start_workout_button">ROZPOCZĄĆ TRENING</string>
     <string name="workout_start_date_restriction">Trening można rozpocząć tylko w dniu, na który jest zaplanowany</string>
     <string name="nutrient_label_kcal">Kcal</string>
-    <string name="nutrient_label_protein">Prot.</string>
-    <string name="nutrient_label_fat">Fats</string>
-    <string name="nutrient_label_carbs">Carbs</string>
+    <string name="nutrient_label_protein">Białko</string>
+    <string name="nutrient_label_fat">Tłuszcze</string>
+    <string name="nutrient_label_carbs">Węgl.</string>
     <string name="unit_kcal">kcal</string>
     <string name="unit_grams">g</string>
 

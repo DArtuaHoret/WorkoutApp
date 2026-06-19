@@ -171,6 +171,14 @@ fun ProductDetailScreen(
                         onProductDescriptionChange = viewModel::onProductDescriptionChange,
                     )
 
+                    if (state.productName.isBlank()) {
+                        Text(
+                            text = stringResource(R.string.product_name_required),
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                        )
+                    }
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -222,6 +230,7 @@ fun ProductDetailScreen(
                     ) {
                         ActionButton(
                             onClick = {
+                                if (!state.productName.isNotBlank()) return@ActionButton
                                 viewModel.onSaveProductClick()
                                 onSaveProductClick()
                             },
@@ -229,6 +238,8 @@ fun ProductDetailScreen(
                             style = ActionButtonStyle.LightFilled,
                             modifier = Modifier.weight(1f),
                         )
+
+
                         IconButton(
                             onClick = viewModel::onToggleCreateFavorite,
                             modifier = Modifier
